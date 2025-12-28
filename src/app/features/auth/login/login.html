@@ -1,0 +1,90 @@
+<div class="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-[450px]">
+    <!-- Logo/Brand -->
+    <div class="text-center mb-8">
+      <a routerLink="/" class="text-3xl font-black tracking-tighter text-slate-900">
+        SHOP<span class="text-primary">X</span>
+      </a>
+    </div>
+
+    <!-- Login Card -->
+    <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-8 md:p-10">
+      <h1 class="text-2xl font-bold text-slate-900 mb-2">Zaloguj się</h1>
+      <p class="text-sm text-slate-500 mb-8">Wpisz swoje dane, aby przejść do konta</p>
+
+      <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="space-y-6">
+        @if (errorMessage()) {
+          <div class="bg-red-50 border border-red-100 text-red-600 p-4 rounded-lg text-sm flex items-start gap-3">
+            <div class="mt-0.5">⚠️</div>
+            <div>{{ errorMessage() }}</div>
+          </div>
+        }
+
+        <!-- Email -->
+        <div class="space-y-2">
+          <label class="text-sm font-bold text-slate-700">Email</label>
+          <div class="relative">
+            <input 
+              type="email" 
+              name="email" 
+              [(ngModel)]="email" 
+              required 
+              class="input-field" 
+              placeholder="np. jan.kowalski@email.pl"
+            >
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center">
+            <label class="text-sm font-bold text-slate-700">Hasło</label>
+            <a href="#" class="text-xs font-bold text-primary hover:underline">Zapomniałeś hasła?</a>
+          </div>
+          <div class="relative">
+            <input 
+              [type]="showPassword() ? 'text' : 'password'" 
+              name="password" 
+              [(ngModel)]="password" 
+              required 
+              class="input-field pr-12" 
+              placeholder="Wpisz hasło"
+            >
+            <button type="button" (click)="togglePassword()" class="absolute right-0 inset-y-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors">
+              <lucide-icon [name]="showPassword() ? EyeOffIcon : EyeIcon" class="w-5 h-5"></lucide-icon>
+            </button>
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          [disabled]="isLoading() || !loginForm.form.valid"
+          class="btn-primary w-full py-4 text-base"
+        >
+          @if (isLoading()) {
+            <lucide-icon [name]="LoaderIcon" class="w-5 h-5 animate-spin"></lucide-icon>
+            <span>Logowanie...</span>
+          } @else {
+            <span>Zaloguj się</span>
+          }
+        </button>
+      </form>
+
+      <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+        <p class="text-sm text-slate-500">
+          Nie masz konta? 
+          <a routerLink="/register" class="text-primary font-bold hover:underline">Zarejestruj się</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- Security Info -->
+    <div class="mt-8 flex items-center justify-center gap-6 text-[11px] text-slate-400 font-medium">
+      <div class="flex items-center gap-1.5">
+        <div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+        Bezpieczne logowanie
+      </div>
+      <div>Polityka prywatności</div>
+    </div>
+  </div>
+</div>

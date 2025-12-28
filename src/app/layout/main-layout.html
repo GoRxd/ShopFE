@@ -1,0 +1,215 @@
+<header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+  <!-- Top Bar -->
+  <div class="bg-slate-900 text-white text-[11px] py-1.5 hidden md:block">
+    <div class="container-custom flex justify-between items-center">
+      <div class="flex gap-4">
+        <a href="#" class="hover:text-primary transition-colors">Sklepy</a>
+        <a href="#" class="hover:text-primary transition-colors">Pomoc i kontakt</a>
+      </div>
+      <div class="flex gap-4">
+        <span>Darmowa dostawa od 99 zł</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Header -->
+  <div class="container-custom py-4 flex items-center gap-4 lg:gap-8">
+    <!-- Logo -->
+    <a routerLink="/" class="flex-shrink-0">
+      <div class="text-2xl font-black tracking-tighter text-slate-900">
+        SHOP<span class="text-primary">X</span>
+      </div>
+    </a>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="md:hidden p-2 hover:bg-slate-100 rounded-lg">
+      <lucide-icon [name]="MenuIcon" class="w-6 h-6"></lucide-icon>
+    </button>
+
+    <!-- Search Bar -->
+    <div class="flex-grow max-w-2xl relative group hidden sm:block">
+      <input
+        type="text"
+        placeholder="Czego szukasz?"
+        class="w-full bg-slate-100 border-none rounded-full py-2.5 pl-14 pr-4 focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+      />
+      <lucide-icon
+        [name]="SearchIcon"
+        class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-primary transition-colors"
+      ></lucide-icon>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-2 lg:gap-4 ml-auto">
+      @if (authService.isLoggedIn()) {
+      <div class="flex items-center gap-4 group relative cursor-pointer">
+        <div class="flex flex-col items-end hidden sm:flex text-right">
+          <span class="text-[11px] font-bold text-slate-900"
+            >{{ authService.currentUser()?.firstName }}
+            {{ authService.currentUser()?.lastName }}</span
+          >
+          <span class="text-[10px] text-slate-500 uppercase tracking-tighter">Mój profil</span>
+        </div>
+        <div class="flex flex-col items-center p-2 hover:text-primary transition-colors">
+          <lucide-icon [name]="UserIcon" class="w-6 h-6"></lucide-icon>
+        </div>
+        <!-- Dropdown -->
+        <div
+          class="absolute top-full right-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 p-2"
+        >
+          <a
+            href="#"
+            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
+            >Moje zamówienia</a
+          >
+          <a
+            href="#"
+            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
+            >Ustawienia</a
+          >
+          <div class="border-t border-slate-100 my-2"></div>
+          <button
+            (click)="logout()"
+            class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-2"
+          >
+            <lucide-icon [name]="LogOutIcon" class="w-4 h-4"></lucide-icon>
+            Wyloguj się
+          </button>
+        </div>
+      </div>
+      } @else {
+      <a
+        routerLink="/login"
+        class="flex flex-col items-center p-2 hover:text-primary transition-colors group"
+      >
+        <lucide-icon [name]="UserIcon" class="w-6 h-6"></lucide-icon>
+        <span class="text-[10px] font-bold mt-1 uppercase">Zaloguj się</span>
+      </a>
+      }
+
+      <a
+        href="#"
+        class="flex flex-col items-center p-2 hover:text-primary transition-colors relative group"
+      >
+        <lucide-icon [name]="CartIcon" class="w-6 h-6"></lucide-icon>
+        <span class="text-[10px] font-bold mt-1 uppercase">Koszyk</span>
+        <span
+          class="absolute top-1 right-1 bg-primary text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center"
+          >0</span
+        >
+      </a>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="border-t border-slate-100 hidden md:block" (mouseleave)="unsuppressMenu()">
+    <div class="container-custom">
+      <ul class="flex gap-6 py-2">
+        @for (cat of categories(); track cat.id) {
+        <li class="relative group">
+          <a
+            [routerLink]="['/category', cat.slug]"
+            (click)="suppressMenu()"
+            class="text-sm font-medium text-slate-600 hover:text-primary flex items-center gap-1 py-3 transition-colors whitespace-nowrap"
+          >
+            {{ cat.name }}
+            @if (cat.subCategories && cat.subCategories.length > 0) {
+            <lucide-icon [name]="ChevronIcon" class="w-3.5 h-3.5 opacity-50"></lucide-icon>
+            }
+          </a>
+
+          <!-- Dropdown Mega Menu -->
+          @if (cat.subCategories && cat.subCategories.length > 0) {
+            <div 
+              class="absolute top-full left-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pt-1"
+              [class.!invisible]="isMenuSuppressed()"
+            >
+              <div class="bg-white border border-slate-200 rounded-xl shadow-xl py-2 min-w-[220px]">
+                @for (sub of cat.subCategories; track sub.id) {
+                  <app-category-menu-item [category]="sub"></app-category-menu-item>
+                }
+              </div>
+            </div>
+          }
+        </li>
+        }
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main class="flex-grow">
+  <router-outlet></router-outlet>
+</main>
+
+<footer class="bg-slate-50 border-t border-slate-200 pt-12 pb-6 mt-12">
+  <div class="container-custom">
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
+      <!-- About -->
+      <div class="col-span-2 lg:col-span-1">
+        <div class="text-xl font-black mb-6">SHOP<span class="text-primary">X</span></div>
+        <p class="text-sm text-slate-500 mb-6">
+          Najlepszy sprzęt w najlepszych cenach. Dołącz do tysięcy zadowolonych klientów.
+        </p>
+        <div class="flex gap-4">
+          <lucide-icon
+            [name]="FacebookIcon"
+            class="w-5 h-5 text-slate-400 hover:text-primary cursor-pointer"
+          ></lucide-icon>
+          <lucide-icon
+            [name]="InstagramIcon"
+            class="w-5 h-5 text-slate-400 hover:text-primary cursor-pointer"
+          ></lucide-icon>
+          <lucide-icon
+            [name]="YoutubeIcon"
+            class="w-5 h-5 text-slate-400 hover:text-primary cursor-pointer"
+          ></lucide-icon>
+        </div>
+      </div>
+
+      <!-- Links -->
+      <div>
+        <h4 class="font-bold text-sm mb-4 uppercase">Zamówienia</h4>
+        <ul class="space-y-2 text-sm text-slate-500">
+          <li><a href="#" class="hover:text-primary transition-colors">Dostawa</a></li>
+          <li><a href="#" class="hover:text-primary transition-colors">Raty</a></li>
+          <li><a href="#" class="hover:text-primary transition-colors">Leasing</a></li>
+          <li><a href="#" class="hover:text-primary transition-colors">Ubezpieczenia</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-sm mb-4 uppercase">Zwroty i reklamacje</h4>
+        <ul class="space-y-2 text-sm text-slate-500">
+          <li><a href="#" class="hover:text-primary transition-colors">Zwróć produkt</a></li>
+          <li><a href="#" class="hover:text-primary transition-colors">Reklamacja</a></li>
+          <li><a href="#" class="hover:text-primary transition-colors">Serwis</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-sm mb-4 uppercase">O nas</h4>
+        <ul class="space-y-2 text-sm text-slate-500">
+          <li><a href="#" class="hover:text-primary transition-colors">Regulamin</a></li>
+          <li><a href="#" class="hover:text-primary transition-colors">Polityka prywatności</a></li>
+          <li><a href="#" class="hover:text-primary transition-colors">Kontakt</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div
+      class="border-t border-slate-200 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-slate-400 font-medium"
+    >
+      <div>&copy; 2025 SHOPX Sp. z o.o.</div>
+      <div class="flex gap-6">
+        <span>Możesz płacić:</span>
+        <div class="flex gap-2">
+          <!-- Placeholder icons -->
+          <span class="px-1.5 py-0.5 border border-slate-200 rounded">VISA</span>
+          <span class="px-1.5 py-0.5 border border-slate-200 rounded">BLIK</span>
+          <span class="px-1.5 py-0.5 border border-slate-200 rounded">MASTER</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
