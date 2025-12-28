@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink } from '@angular/router';
+import { RouterOutlet, RouterLink, Router } from '@angular/router';
 import { LucideAngularModule, Search, ShoppingCart, User, Menu, ChevronDown, Facebook, Instagram, Youtube, LogOut } from 'lucide-angular';
 import { CategoryService, CategoryTree } from '../core/services/category.service';
 import { AuthService } from '../core/services/auth.service';
@@ -21,7 +21,10 @@ import { CategoryMenuItemComponent } from './category-menu-item';
 })
 export class MainLayoutComponent implements OnInit {
   private categoryService = inject(CategoryService);
+  private router = inject(Router);
   authService = inject(AuthService);
+
+  searchQuery = signal('');
 
   readonly SearchIcon = Search;
   readonly CartIcon = ShoppingCart;
@@ -40,6 +43,14 @@ export class MainLayoutComponent implements OnInit {
     this.categoryService.getCategoriesTree().subscribe(cats => {
       this.categories.set(cats);
     });
+  }
+
+  onSearch() {
+    const query = this.searchQuery().trim();
+    if (query) {
+      this.router.navigate(['/products'], { queryParams: { q: query } });
+      this.searchQuery.set(''); // Clear search after navigation
+    }
   }
 
   suppressMenu() {

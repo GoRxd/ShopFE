@@ -30,12 +30,16 @@
     <div class="flex-grow max-w-2xl relative group hidden sm:block">
       <input
         type="text"
+        [value]="searchQuery()"
+        (input)="searchQuery.set($any($event.target).value)"
+        (keyup.enter)="onSearch()"
         placeholder="Czego szukasz?"
-        class="w-full bg-slate-100 border-none rounded-full py-2.5 pl-14 pr-4 focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+        class="w-full bg-slate-100 border-none rounded-full py-2.5 pl-16 pr-4 focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all outline-none shadow-sm"
       />
       <lucide-icon
         [name]="SearchIcon"
-        class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-primary transition-colors"
+        class="absolute left-4.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-primary transition-colors cursor-pointer"
+        (click)="onSearch()"
       ></lucide-icon>
     </div>
 
@@ -108,7 +112,7 @@
         @for (cat of categories(); track cat.id) {
         <li class="relative group">
           <a
-            [routerLink]="['/category', cat.slug]"
+            [routerLink]="['/products', cat.slug]"
             (click)="suppressMenu()"
             class="text-sm font-medium text-slate-600 hover:text-primary flex items-center gap-1 py-3 transition-colors whitespace-nowrap"
           >

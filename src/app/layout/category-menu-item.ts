@@ -12,7 +12,7 @@ import { MainLayoutComponent } from './main-layout';
   template: `
     <div class="relative group/sub">
       <a 
-        [routerLink]="['/category', category.slug]" 
+        [routerLink]="['/products', category.slug]" 
         (click)="mainLayout.suppressMenu()"
         class="flex items-center justify-between px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary transition-colors whitespace-nowrap min-w-[200px]"
       >

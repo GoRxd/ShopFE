@@ -2,11 +2,17 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BaseService } from './base.service';
 
+export interface AttributeFilter {
+  name: string;
+  options: string[];
+}
+
 export interface CategoryTree {
   id: number;
   name: string;
   slug: string;
   subCategories: CategoryTree[];
+  applicableAttributes: AttributeFilter[];
 }
 
 @Injectable({
