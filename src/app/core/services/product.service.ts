@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BaseService } from './base.service';
-import { Product, ProductListItem, ProductSearchQuery } from '../models/product.model';
+import { Product, ProductListItem, ProductSearchQuery, SearchSuggestions } from '../models/product.model';
 import { HttpParams } from '@angular/common/http';
 
 @Injectable({
@@ -33,5 +33,11 @@ export class ProductService extends BaseService {
 
   getProductDetails(id: number): Observable<Product> {
     return this.http.get<Product>(`${this.apiUrl}/products/${id}`);
+  }
+
+  getSearchSuggestions(query: string): Observable<SearchSuggestions> {
+    return this.http.get<SearchSuggestions>(`${this.apiUrl}/search/suggestions`, {
+      params: new HttpParams().set('q', query)
+    });
   }
 }

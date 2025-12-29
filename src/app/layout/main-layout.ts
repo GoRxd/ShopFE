@@ -4,7 +4,11 @@ import { RouterOutlet, RouterLink, Router } from '@angular/router';
 import { LucideAngularModule, Search, ShoppingCart, User, Menu, ChevronDown, Facebook, Instagram, Youtube, LogOut } from 'lucide-angular';
 import { CategoryService, CategoryTree } from '../core/services/category.service';
 import { AuthService } from '../core/services/auth.service';
+import { ProductService } from '../core/services/product.service';
+import { SearchSuggestions } from '../core/models/product.model';
 import { CategoryMenuItemComponent } from './category-menu-item';
+import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-main-layout',
@@ -21,10 +25,14 @@ import { CategoryMenuItemComponent } from './category-menu-item';
 })
 export class MainLayoutComponent implements OnInit {
   private categoryService = inject(CategoryService);
+  private productService = inject(ProductService);
   private router = inject(Router);
   authService = inject(AuthService);
 
   searchQuery = signal('');
+  suggestions = signal<SearchSuggestions | null>(null);
+  showSuggestions = signal(false);
+  private searchSubject = new Subject<string>();
 
   readonly SearchIcon = Search;
   readonly CartIcon = ShoppingCart;
@@ -43,14 +51,62 @@ export class MainLayoutComponent implements OnInit {
     this.categoryService.getCategoriesTree().subscribe(cats => {
       this.categories.set(cats);
     });
+
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      tap(query => {
+        if (query.length < 2) {
+          this.suggestions.set(null);
+          this.showSuggestions.set(false);
+        }
+      }),
+      filter(query => query.length >= 2),
+      switchMap(query => this.productService.getSearchSuggestions(query))
+    ).subscribe(res => {
+      this.suggestions.set(res);
+      this.showSuggestions.set(true);
+    });
+  }
+
+  onSearchInput(event: Event) {
+    const value = (event.target as HTMLInputElement).value;
+    this.searchQuery.set(value);
+    this.searchSubject.next(value);
+  }
+
+  onSearchFocus() {
+    const query = this.searchQuery();
+    if (query.length >= 2) {
+      this.showSuggestions.set(true);
+      this.searchSubject.next(query);
+    }
   }
 
   onSearch() {
     const query = this.searchQuery().trim();
     if (query) {
       this.router.navigate(['/products'], { queryParams: { q: query } });
-      this.searchQuery.set(''); // Clear search after navigation
+      this.hideSuggestions();
+      this.searchQuery.set('');
     }
+  }
+
+  hideSuggestions() {
+    setTimeout(() => {
+      this.showSuggestions.set(false);
+    }, 200);
+  }
+
+  selectSuggestion(term: string) {
+    this.searchQuery.set(term);
+    this.onSearch();
+  }
+
+  selectCategory(slug: string) {
+    this.router.navigate(['/products', slug]);
+    this.hideSuggestions();
+    this.searchQuery.set('');
   }
 
   suppressMenu() {

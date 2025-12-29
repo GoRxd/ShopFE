@@ -28,19 +28,73 @@
 
     <!-- Search Bar -->
     <div class="flex-grow max-w-2xl relative group hidden sm:block">
-      <input
-        type="text"
-        [value]="searchQuery()"
-        (input)="searchQuery.set($any($event.target).value)"
-        (keyup.enter)="onSearch()"
-        placeholder="Czego szukasz?"
-        class="w-full bg-slate-100 border-none rounded-full py-2.5 pl-16 pr-4 focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all outline-none shadow-sm"
-      />
-      <lucide-icon
-        [name]="SearchIcon"
-        class="absolute left-4.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-primary transition-colors cursor-pointer"
-        (click)="onSearch()"
-      ></lucide-icon>
+      <div class="relative">
+        <input
+          type="text"
+          [value]="searchQuery()"
+          (input)="onSearchInput($event)"
+          (keyup.enter)="onSearch()"
+          (focus)="onSearchFocus()"
+          (blur)="hideSuggestions()"
+          placeholder="Czego szukasz?"
+          class="w-full bg-slate-100 border-none rounded-full py-2.5 pl-16 pr-4 focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all outline-none shadow-sm"
+        />
+        <lucide-icon
+          [name]="SearchIcon"
+          class="absolute left-4.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-primary transition-colors cursor-pointer"
+          (click)="onSearch()"
+        ></lucide-icon>
+      </div>
+
+      <!-- Search Suggestions Dropdown -->
+      @if (showSuggestions() && suggestions()) {
+        <div class="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl z-[60] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+          
+          <!-- Categories Section -->
+          @if (suggestions()!.categories.length > 0) {
+            <div class="p-3 border-b border-slate-50">
+              <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-3 mb-2">Kategorie</div>
+              <div class="space-y-1">
+                @for (cat of suggestions()!.categories; track cat.id) {
+                  <button 
+                    (click)="selectCategory(cat.slug)"
+                    class="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors flex items-center gap-3 group/item"
+                  >
+                    <div class="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary group-hover/item:bg-primary group-hover/item:text-white transition-colors">
+                      <lucide-icon [name]="MenuIcon" class="w-4 h-4"></lucide-icon>
+                    </div>
+                    <span class="font-medium">{{ cat.name }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Products/Terms Section -->
+          @if (suggestions()!.products.length > 0) {
+            <div class="p-3 bg-slate-50/30">
+              <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-3 mb-2">Wyszukiwania</div>
+              <div class="space-y-0.5">
+                @for (prod of suggestions()!.products; track prod.id) {
+                  <button 
+                    (click)="selectSuggestion(prod.name)"
+                    class="w-full text-left px-3 py-2 text-sm text-slate-600 hover:bg-white hover:text-primary hover:shadow-sm rounded-lg transition-all flex items-center gap-3"
+                  >
+                    <lucide-icon [name]="SearchIcon" class="w-4 h-4 text-slate-300"></lucide-icon>
+                    <span>{{ prod.name }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+          @if (suggestions()!.categories.length === 0 && suggestions()!.products.length === 0) {
+            <div class="p-8 text-center text-slate-400 text-sm">
+              Brak dopasowań dla "<span class="text-slate-600 font-bold">{{ searchQuery() }}</span>"
+            </div>
+          }
+        </div>
+      }
     </div>
 
     <!-- Actions -->

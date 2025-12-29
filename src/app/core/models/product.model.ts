@@ -25,3 +25,19 @@ export interface ProductSearchQuery {
   categoryIds?: number[];
   [key: string]: any; // For attr_ parameters
 }
+
+export interface SearchSuggestions {
+  categories: CategorySuggestion[];
+  products: ProductSuggestion[];
+}
+
+export interface CategorySuggestion {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+export interface ProductSuggestion {
+  id: number;
+  name: string;
+}
