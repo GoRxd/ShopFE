@@ -1,13 +1,14 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CategoryTree, AttributeFilter } from '../../core/services/category.service';
 import { LucideAngularModule, ChevronLeft, ChevronRight, Filter } from 'lucide-angular';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-product-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, LucideAngularModule],
+  imports: [CommonModule, RouterLink, RouterLinkActive, LucideAngularModule, FormsModule],
   template: `
     <div class="space-y-8">
       <!-- Category Navigation -->
@@ -71,29 +72,43 @@ import { LucideAngularModule, ChevronLeft, ChevronRight, Filter } from 'lucide-a
                 <div class="space-y-3">
                   @for (option of attr.options; track option) {
                     <label class="flex items-center gap-3 cursor-pointer group">
-                      <div class="w-5 h-5 border-2 border-slate-200 rounded-lg group-hover:border-indigo-200 transition-colors flex items-center justify-center bg-white">
-                        <div class="w-2.5 h-2.5 bg-indigo-600 rounded-sm opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                      <div class="w-5 h-5 border-2 rounded-lg transition-colors flex items-center justify-center"
+                           [class.border-slate-200]="!isAttributeSelected(attr.name, option)"
+                           [class.bg-white]="!isAttributeSelected(attr.name, option)"
+                           [class.group-hover:border-indigo-200]="!isAttributeSelected(attr.name, option)"
+                           [class.border-indigo-600]="isAttributeSelected(attr.name, option)"
+                           [class.bg-indigo-600]="isAttributeSelected(attr.name, option)">
+                        <input type="checkbox" class="hidden" 
+                               [checked]="isAttributeSelected(attr.name, option)"
+                               (change)="updateAttribute(attr.name, option)">
+                         @if (isAttributeSelected(attr.name, option)) {
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                           </svg>
+                         }
                       </div>
-                      <span class="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">{{ option }}</span>
+                      <span class="text-sm transition-colors"
+                            [class.text-slate-600]="!isAttributeSelected(attr.name, option)"
+                            [class.group-hover:text-slate-900]="!isAttributeSelected(attr.name, option)"
+                            [class.font-bold]="isAttributeSelected(attr.name, option)"
+                            [class.text-indigo-900]="isAttributeSelected(attr.name, option)">
+                        {{ option }}
+                      </span>
                     </label>
                   }
                 </div>
               </div>
             }
 
-            <!-- Price Range (Keeping it as it is universal) -->
+            <!-- Price Range -->
             <div>
               <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Cena</h3>
               <div class="flex items-center gap-2">
-                <input type="number" placeholder="od" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-100 transition-all">
+                <input type="number" [(ngModel)]="minPrice" (change)="applyFilters()" placeholder="od" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-100 transition-all">
                 <span class="text-slate-300">-</span>
-                <input type="number" placeholder="do" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-100 transition-all">
+                <input type="number" [(ngModel)]="maxPrice" (change)="applyFilters()" placeholder="do" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-100 transition-all">
               </div>
             </div>
-
-            <button class="w-full bg-slate-900 text-white font-bold py-3 rounded-xl hover:bg-slate-800 transition-all shadow-md active:scale-[0.98] text-sm">
-              Pokaż wyniki
-            </button>
           </div>
         </section>
       }
@@ -108,7 +123,51 @@ export class ProductSidebar {
   categories = input<CategoryTree[]>([]);
   applicableAttributes = input<AttributeFilter[]>([]);
 
+  filtersChanged = output<{ minPrice?: number, maxPrice?: number, attributes: Record<string, string> }>();
+
+  selectedAttributes: Record<string, string[]> = {};
+  minPrice: number | null = null;
+  maxPrice: number | null = null;
+
   readonly ChevronLeftIcon = ChevronLeft;
   readonly ChevronRightIcon = ChevronRight;
   readonly FilterIcon = Filter;
+
+  isAttributeSelected(name: string, value: string): boolean {
+    return this.selectedAttributes[name]?.includes(value) ?? false;
+  }
+
+  updateAttribute(name: string, value: string) {
+    const current = this.selectedAttributes[name] || [];
+    
+    if (current.includes(value)) {
+      this.selectedAttributes = {
+        ...this.selectedAttributes,
+        [name]: current.filter(v => v !== value)
+      };
+    } else {
+      this.selectedAttributes = {
+        ...this.selectedAttributes,
+        [name]: [...current, value]
+      };
+    }
+    
+    this.applyFilters();
+  }
+
+  applyFilters() {
+    // Flatten arrays to comma-separated strings for the output
+    const flatAttributes: Record<string, string> = {};
+    for (const [key, values] of Object.entries(this.selectedAttributes)) {
+      if (values && values.length > 0) {
+        flatAttributes[key] = values.join(',');
+      }
+    }
+
+    this.filtersChanged.emit({
+      minPrice: this.minPrice ?? undefined,
+      maxPrice: this.maxPrice ?? undefined,
+      attributes: flatAttributes
+    });
+  }
 }

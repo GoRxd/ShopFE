@@ -23,6 +23,10 @@ export interface Product {
 export interface ProductSearchQuery {
   q?: string;
   categoryIds?: number[];
+  minPrice?: number;
+  maxPrice?: number;
+  sortBy?: string;
+  sortDirection?: string;
   [key: string]: any; // For attr_ parameters
 }
 

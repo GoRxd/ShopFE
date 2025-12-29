@@ -21,6 +21,22 @@ export class ProductService extends BaseService {
       });
     }
 
+    if (query.minPrice !== undefined && query.minPrice !== null) {
+      params = params.set('minPrice', query.minPrice.toString());
+    }
+
+    if (query.maxPrice !== undefined && query.maxPrice !== null) {
+      params = params.set('maxPrice', query.maxPrice.toString());
+    }
+
+    if (query.sortBy) {
+      params = params.set('sortBy', query.sortBy);
+    }
+
+    if (query.sortDirection) {
+      params = params.set('sortDirection', query.sortDirection);
+    }
+
     // Handle attributes starting with attr_
     Object.keys(query).forEach(key => {
       if (key.startsWith('attr_') && query[key]) {

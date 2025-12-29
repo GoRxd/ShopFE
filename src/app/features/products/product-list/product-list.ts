@@ -43,6 +43,7 @@ import { LucideAngularModule, ChevronRight, Home } from 'lucide-angular';
             [parentCategory]="parentCategory()"
             [subCategories]="subCategories()"
             [applicableAttributes]="applicableAttributes()"
+            (filtersChanged)="onFiltersChange($event)"
           />
         </aside>
 
@@ -59,11 +60,11 @@ import { LucideAngularModule, ChevronRight, Home } from 'lucide-angular';
             </div>
             
             <div class="flex items-center gap-3">
-              <select class="bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-indigo-100 outline-none cursor-pointer">
-                <option>Od najtrafniejszych</option>
-                <option>Cena: od najniższej</option>
-                <option>Cena: od najwyższej</option>
-                <option>Najnowsze</option>
+              <select (change)="onSortChange($event)" class="bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-indigo-100 outline-none cursor-pointer">
+                <option value="">Od najtrafniejszych</option>
+                <option value="price_asc">Cena: od najniższej</option>
+                <option value="price_desc">Cena: od najwyższej</option>
+                <option value="newest">Najnowsze</option>
               </select>
             </div>
           </div>
@@ -178,14 +179,26 @@ export class ProductListComponent {
     return category?.applicableAttributes ?? [];
   });
 
+  // Filter signals
+  minPrice = signal<number | undefined>(undefined);
+  maxPrice = signal<number | undefined>(undefined);
+  attributes = signal<Record<string, string>>({});
+  sortBy = signal<string | undefined>(undefined);
+  sortDirection = signal<string | undefined>(undefined);
+
   // Modern Resource API for data fetching
-  productsResource = resource<ProductListItem[], { slug?: string, q?: string }>({
+  productsResource = resource<ProductListItem[], { slug?: string, q?: string, minPrice?: number, maxPrice?: number, attributes?: Record<string, string>, sortBy?: string, sortDirection?: string }>({
     params: () => ({
       slug: this.params()?.['slug'],
-      q: this.queryParams()?.['q']
+      q: this.queryParams()?.['q'],
+      minPrice: this.minPrice(),
+      maxPrice: this.maxPrice(),
+      attributes: this.attributes(),
+      sortBy: this.sortBy(),
+      sortDirection: this.sortDirection()
     }),
     loader: async ({ params }) => {
-      const { slug, q } = params;
+      const { slug, q, minPrice, maxPrice, attributes, sortBy, sortDirection } = params;
       
       const categories = await firstValueFrom(this.categoryService.getCategoriesTree().pipe(take(1)));
       this.allCategories.set(categories);
@@ -199,7 +212,7 @@ export class ProductListComponent {
           this.currentCategory.set({ 
             id: category.id, 
             name: category.name, 
-            slug: category.slug,
+            slug: category.slug, // Fix: Changed from parentId logic which might be buggy if parentId is not populated correctly in findCategory
             parentId: this.findParentIdInTree(category.id, categories)
           });
         } else {
@@ -209,10 +222,53 @@ export class ProductListComponent {
         this.currentCategory.set(null);
       }
 
-      return firstValueFrom(this.productService.getProducts({ categoryIds, q }));
+      // Convert attributes record to matching query params (e.g. attr_Color: 'Red')
+      const queryParams: any = { 
+        categoryIds, 
+        q,
+        minPrice,
+        maxPrice,
+        sortBy,
+        sortDirection
+      };
+
+      if (attributes) {
+        Object.entries(attributes).forEach(([key, value]) => {
+          queryParams[`attr_${key}`] = value;
+        });
+      }
+
+      return firstValueFrom(this.productService.getProducts(queryParams));
     }
   });
   products = computed(() => this.productsResource.value() ?? []);
+
+  onFiltersChange(filters: { minPrice?: number, maxPrice?: number, attributes: Record<string, string> }) {
+    this.minPrice.set(filters.minPrice);
+    this.maxPrice.set(filters.maxPrice);
+    this.attributes.set(filters.attributes);
+  }
+
+  onSortChange(event: Event) {
+    const value = (event.target as HTMLSelectElement).value;
+    switch (value) {
+      case 'price_asc':
+        this.sortBy.set('price');
+        this.sortDirection.set('asc');
+        break;
+      case 'price_desc':
+        this.sortBy.set('price');
+        this.sortDirection.set('desc');
+        break;
+      case 'newest':
+        this.sortBy.set('newest');
+        this.sortDirection.set('desc');
+        break;
+      default:
+        this.sortBy.set(undefined);
+        this.sortDirection.set(undefined);
+    }
+  }
   
   headerTitle = computed(() => {
     const categoryName = this.currentCategory()?.name;
