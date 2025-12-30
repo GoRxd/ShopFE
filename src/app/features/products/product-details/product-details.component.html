@@ -1,0 +1,195 @@
+<div class="container-custom py-4 lg:py-8">
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="animate-pulse space-y-8">
+      <div class="h-6 bg-slate-100 rounded w-1/4"></div>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-7 bg-slate-100 h-[500px] rounded-2xl"></div>
+        <div class="lg:col-span-5 space-y-6">
+          <div class="h-10 bg-slate-100 rounded w-3/4"></div>
+          <div class="h-32 bg-slate-100 rounded-xl"></div>
+        </div>
+      </div>
+    </div>
+  } @else if (error()) {
+    <div class="text-center py-20">
+      <h2 class="text-2xl font-bold text-slate-800 mb-2">Wystąpił błąd</h2>
+      <p class="text-slate-500">{{ error() }}</p>
+      <a routerLink="/" class="text-indigo-600 hover:text-indigo-700 font-medium mt-4 inline-block">Wróć do strony głównej</a>
+    </div>
+  } @else if (product(); as product) {
+    <!-- Breadcrumbs -->
+    <nav class="flex items-center gap-2 text-sm text-slate-500 mb-6 overflow-x-auto whitespace-nowrap pb-2">
+      <a routerLink="/" class="hover:text-slate-900 transition-colors flex items-center gap-1">
+        <lucide-icon [name]="HomeIcon" class="w-4 h-4"></lucide-icon>
+        <span>Sklep</span>
+      </a>
+      <lucide-icon [name]="ChevronRightIcon" class="w-4 h-4 text-slate-300"></lucide-icon>
+      
+      @for (crumb of breadcrumbs(); track crumb.slug; let last = $last) {
+        @if (!last) {
+          <a [routerLink]="['/products', crumb.slug]" class="hover:text-slate-900 transition-colors">
+            {{ crumb.name }}
+          </a>
+          <lucide-icon [name]="ChevronRightIcon" class="w-4 h-4 text-slate-300"></lucide-icon>
+        } @else {
+          <a [routerLink]="['/products', crumb.slug]" class="text-slate-900 font-medium">
+             {{ crumb.name }}
+          </a>
+        }
+      }
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-16">
+      
+      <!-- Left Column: Gallery -->
+      <div class="lg:col-span-7 space-y-6">
+        <div class="bg-white border border-slate-100 rounded-3xl p-8 flex items-center justify-center min-h-[400px] lg:min-h-[500px] relative group">
+           <img 
+            [src]="product.imageUrl || 'https://placehold.co/600x600/f8fafc/6366f1?text=' + product.name" 
+            [alt]="product.name"
+            class="max-w-full max-h-[400px] object-contain transition-transform duration-500 group-hover:scale-105"
+          />
+        </div>
+        <!-- Thumbnails placeholder (if we had multiple images) -->
+        <!-- <div class="flex gap-4 overflow-x-auto pb-2">...</div> -->
+      </div>
+
+      <!-- Right Column: Info & Buy Box -->
+      <div class="lg:col-span-5 flex flex-col gap-6">
+        <div>
+          <h1 class="text-2xl lg:text-3xl font-black text-slate-900 leading-tight mb-4">
+            {{ product.name }}
+          </h1>
+          
+          <!-- Key Specs Preview -->
+          <ul class="text-sm text-slate-600 space-y-2 mb-6">
+            @for (attr of product.attributes | slice:0:5; track attr.name) {
+              <li class="flex items-start gap-2">
+                <span class="text-slate-400 min-w-[120px]">{{ attr.name }}:</span>
+                @if (getAttributeLinkParams(attr.name, attr.value); as link) {
+                  <a [routerLink]="link.path" [queryParams]="link.queryParams" 
+                     class="font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors cursor-pointer">
+                    {{ attr.value }}
+                  </a>
+                } @else {
+                  <span class="font-medium text-slate-800">{{ attr.value }}</span>
+                }
+              </li>
+            }
+          </ul>
+        </div>
+
+        <!-- Buy Box -->
+        <div class="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm ring-1 ring-slate-100/50">
+          <div class="flex items-end justify-between mb-6">
+            <div class="space-y-1">
+              <!-- <span class="text-sm text-slate-500 font-medium line-through">1 399,00 zł</span> --> <!-- Placeholder logic for fake discount -->
+              <div class="text-3xl lg:text-4xl font-black text-slate-700 tracking-tight">
+                {{ product.price | number:'1.2-2' }} <span class="text-xl lg:text-2xl text-slate-500 font-bold ml-1">zł</span>
+              </div>
+            </div>
+            <!-- <div class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold">Oszczędzasz 200 zł</div> -->
+          </div>
+
+          <div class="space-y-4 mb-6">
+             <div class="flex items-center gap-3 text-sm text-green-700 bg-green-50 px-4 py-3 rounded-xl border border-green-100">
+               <lucide-icon [name]="ClockIcon" class="w-5 h-5 flex-shrink-0"></lucide-icon>
+               <div>
+                  <span class="font-bold block">Dostępny od ręki</span>
+                  <span class="text-green-600/80">Kup teraz, wyślemy dzisiaj!</span>
+               </div>
+             </div>
+             
+             <!-- Delivery Info -->
+             <div class="flex items-center gap-3 text-sm text-slate-600 px-2">
+                <lucide-icon [name]="TruckIcon" class="w-5 h-5 text-indigo-500"></lucide-icon>
+                <span>Darmowa dostawa od 300 zł</span>
+             </div>
+             <div class="flex items-center gap-3 text-sm text-slate-600 px-2">
+                <lucide-icon [name]="ShieldCheckIcon" class="w-5 h-5 text-indigo-500"></lucide-icon>
+                <span>Gwarancja 24 miesiące</span>
+             </div>
+          </div>
+
+          <div class="flex flex-col gap-3">
+             <button class="w-full bg-green-600 hover:bg-green-700 text-white font-bold h-14 rounded-xl text-lg transition-all shadow-lg hover:shadow-green-200 flex items-center justify-center gap-3 group active:scale-[0.98]">
+               <lucide-icon [name]="ShoppingCartIcon" class="w-6 h-6 group-hover:scale-110 transition-transform"></lucide-icon>
+               <span>Dodaj do koszyka</span>
+             </button>
+             <button class="w-full bg-white border-2 border-slate-200 hover:border-slate-800 text-slate-800 font-bold h-12 rounded-xl transition-all active:scale-[0.98]">
+               Dodaj do listy życzeń
+             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Description & Specs Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 border-t border-slate-100 pt-16">
+      <div class="lg:col-span-2 space-y-12">
+        <section>
+          <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+            Opis produktu
+          </h2>
+          <div class="prose prose-slate max-w-none text-slate-600 leading-relaxed bg-white rounded-2xl p-6 lg:p-10 border border-slate-100">
+             {{ product.description }}
+             @if (!product.description) {
+               <p class="italic text-slate-400 text-center py-8">Brak opisu dla tego produktu.</p>
+             }
+          </div>
+        </section>
+        
+        <section>
+          <h2 class="text-2xl font-bold text-slate-900 mb-6">Specyfikacja</h2>
+          <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+            @for (attr of product.attributes; track attr.name; let odd = $odd) {
+              <div class="grid grid-cols-1 sm:grid-cols-3 p-4 sm:px-6 hover:bg-slate-50 transition-colors" [class.bg-slate-50]="odd">
+                <dt class="font-medium text-slate-500 sm:col-span-1">{{ attr.name }}</dt>
+                 <dd class="sm:col-span-2 font-medium">
+                  @if (getAttributeLinkParams(attr.name, attr.value); as link) {
+                    <a [routerLink]="link.path" [queryParams]="link.queryParams" 
+                       class="text-indigo-600 hover:text-indigo-800 hover:underline transition-colors block w-full">
+                      {{ attr.value }}
+                    </a>
+                  } @else {
+                    <span class="text-slate-900">{{ attr.value }}</span>
+                  }
+                </dd>
+              </div>
+            } @empty {
+               <div class="p-8 text-center text-slate-400 italic">Brak szczegółowej specyfikacji.</div>
+            }
+          </div>
+        </section>
+      </div>
+
+      <!-- Sticky Sidebar/Banner (Optional) -->
+      <div class="hidden lg:block lg:col-span-1">
+         <div class="sticky top-8 bg-indigo-50 rounded-3xl p-8 border border-indigo-100/50">
+            <h3 class="text-xl font-bold text-indigo-900 mb-4">Dlaczego warto?</h3>
+            <ul class="space-y-4">
+              <li class="flex gap-3">
+                <div class="bg-white p-2 rounded-lg text-indigo-600 shadow-sm">
+                   <lucide-icon [name]="TruckIcon" class="w-5 h-5"></lucide-icon>
+                </div>
+                <div>
+                  <p class="font-bold text-indigo-900 text-sm">Szybka wysyłka</p>
+                  <p class="text-indigo-700/80 text-xs mt-0.5">Większość zamówień wysyłamy w 24h</p>
+                </div>
+              </li>
+              <li class="flex gap-3">
+                <div class="bg-white p-2 rounded-lg text-indigo-600 shadow-sm">
+                   <lucide-icon [name]="ShieldCheckIcon" class="w-5 h-5"></lucide-icon>
+                </div>
+                <div>
+                  <p class="font-bold text-indigo-900 text-sm">Bezpieczne zakupy</p>
+                  <p class="text-indigo-700/80 text-xs mt-0.5">Szyfrowane połączenie i płatności</p>
+                </div>
+              </li>
+            </ul>
+         </div>
+      </div>
+    </div>
+  }
+</div>

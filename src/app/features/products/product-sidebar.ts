@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CategoryTree, AttributeFilter } from '../../core/services/category.service';
@@ -122,12 +122,42 @@ export class ProductSidebar {
   subCategories = input<CategoryTree[]>([]);
   categories = input<CategoryTree[]>([]);
   applicableAttributes = input<AttributeFilter[]>([]);
+  activeAttributes = input<Record<string, string>>({});
+  inputMinPrice = input<number | undefined>(undefined, { alias: 'minPrice' });
+  inputMaxPrice = input<number | undefined>(undefined, { alias: 'maxPrice' });
 
   filtersChanged = output<{ minPrice?: number, maxPrice?: number, attributes: Record<string, string> }>();
+
+
 
   selectedAttributes: Record<string, string[]> = {};
   minPrice: number | null = null;
   maxPrice: number | null = null;
+
+  constructor() {
+    // Sync activeAttributes input to local state
+    effect(() => {
+      const active = this.activeAttributes();
+      // Reset logic or merge? 
+      // Usually, if parent passes new active filters (e.g. from URL), we should reflect them.
+      const newSelected: Record<string, string[]> = {};
+      
+      Object.entries(active).forEach(([key, value]) => {
+        if (value) {
+          newSelected[key] = value.split(',').filter(v => !!v);
+        }
+      });
+      
+      this.selectedAttributes = newSelected;
+    });
+
+    // Sync Price inputs
+    effect(() => {
+      this.minPrice = this.inputMinPrice() ?? null;
+      this.maxPrice = this.inputMaxPrice() ?? null;
+    });
+
+  }
 
   readonly ChevronLeftIcon = ChevronLeft;
   readonly ChevronRightIcon = ChevronRight;

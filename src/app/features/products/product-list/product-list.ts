@@ -1,9 +1,9 @@
-import { Component, inject, signal, computed, resource, input } from '@angular/core';
+import { Component, inject, signal, computed, resource, input, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../../core/services/product.service';
 import { CategoryService, CategoryTree, AttributeFilter } from '../../../core/services/category.service';
 import { ProductListItem } from '../../../core/models/product.model';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { firstValueFrom, map, take } from 'rxjs';
 import { ProductSidebar } from '../product-sidebar';
@@ -43,6 +43,9 @@ import { LucideAngularModule, ChevronRight, Home } from 'lucide-angular';
             [parentCategory]="parentCategory()"
             [subCategories]="subCategories()"
             [applicableAttributes]="applicableAttributes()"
+            [activeAttributes]="attributes()"
+            [minPrice]="minPrice()"
+            [maxPrice]="maxPrice()"
             (filtersChanged)="onFiltersChange($event)"
           />
         </aside>
@@ -80,7 +83,7 @@ import { LucideAngularModule, ChevronRight, Home } from 'lucide-angular';
           }
         } @else {
           @for (product of products(); track product.id) {
-            <div class="group bg-white border border-slate-100 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:border-indigo-100 transition-all duration-300 cursor-pointer flex flex-col">
+            <div [routerLink]="['/product', product.id]" class="group bg-white border border-slate-100 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:border-indigo-100 transition-all duration-300 cursor-pointer flex flex-col">
               <div class="relative w-full aspect-square bg-slate-50 rounded-xl mb-4 overflow-hidden">
                 <img 
                   [src]="product.imageUrl || 'https://placehold.co/600x600/f8fafc/6366f1?text=' + product.name" 
@@ -131,6 +134,7 @@ export class ProductListComponent {
   private productService = inject(ProductService);
   private categoryService = inject(CategoryService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   readonly ChevronRightIcon = ChevronRight;
   readonly HomeIcon = Home;
@@ -138,6 +142,39 @@ export class ProductListComponent {
   // Modern Angular 19+ route handling
   private params = toSignal(this.route.params);
   private queryParams = toSignal(this.route.queryParams);
+
+  constructor() {
+    effect(() => {
+      const params = this.queryParams();
+      if (!params) return;
+
+      const attrs: Record<string, string> = {};
+      let hasAttrs = false;
+
+      Object.keys(params).forEach(key => {
+        if (key.startsWith('attr_')) {
+          attrs[key.replace('attr_', '')] = params[key];
+          hasAttrs = true;
+        }
+      });
+
+      // Update signal only if we found attributes (or to clear if none? tricky with manual filters)
+      // For now, assume URL is source of truth if specific attrs are present.
+      // Or we can just set it. 
+      // If user navigates to clean URL, attrs should receive empty object? 
+       // If no attr_ params, we might want to clear existing attributes IF they came from URL previously. 
+       // But if manual filters added them... 
+       // Simple approach: Always sync signal to URL content for attributes.
+       this.attributes.set(attrs);
+       
+       // Also sync Price
+       const minP = params['minPrice'] ? Number(params['minPrice']) : undefined;
+       const maxP = params['maxPrice'] ? Number(params['maxPrice']) : undefined;
+       
+       this.minPrice.set(minP);
+       this.maxPrice.set(maxP);
+    }, { allowSignalWrites: true });
+  }
 
   // Store all categories for tree traversal
   allCategories = signal<CategoryTree[]>([]);
@@ -244,9 +281,33 @@ export class ProductListComponent {
   products = computed(() => this.productsResource.value() ?? []);
 
   onFiltersChange(filters: { minPrice?: number, maxPrice?: number, attributes: Record<string, string> }) {
-    this.minPrice.set(filters.minPrice);
-    this.maxPrice.set(filters.maxPrice);
-    this.attributes.set(filters.attributes);
+    // 1. Get current query params to preserve non-filter ones (like 'q')
+    const currentParams = this.queryParams() || {};
+    const newParams: any = { ...currentParams };
+
+    // 2. Remove all existing attr_ params and min/max price to start clean for filters
+    Object.keys(newParams).forEach(key => {
+      if (key.startsWith('attr_') || key === 'minPrice' || key === 'maxPrice') {
+        delete newParams[key];
+      }
+    });
+
+    // 3. Add new filter params
+    if (filters.minPrice !== undefined) newParams.minPrice = filters.minPrice;
+    if (filters.maxPrice !== undefined) newParams.maxPrice = filters.maxPrice;
+    
+    Object.entries(filters.attributes).forEach(([key, value]) => {
+      if (value) {
+        newParams[`attr_${key}`] = value;
+      }
+    });
+
+    // 4. Navigate (this will trigger the effect to update signals)
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: newParams,
+      queryParamsHandling: 'replace' // We manually constructed the full set
+    });
   }
 
   onSortChange(event: Event) {
