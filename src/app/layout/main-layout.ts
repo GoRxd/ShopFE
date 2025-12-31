@@ -8,13 +8,14 @@ import { ProductService } from '../core/services/product.service';
 import { CartService } from '../core/services/cart.service';
 import { SearchSuggestions } from '../core/models/product.model';
 import { CategoryMenuItemComponent } from './category-menu-item';
+import { AddToCartModalComponent } from '../features/cart/add-to-cart-modal/add-to-cart-modal.component';
 import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, LucideAngularModule, CategoryMenuItemComponent],
+  imports: [CommonModule, RouterOutlet, RouterLink, LucideAngularModule, CategoryMenuItemComponent, AddToCartModalComponent],
   templateUrl: './main-layout.html',
   styles: [`
     :host {

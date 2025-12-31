@@ -9,19 +9,24 @@
       <!-- Cart Items List -->
       <div class="lg:col-span-2 space-y-4">
         @for (item of cartService.items(); track item.productId) {
-          <div class="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
-            <!-- Product Image Placeholder -->
+          <div class="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow relative">
             <div class="w-20 h-20 bg-slate-100 rounded-lg flex-shrink-0 flex items-center justify-center text-slate-300">
-               <!-- Ideally we load a real image here -->
                <lucide-icon [name]="CartIcon" class="w-8 h-8"></lucide-icon>
             </div>
             
-            <div class="flex-grow">
+            <div class="flex-grow pr-8">
                <h3 class="font-bold text-slate-700 text-lg">{{ item.productName }}</h3>
                <div class="text-sm text-slate-400">Produkt ID: {{ item.productId }}</div>
             </div>
 
-            <!-- Quantity Controls -->
+            <button 
+             (click)="cartService.removeFromCart(item.productId)"
+             class="absolute top-2 right-2 text-red-400 hover:text-red-600 transition-colors p-1"
+             title="Usuń z koszyka"
+            >
+              <lucide-icon [name]="TrashIcon" class="w-5 h-5"></lucide-icon>
+            </button>
+
             <div class="flex items-center gap-3">
                <button 
                 (click)="cartService.updateQuantity(item.productId, -1)"
@@ -30,7 +35,14 @@
                >
                  <lucide-icon [name]="MinusIcon" class="w-4 h-4"></lucide-icon>
                </button>
-               <span class="font-bold text-slate-900 w-8 text-center">{{ item.quantity }}</span>
+               <input 
+                 type="number" 
+                 [value]="item.quantity" 
+                 (change)="cartService.setQuantity(item.productId, $any($event.target).valueAsNumber)"
+                 min="1" 
+                 max="100"
+                 class="w-12 text-center font-bold text-slate-900 border-none bg-transparent focus:ring-0 p-0 appearance-none [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:m-0"
+               >
                <button 
                 (click)="cartService.updateQuantity(item.productId, 1)"
                 class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50"
@@ -39,7 +51,6 @@
                </button>
             </div>
 
-            <!-- Price & Remove -->
             <div class="text-right min-w-[100px]">
                <div class="font-black text-slate-900 text-lg">
                  {{ (item.unitPrice * item.quantity) | plnCurrency }}
@@ -47,14 +58,6 @@
                <div class="text-xs text-slate-400">
                  {{ item.unitPrice | plnCurrency }} / szt.
                </div>
-               
-               <button 
-                (click)="cartService.removeFromCart(item.productId)"
-                class="text-red-500 hover:text-red-700 text-sm font-medium mt-2 flex items-center justify-end gap-1"
-               >
-                 <lucide-icon [name]="TrashIcon" class="w-3 h-3"></lucide-icon>
-                 Usuń
-               </button>
             </div>
           </div>
         }

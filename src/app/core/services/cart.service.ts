@@ -10,7 +10,7 @@ export interface CartItem {
   productName: string;
   unitPrice: number;
   quantity: number;
-  imageUrl?: string; // Optional for now
+  imageUrl?: string;
 }
 
 export interface Cart {
@@ -27,6 +27,7 @@ export class CartService {
   
   // State
   private cartState = signal<Cart>({ items: [], totalAmount: 0 });
+  readonly lastAddedItem = signal<{ product: Product, quantity: number } | null>(null);
   
   // Selectors
   readonly cart = computed(() => this.cartState());
@@ -56,13 +57,13 @@ export class CartService {
     } else {
       this.addToGuestCart(product, quantity);
     }
+    this.lastAddedItem.set({ product, quantity });
   }
 
-  async updateQuantity(productId: number, quantity: number) {
-      if (this.authService.isLoggedIn()) {
-          await this.addToUserCart(productId, quantity);
-      } else {
-          this.updateGuestQuantity(productId, quantity);
+  async updateQuantity(productId: number, delta: number) {
+      const item = this.items().find(i => i.productId === productId);
+      if (item) {
+          await this.setQuantity(productId, item.quantity + delta);
       }
   }
 
@@ -74,6 +75,33 @@ export class CartService {
     }
   }
   
+  /**
+   * Sets absolute quantity for an item.
+   * Use this for direct input changes (not relative +1/-1).
+   */
+  async setQuantity(productId: number, quantity: number) {
+      if (isNaN(quantity)) return;
+      if (quantity > 100) quantity = 100;
+      
+      if (quantity <= 0) {
+          await this.removeFromCart(productId);
+          return;
+      }
+
+      if (this.authService.isLoggedIn()) {
+          const dto = { productId, quantity };
+          await firstValueFrom(this.http.put(`${this.apiUrl}/items`, dto));
+          await this.loadUserCart();
+      } else {
+          const items = this.getGuestCartFromStorage();
+          const existing = items.find(i => i.productId === productId);
+          if (existing) {
+              existing.quantity = quantity;
+              this.saveGuestCartToStorage(items);
+          }
+      }
+  }
+
   async syncCart() {
      const localCart = this.getGuestCartFromStorage();
      if (localCart.length > 0) {
@@ -129,26 +157,13 @@ export class CartService {
               productName: product.name,
               unitPrice: product.price,
               quantity: quantity,
-              imageUrl: product.imageUrl // Ensure Product model has this or handle
+              imageUrl: product.imageUrl
           });
       }
       
       this.saveGuestCartToStorage(items);
   }
 
-  private updateGuestQuantity(productId: number, quantity: number) {
-      const items = this.getGuestCartFromStorage();
-      const existing = items.find(i => i.productId === productId);
-      
-      if (existing) {
-          existing.quantity += quantity;
-          if (existing.quantity <= 0) {
-              this.removeFromGuestCart(productId);
-              return;
-          }
-           this.saveGuestCartToStorage(items);
-      }
-  }
 
   private removeFromGuestCart(productId: number) {
       let items = this.getGuestCartFromStorage();
@@ -161,7 +176,6 @@ export class CartService {
   private async loadUserCart() {
       try {
           const cart = await firstValueFrom(this.http.get<any>(this.apiUrl));
-          // Map Backend DTO to Frontend Model
           const items: CartItem[] = cart.items.map((i: any) => ({
               productId: i.productId,
               productName: i.productName,
