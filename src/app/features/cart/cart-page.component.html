@@ -1,0 +1,106 @@
+<div class="container-custom py-8">
+  <h1 class="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
+    <lucide-icon [name]="CartIcon" class="w-8 h-8 text-primary"></lucide-icon>
+    Twój Koszyk
+  </h1>
+
+  @if (cartService.items().length > 0) {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Cart Items List -->
+      <div class="lg:col-span-2 space-y-4">
+        @for (item of cartService.items(); track item.productId) {
+          <div class="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
+            <!-- Product Image Placeholder -->
+            <div class="w-20 h-20 bg-slate-100 rounded-lg flex-shrink-0 flex items-center justify-center text-slate-300">
+               <!-- Ideally we load a real image here -->
+               <lucide-icon [name]="CartIcon" class="w-8 h-8"></lucide-icon>
+            </div>
+            
+            <div class="flex-grow">
+               <h3 class="font-bold text-slate-700 text-lg">{{ item.productName }}</h3>
+               <div class="text-sm text-slate-400">Produkt ID: {{ item.productId }}</div>
+            </div>
+
+            <!-- Quantity Controls -->
+            <div class="flex items-center gap-3">
+               <button 
+                (click)="cartService.updateQuantity(item.productId, -1)"
+                [disabled]="item.quantity <= 1"
+                class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+               >
+                 <lucide-icon [name]="MinusIcon" class="w-4 h-4"></lucide-icon>
+               </button>
+               <span class="font-bold text-slate-900 w-8 text-center">{{ item.quantity }}</span>
+               <button 
+                (click)="cartService.updateQuantity(item.productId, 1)"
+                class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50"
+               >
+                 <lucide-icon [name]="PlusIcon" class="w-4 h-4"></lucide-icon>
+               </button>
+            </div>
+
+            <!-- Price & Remove -->
+            <div class="text-right min-w-[100px]">
+               <div class="font-black text-slate-900 text-lg">
+                 {{ (item.unitPrice * item.quantity) | plnCurrency }}
+               </div>
+               <div class="text-xs text-slate-400">
+                 {{ item.unitPrice | plnCurrency }} / szt.
+               </div>
+               
+               <button 
+                (click)="cartService.removeFromCart(item.productId)"
+                class="text-red-500 hover:text-red-700 text-sm font-medium mt-2 flex items-center justify-end gap-1"
+               >
+                 <lucide-icon [name]="TrashIcon" class="w-3 h-3"></lucide-icon>
+                 Usuń
+               </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Summary -->
+      <div class="lg:col-span-1">
+         <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm sticky top-24">
+            <h2 class="font-bold text-xl text-slate-900 mb-6">Podsumowanie</h2>
+            
+            <div class="space-y-3 mb-6">
+              <div class="flex justify-between text-slate-600">
+                <span>Wartość produktów</span>
+                <span class="font-medium">{{ cartService.totalAmount() | plnCurrency }}</span>
+              </div>
+              <div class="flex justify-between text-slate-600">
+                <span>Dostawa</span>
+                <span class="font-medium text-green-600">0,00 zł</span>
+              </div>
+              <div class="border-t border-slate-100 my-2"></div>
+              <div class="flex justify-between text-lg font-black text-slate-900">
+                <span>Do zapłaty</span>
+                <span class="text-primary">{{ cartService.totalAmount() | plnCurrency }}</span>
+              </div>
+            </div>
+
+            <button 
+              (click)="checkout()"
+              class="w-full bg-primary text-white font-bold py-3.5 rounded-xl hover:bg-primary-dark transition-colors shadow-lg shadow-primary/30 flex items-center justify-center gap-2"
+            >
+               Przejdź do kasy
+            </button>
+         </div>
+      </div>
+    </div>
+  } @else {
+     <!-- Empty State -->
+     <div class="text-center py-20">
+        <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+           <lucide-icon [name]="CartIcon" class="w-10 h-10 text-slate-300"></lucide-icon>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-900 mb-2">Twój koszyk jest pusty</h2>
+        <p class="text-slate-500 mb-8">Dodaj produkty do koszyka, aby złożyć zamówienie</p>
+        <a routerLink="/" class="inline-flex items-center gap-2 bg-primary text-white font-bold px-8 py-3 rounded-xl hover:bg-primary-dark transition-colors">
+           Przejdź do sklepu
+        </a>
+     </div>
+  }
+</div>

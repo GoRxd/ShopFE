@@ -5,6 +5,7 @@ import { LucideAngularModule, Search, ShoppingCart, User, Menu, ChevronDown, Fac
 import { CategoryService, CategoryTree } from '../core/services/category.service';
 import { AuthService } from '../core/services/auth.service';
 import { ProductService } from '../core/services/product.service';
+import { CartService } from '../core/services/cart.service';
 import { SearchSuggestions } from '../core/models/product.model';
 import { CategoryMenuItemComponent } from './category-menu-item';
 import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs/operators';
@@ -28,6 +29,7 @@ export class MainLayoutComponent implements OnInit {
   private productService = inject(ProductService);
   private router = inject(Router);
   authService = inject(AuthService);
+  cartService = inject(CartService);
 
   searchQuery = signal('');
   suggestions = signal<SearchSuggestions | null>(null);

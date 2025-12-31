@@ -3,21 +3,24 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProductService } from '../../../core/services/product.service';
 import { CategoryService, CategoryTree } from '../../../core/services/category.service';
+import { CartService } from '../../../core/services/cart.service';
 import { Product } from '../../../core/models/product.model';
 import { LucideAngularModule, Home, ChevronRight, ShoppingCart, Check, ShieldCheck, Truck, Clock } from 'lucide-angular';
+import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, LucideAngularModule],
+  imports: [CommonModule, RouterLink, LucideAngularModule, PlnCurrencyPipe],
   templateUrl: './product-details.component.html'
 })
 export class ProductDetailsComponent {
   private route = inject(ActivatedRoute);
   private productService = inject(ProductService);
   private categoryService = inject(CategoryService);
+  private cartService = inject(CartService);
 
   // Icons
   readonly HomeIcon = Home;
@@ -87,6 +90,14 @@ export class ProductDetailsComponent {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  addToCart() {
+      const product = this.product();
+      if (product) {
+          this.cartService.addToCart(product);
+          // Optional: Show notification or visual feedback
+      }
   }
 
   getAttributeLinkParams(name: string, value: string) {

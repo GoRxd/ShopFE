@@ -146,14 +146,16 @@
       }
 
       <a
-        href="#"
+        routerLink="/cart"
         class="flex flex-col items-center p-2 hover:text-primary transition-colors relative group"
       >
         <lucide-icon [name]="CartIcon" class="w-6 h-6"></lucide-icon>
         <span class="text-[10px] font-bold mt-1 uppercase">Koszyk</span>
         <span
-          class="absolute top-1 right-1 bg-primary text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center"
-          >0</span
+          class="absolute top-1 right-1 bg-primary text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center transition-transform duration-200"
+          [class.scale-0]="cartService.itemCount() === 0"
+          [class.scale-100]="cartService.itemCount() > 0"
+          >{{ cartService.itemCount() }}</span
         >
       </a>
     </div>

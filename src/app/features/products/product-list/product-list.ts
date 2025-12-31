@@ -2,17 +2,19 @@ import { Component, inject, signal, computed, resource, input, effect } from '@a
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../../core/services/product.service';
 import { CategoryService, CategoryTree, AttributeFilter } from '../../../core/services/category.service';
+import { CartService } from '../../../core/services/cart.service';
 import { ProductListItem } from '../../../core/models/product.model';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { firstValueFrom, map, take } from 'rxjs';
 import { ProductSidebar } from '../product-sidebar';
 import { LucideAngularModule, ChevronRight, Home } from 'lucide-angular';
+import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, ProductSidebar, LucideAngularModule, RouterLink],
+  imports: [CommonModule, ProductSidebar, LucideAngularModule, RouterLink, PlnCurrencyPipe],
   template: `
     <div class="container-custom py-8">
       <!-- Breadcrumbs -->
@@ -90,8 +92,11 @@ import { LucideAngularModule, ChevronRight, Home } from 'lucide-angular';
                   [alt]="product.name"
                   class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
-                <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button class="bg-white/90 backdrop-blur p-2 rounded-full shadow-lg text-indigo-600 hover:bg-indigo-600 hover:text-white transition-colors">
+                <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                  <button 
+                    (click)="addToCart($event, product)"
+                    class="bg-white/90 backdrop-blur p-2 rounded-full shadow-lg text-indigo-600 hover:bg-indigo-600 hover:text-white transition-colors cursor-pointer"
+                  >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
@@ -107,7 +112,7 @@ import { LucideAngularModule, ChevronRight, Home } from 'lucide-angular';
               </div>
 
               <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-50">
-                <span class="text-2xl font-black text-slate-900">{{ product.price | number:'1.2-2' }} PLN</span>
+                <span class="text-2xl font-black text-slate-900">{{ product.price | plnCurrency }}</span>
                 <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md uppercase tracking-wider">Nowość</span>
               </div>
             </div>
@@ -133,6 +138,7 @@ import { LucideAngularModule, ChevronRight, Home } from 'lucide-angular';
 export class ProductListComponent {
   private productService = inject(ProductService);
   private categoryService = inject(CategoryService);
+  private cartService = inject(CartService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -339,6 +345,14 @@ export class ProductListComponent {
     if (searchTerm) return `Wyniki dla "${searchTerm}"`;
     return categoryName || 'Nasze Produkty';
   });
+
+  addToCart(event: Event, product: ProductListItem) {
+    event.stopPropagation();
+    event.preventDefault(); // Prevent navigation
+    // Cast to any to bypass strict structure if model has extra fields, 
+    // but ProductListItem has all we need (id, name, price, imageUrl)
+    this.cartService.addToCart(product as any);
+  }
 
   // Helper methods for tree traversal
   private findCategoryInTreeRecursive(slug: string, categories: CategoryTree[]): CategoryTree | null {
