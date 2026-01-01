@@ -1,0 +1,108 @@
+<div class="container-custom py-8">
+  <button routerLink="/shopping-lists" class="flex items-center gap-2 text-slate-500 hover:text-primary mb-6 transition-colors cursor-pointer">
+      <lucide-icon [name]="BackIcon" class="w-5 h-5"></lucide-icon>
+      Wróć do list
+  </button>
+
+  @if (currentList(); as list) {
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-black text-slate-900 mb-2">{{ list.name }}</h1>
+            <p class="text-slate-400">Utworzono: {{ list.createdAt | date:'longDate' }} • {{ list.items.length }} produktów</p>
+        </div>
+
+        @if (list.items.length > 0) {
+            <button 
+                (click)="addAllToCart()" 
+                [disabled]="isAddingAll()"
+                class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:shadow-green-200 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+                @if (isAddingAll()) {
+                    <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    Dodawanie...
+                } @else {
+                    <lucide-icon [name]="CartIcon" class="w-5 h-5"></lucide-icon>
+                    Dodaj wszystkie do koszyka
+                }
+            </button>
+        }
+    </div>
+
+    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+        @if (list.items.length > 0) {
+            <div class="divide-y divide-slate-100">
+                @for (item of list.items; track item.id) {
+                    <div class="p-4 flex items-center gap-4 hover:bg-slate-50 transition-colors group">
+                        <!-- Image Placeholder -->
+                        <div 
+                          class="w-16 h-16 bg-slate-100 rounded-lg flex items-center justify-center text-slate-300 cursor-pointer overflow-hidden border border-slate-200"
+                          [routerLink]="['/product', item.productId]"
+                        >
+                             <!-- If we had image url in future, we would put it here. For now Icon or text -->
+                             <lucide-icon [name]="CartIcon" class="w-6 h-6"></lucide-icon>
+                        </div>
+
+                        <div class="flex-grow">
+                            <h3 
+                              class="font-bold text-slate-800 hover:text-primary transition-colors cursor-pointer"
+                              [routerLink]="['/product', item.productId]"
+                            >
+                              {{ item.productName }}
+                            </h3>
+                            <p class="text-sm text-primary font-medium">{{ item.unitPrice | plnCurrency }}</p>
+                            <p class="text-xs text-slate-400">Dodano: {{ item.addedAt | date:'shortDate' }}</p>
+                        </div>
+
+                        <div class="flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <!-- Quantity Controls -->
+                            <div class="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
+                                <button 
+                                    (click)="decreaseQuantity(item)"
+                                    class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white text-slate-500 hover:text-slate-900 transition-colors disabled:opacity-50"
+                                    [disabled]="item.quantity <= 1"
+                                >
+                                    <lucide-icon [name]="MinusIcon" class="w-3.5 h-3.5"></lucide-icon>
+                                </button>
+                                <input 
+                                    type="number" 
+                                    [value]="item.quantity" 
+                                    (change)="updateQuantity(item, $any($event.target).valueAsNumber)"
+                                    (input)="validateInput($event, item)"
+                                    min="1" 
+                                    max="100"
+                                    class="w-8 text-center font-bold text-sm text-slate-700 border-none bg-transparent focus:ring-0 p-0 appearance-none [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:m-0"
+                                >
+                                <button 
+                                    (click)="increaseQuantity(item)"
+                                    class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white text-slate-500 hover:text-slate-900 transition-colors"
+                                >
+                                    <lucide-icon [name]="PlusIcon" class="w-3.5 h-3.5"></lucide-icon>
+                                </button>
+                            </div>
+
+                            <button 
+                                (click)="addToCart(item)"
+                                class="bg-primary/10 text-primary hover:bg-primary hover:text-white px-4 py-2 rounded-lg font-bold text-sm transition-all flex items-center gap-2"
+                            >
+                                <lucide-icon [name]="CartIcon" class="w-4 h-4"></lucide-icon>
+                                Do koszyka
+                            </button>
+                            <button 
+                                (click)="removeItem(item.productId)"
+                                class="text-slate-300 hover:text-red-500 p-2 transition-colors"
+                                title="Usuń z listy"
+                            >
+                                <lucide-icon [name]="TrashIcon" class="w-5 h-5"></lucide-icon>
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        } @else {
+            <div class="p-12 text-center text-slate-400">
+                Ta lista jest pusta. Dodaj produkty przeglądając sklep.
+            </div>
+        }
+    </div>
+  }
+</div>

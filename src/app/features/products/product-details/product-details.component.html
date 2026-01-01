@@ -120,8 +120,12 @@
                <lucide-icon [name]="ShoppingCartIcon" class="w-6 h-6 group-hover:scale-110 transition-transform"></lucide-icon>
                <span>Dodaj do koszyka</span>
              </button>
-             <button class="w-full bg-white border-2 border-slate-200 hover:border-slate-800 text-slate-800 font-bold h-12 rounded-xl transition-all active:scale-[0.98]">
-               Dodaj do listy życzeń
+             <button 
+               (click)="openListModal()"
+               class="w-full bg-white border-2 border-slate-200 hover:border-slate-800 text-slate-800 font-bold h-12 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 group"
+             >
+                <lucide-icon [name]="HeartIcon" class="w-5 h-5 text-slate-400 group-hover:text-red-500 transition-colors"></lucide-icon>
+                Dodaj do listy
              </button>
           </div>
         </div>
@@ -184,8 +188,6 @@
               <li class="flex gap-3">
                 <div class="bg-white p-2 rounded-lg text-indigo-600 shadow-sm">
                    <lucide-icon [name]="ShieldCheckIcon" class="w-5 h-5"></lucide-icon>
-                </div>
-                <div>
                   <p class="font-bold text-indigo-900 text-sm">Bezpieczne zakupy</p>
                   <p class="text-indigo-700/80 text-xs mt-0.5">Szyfrowane połączenie i płatności</p>
                 </div>
@@ -196,3 +198,12 @@
     </div>
   }
 </div>
+
+<!-- Add to List Modal -->
+@if (product(); as p) {
+  <app-add-to-shopping-list 
+    [productId]="p.id" 
+    [isOpen]="isListModalOpen()" 
+    (closeModal)="closeListModal()"
+  ></app-add-to-shopping-list>
+}

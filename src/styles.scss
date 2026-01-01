@@ -12,6 +12,10 @@
 }
 
 @layer base {
+  html {
+    overflow-y: scroll;
+  }
+
   body {
     @apply bg-white text-slate-900 antialiased;
     font-family: var(--font-sans);
@@ -29,5 +33,27 @@
 
   .input-field {
     @apply w-full px-4 py-3 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-slate-400;
+  }
+}
+
+/* Global utility to hide spin buttons in number inputs */
+@layer utilities {
+  .no-spin-buttons {
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    -moz-appearance: textfield;
+  }
+  
+  /* Apply implicitly to all number inputs if desired, or just use the class */
+  input[type=number] {
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    -moz-appearance: textfield;
   }
 }

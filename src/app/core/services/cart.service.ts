@@ -1,9 +1,11 @@
-import { Injectable, signal, computed, effect } from '@angular/core';
+import { Injectable, signal, computed, effect, PLATFORM_ID, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from './auth.service';
+import { ToastService } from './toast.service';
 import { Product } from '../models/product.model';
 import { environment } from '../../../environments/environment';
-import { map, tap, switchMap, catchError, of, Observable, BehaviorSubject, firstValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 export interface CartItem {
   productId: number;
@@ -25,11 +27,9 @@ export class CartService {
   private apiUrl = `${environment.apiUrl}/cart`;
   private readonly GUEST_CART_KEY = 'guest_cart';
   
-  // State
   private cartState = signal<Cart>({ items: [], totalAmount: 0 });
   readonly lastAddedItem = signal<{ product: Product, quantity: number } | null>(null);
   
-  // Selectors
   readonly cart = computed(() => this.cartState());
   readonly items = computed(() => this.cartState().items);
   readonly itemCount = computed(() => this.cartState().items.reduce((acc, item) => acc + item.quantity, 0));
@@ -37,27 +37,38 @@ export class CartService {
 
   constructor(
     private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastService: ToastService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    // Initialize
     effect(() => {
         if (this.authService.isLoggedIn()) {
              this.syncCart();
         } else {
              this.loadGuestCart();
-        }
-    }, { allowSignalWrites: true });
+      }
+    });
   }
 
-  // --- Public API ---
+  async addToCart(product: Product, quantity: number = 1, options: { openModal?: boolean } = { openModal: true }): Promise<boolean> {
+    const currentTotal = this.itemCount();
+    
+    if (currentTotal + quantity > 100) {
+        this.toastService.error('Łączna ilość produktów w koszyku nie może przekraczać 100 sztuk.');
+        return false;
+    }
 
-  async addToCart(product: Product, quantity: number = 1) {
     if (this.authService.isLoggedIn()) {
       await this.addToUserCart(product.id, quantity);
     } else {
       this.addToGuestCart(product, quantity);
     }
-    this.lastAddedItem.set({ product, quantity });
+    
+    if (options.openModal) {
+        this.lastAddedItem.set({ product, quantity });
+    }
+    
+    return true;
   }
 
   async updateQuantity(productId: number, delta: number) {
@@ -79,13 +90,24 @@ export class CartService {
    * Sets absolute quantity for an item.
    * Use this for direct input changes (not relative +1/-1).
    */
-  async setQuantity(productId: number, quantity: number) {
-      if (isNaN(quantity)) return;
-      if (quantity > 100) quantity = 100;
+  async setQuantity(productId: number, quantity: number): Promise<boolean> {
+      if (isNaN(quantity)) return false;
+      
+      const currentItems = this.items();
+      const currentItem = currentItems.find(i => i.productId === productId);
+      const currentItemQty = currentItem ? currentItem.quantity : 0;
+      const otherItemsTotal = this.itemCount() - currentItemQty;
+
+      if (otherItemsTotal + quantity > 100) {
+          this.toastService.error('Łączna ilość produktów w koszyku nie może przekraczać 100 sztuk.');
+          // Force existing state update to ensure UI can re-sync if strictly binding
+          this.cartState.set({ ...this.cartState() }); 
+          return false;
+      }
       
       if (quantity <= 0) {
           await this.removeFromCart(productId);
-          return;
+          return true;
       }
 
       if (this.authService.isLoggedIn()) {
@@ -100,6 +122,7 @@ export class CartService {
               this.saveGuestCartToStorage(items);
           }
       }
+      return true;
   }
 
   async syncCart() {
@@ -112,7 +135,9 @@ export class CartService {
         try {
             await firstValueFrom(this.http.post(`${this.apiUrl}/sync`, syncDto));
             // Clear local storage
-            localStorage.removeItem(this.GUEST_CART_KEY);
+            if (isPlatformBrowser(this.platformId)) {
+                localStorage.removeItem(this.GUEST_CART_KEY);
+            }
         } catch (err) {
             console.error('Failed to sync cart', err);
         }
@@ -133,12 +158,15 @@ export class CartService {
   }
 
   private getGuestCartFromStorage(): CartItem[] {
+      if (!isPlatformBrowser(this.platformId)) return [];
       const stored = localStorage.getItem(this.GUEST_CART_KEY);
       return stored ? JSON.parse(stored) : [];
   }
 
   private saveGuestCartToStorage(items: CartItem[]) {
-      localStorage.setItem(this.GUEST_CART_KEY, JSON.stringify(items));
+      if (isPlatformBrowser(this.platformId)) {
+          localStorage.setItem(this.GUEST_CART_KEY, JSON.stringify(items));
+      }
       this.updateState({
           items,
           totalAmount: this.calculateTotal(items)

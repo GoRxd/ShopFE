@@ -1,0 +1,38 @@
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { LucideAngularModule, Plus, Trash2, List } from 'lucide-angular';
+import { ShoppingListService } from '../../core/services/shopping-list.service';
+
+@Component({
+  selector: 'app-shopping-lists-page',
+  standalone: true,
+  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule],
+  templateUrl: './shopping-lists-page.component.html'
+})
+export class ShoppingListsPageComponent implements OnInit {
+  listService = inject(ShoppingListService);
+  
+  newListName = '';
+  readonly PlusIcon = Plus;
+  readonly TrashIcon = Trash2;
+  readonly ListIcon = List;
+
+  ngOnInit() {
+    this.listService.loadLists();
+  }
+
+  async createList() {
+    if (!this.newListName.trim()) return;
+    await this.listService.createList(this.newListName);
+    this.newListName = '';
+  }
+
+  async deleteList(event: Event, id: number) {
+    event.stopPropagation(); // Prevent navigation
+    if (confirm('Czy na pewno chcesz usunąć tę listę?')) {
+       await this.listService.deleteList(id);
+    }
+  }
+}

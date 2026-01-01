@@ -14,7 +14,7 @@ import { firstValueFrom } from 'rxjs';
   imports: [CommonModule, RouterLink, LucideAngularModule, PlnCurrencyPipe],
   template: `
     @if (isOpen()) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" role="dialog" aria-modal="true">
+      <div class="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6" role="dialog" aria-modal="true">
         <!-- Backdrop -->
         <div 
           class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
@@ -173,7 +173,7 @@ export class AddToCartModalComponent {
         this.isOpen.set(true);
         this.loadAccessories(item.product.categoryId); // Load relevant accessories
       }
-    }, { allowSignalWrites: true });
+    });
   }
 
   close() {

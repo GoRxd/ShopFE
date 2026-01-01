@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, Router } from '@angular/router';
-import { LucideAngularModule, Search, ShoppingCart, User, Menu, ChevronDown, Facebook, Instagram, Youtube, LogOut } from 'lucide-angular';
+import { LucideAngularModule, Search, ShoppingCart, User, Menu, ChevronDown, Facebook, Instagram, Youtube, LogOut, List } from 'lucide-angular';
 import { CategoryService, CategoryTree } from '../core/services/category.service';
 import { AuthService } from '../core/services/auth.service';
 import { ProductService } from '../core/services/product.service';
@@ -9,13 +9,17 @@ import { CartService } from '../core/services/cart.service';
 import { SearchSuggestions } from '../core/models/product.model';
 import { CategoryMenuItemComponent } from './category-menu-item';
 import { AddToCartModalComponent } from '../features/cart/add-to-cart-modal/add-to-cart-modal.component';
+import { ToastComponent } from '../shared/components/toast/toast.component';
 import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, LucideAngularModule, CategoryMenuItemComponent, AddToCartModalComponent],
+  imports: [
+    CommonModule, RouterOutlet, RouterLink, LucideAngularModule, 
+    CategoryMenuItemComponent, AddToCartModalComponent, ToastComponent
+  ],
   templateUrl: './main-layout.html',
   styles: [`
     :host {
@@ -38,10 +42,14 @@ export class MainLayoutComponent implements OnInit {
   private searchSubject = new Subject<string>();
 
   readonly SearchIcon = Search;
-  readonly CartIcon = ShoppingCart;
+  readonly ShoppingCartIcon = ShoppingCart;
   readonly UserIcon = User;
   readonly LogOutIcon = LogOut;
   readonly MenuIcon = Menu;
+  // readonly CloseIcon = X; // If X is not used, remove it or import it
+  readonly ListIcon = List;
+
+  readonly cartCount = this.cartService.itemCount;
   readonly ChevronIcon = ChevronDown;
   readonly FacebookIcon = Facebook;
   readonly InstagramIcon = Instagram;

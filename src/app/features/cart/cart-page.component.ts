@@ -24,4 +24,29 @@ export class CartPageComponent {
       // Navigate to checkout or login
       // implementation TBD
   }
+  
+  async updateQuantityInput(event: Event, item: any) {
+    const input = event.target as HTMLInputElement;
+    const value = input.valueAsNumber;
+    
+    if (isNaN(value)) {
+        input.value = item.quantity.toString();
+        return;
+    }
+
+    const success = await this.cartService.setQuantity(item.productId, value);
+    if (!success) {
+        input.value = item.quantity.toString();
+    }
+  }
+
+  validateInput(event: Event, productId: number) {
+    const input = event.target as HTMLInputElement;
+    let value = parseInt(input.value);
+    
+    if (value > 100) {
+      input.value = '100';
+      this.cartService.setQuantity(productId, 100);
+    }
+  }
 }

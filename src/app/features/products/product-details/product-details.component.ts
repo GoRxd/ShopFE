@@ -1,19 +1,21 @@
 import { Component, inject, input, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../../core/services/product.service';
 import { CategoryService, CategoryTree } from '../../../core/services/category.service';
 import { CartService } from '../../../core/services/cart.service';
 import { Product } from '../../../core/models/product.model';
-import { LucideAngularModule, Home, ChevronRight, ShoppingCart, Check, ShieldCheck, Truck, Clock } from 'lucide-angular';
+import { LucideAngularModule, Home, ChevronRight, ShoppingCart, Check, ShieldCheck, Truck, Clock, Heart, Plus } from 'lucide-angular';
 import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
+import { AddToShoppingListComponent } from '../../shopping-lists/components/add-to-shopping-list/add-to-shopping-list.component';
 
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, LucideAngularModule, PlnCurrencyPipe],
+  imports: [CommonModule, RouterLink, LucideAngularModule, PlnCurrencyPipe, FormsModule, AddToShoppingListComponent],
   templateUrl: './product-details.component.html'
 })
 export class ProductDetailsComponent {
@@ -22,7 +24,6 @@ export class ProductDetailsComponent {
   private categoryService = inject(CategoryService);
   private cartService = inject(CartService);
 
-  // Icons
   readonly HomeIcon = Home;
   readonly ChevronRightIcon = ChevronRight;
   readonly ShoppingCartIcon = ShoppingCart;
@@ -30,19 +31,19 @@ export class ProductDetailsComponent {
   readonly ShieldCheckIcon = ShieldCheck;
   readonly TruckIcon = Truck;
   readonly ClockIcon = Clock;
+  readonly HeartIcon = Heart;
+  readonly PlusIcon = Plus;
 
-  // State
   product = signal<Product | null>(null);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
   
-  // Categories for breadcrumbs
+  isListModalOpen = signal(false);
+
   categories = signal<CategoryTree[]>([]);
 
-  // Route Params
   private params = toSignal(this.route.params);
   
-  // Computed Breadcrumbs
   breadcrumbs = computed(() => {
     const product = this.product();
     const allCats = this.categories();
@@ -52,10 +53,6 @@ export class ProductDetailsComponent {
     const path: { name: string, slug: string }[] = [];
     this.findPathInTreeById(product.categoryId, allCats, path);
     return path;
-    
-    // Add product name as last crumb? Or keep it separate? 
-    // Usually x-kom shows category path in breadcrumbs, 
-    // and product name is the H1 below.
   });
 
   constructor() {
@@ -96,8 +93,15 @@ export class ProductDetailsComponent {
       const product = this.product();
       if (product) {
           this.cartService.addToCart(product);
-          // Optional: Show notification or visual feedback
       }
+  }
+
+  openListModal() {
+     this.isListModalOpen.set(true);
+  }
+
+  closeListModal() {
+    this.isListModalOpen.set(false);
   }
 
   getAttributeLinkParams(name: string, value: string) {
@@ -132,7 +136,6 @@ export class ProductDetailsComponent {
     };
   }
 
-  // Helper for breadcrumbs traversal by ID
   private findPathInTreeById(targetId: number, categories: CategoryTree[], path: { name: string, slug: string }[]): boolean {
     for (const category of categories) {
       path.push({ name: category.name, slug: category.slug });
