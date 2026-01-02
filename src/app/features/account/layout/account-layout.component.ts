@@ -24,8 +24,8 @@ import { AuthService } from '../../../core/services/auth.service';
           <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
             <!-- User Header -->
             <div class="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
-              <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+              <a routerLink="/account" class="flex items-center gap-4 group/user cursor-pointer no-underline">
+                <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover/user:bg-primary group-hover/user:text-white transition-all shadow-sm">
                   <lucide-icon [name]="UserIcon" class="w-6 h-6"></lucide-icon>
                 </div>
                 <div>
@@ -34,7 +34,7 @@ import { AuthService } from '../../../core/services/auth.service';
                     {{ authService.currentUser()?.firstName || 'Użytkowniku' }}
                   </div>
                 </div>
-              </div>
+              </a>
             </div>
 
             <!-- Navigation -->

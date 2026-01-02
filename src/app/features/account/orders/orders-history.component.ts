@@ -14,22 +14,28 @@ import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
         <h1 class="text-3xl font-black text-slate-900 dark:text-white mb-6">Zamówienia</h1>
         
         <!-- Filters (Mock) -->
-        <div class="flex flex-wrap gap-4 items-center mb-8">
-          <div class="flex items-center gap-2">
-            <span class="text-sm font-bold text-slate-500 dark:text-slate-400">Filtruj:</span>
-            <button class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+        <div class="flex flex-col sm:flex-row sm:flex-wrap gap-4 items-start sm:items-center mb-8">
+          <div class="flex items-center gap-3 w-full sm:w-auto">
+            <span class="text-sm font-bold text-slate-500 dark:text-slate-400 min-w-[50px]">Filtruj:</span>
+            <button class="flex-grow sm:flex-grow-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 py-2.5 rounded-xl text-sm font-bold flex items-center justify-between gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
               Pokaż wszystkie
               <lucide-icon [name]="ChevronDownIcon" class="w-4 h-4"></lucide-icon>
             </button>
           </div>
-          <button class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-            Fizyczne i cyfrowe
-            <lucide-icon [name]="ChevronDownIcon" class="w-4 h-4"></lucide-icon>
-          </button>
-          <div class="flex-grow"></div>
-          <div class="flex items-center gap-2">
-            <span class="text-sm font-bold text-slate-500 dark:text-slate-400">Sortuj:</span>
-            <button class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+          
+          <div class="flex items-center gap-3 w-full sm:w-auto">
+            <span class="text-sm font-bold text-slate-500 dark:text-slate-400 min-w-[50px]">Typ:</span>
+            <button class="flex-grow sm:flex-grow-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 py-2.5 rounded-xl text-sm font-bold flex items-center justify-between gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+              Fizyczne i cyfrowe
+              <lucide-icon [name]="ChevronDownIcon" class="w-4 h-4"></lucide-icon>
+            </button>
+          </div>
+
+          <div class="hidden sm:block flex-grow"></div>
+          
+          <div class="flex items-center gap-3 w-full sm:w-auto">
+            <span class="text-sm font-bold text-slate-500 dark:text-slate-400 min-w-[50px]">Sortuj:</span>
+            <button class="flex-grow sm:flex-grow-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 py-2.5 rounded-xl text-sm font-bold flex items-center justify-between gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
               Data zakupu: Od n...
               <lucide-icon [name]="ChevronDownIcon" class="w-4 h-4"></lucide-icon>
             </button>
@@ -130,10 +136,8 @@ export class OrdersHistoryComponent implements OnInit {
   MoreIcon = MoreVertical;
 
   ngOnInit() {
-    // Try to fetch, if fails or empty, we'll see the empty state
     this.orderService.getOrderHistory().subscribe({
       next: (data) => {
-        // Mock data if empty for demo purposes as requested to match style
         if (data.length === 0) {
            this.orders.set([
              {
@@ -169,7 +173,6 @@ export class OrdersHistoryComponent implements OnInit {
         }
       },
       error: () => {
-        // Fallback to mock data for visual consistency if API not fully ready
         this.orders.set([
           {
             id: 1,
@@ -201,7 +204,6 @@ export class OrdersHistoryComponent implements OnInit {
     });
 
     return groups.sort((a, b) => {
-        // Simple sort by year/month descending
         const [mA, yA] = a.month.split(' ');
         const [mB, yB] = b.month.split(' ');
         if (yA !== yB) return parseInt(yB) - parseInt(yA);

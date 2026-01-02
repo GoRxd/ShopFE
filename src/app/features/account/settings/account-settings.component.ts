@@ -64,8 +64,10 @@ import { LucideAngularModule, Sun, Moon, Monitor, Shield, Bell, HardDrive } from
         <div class="divide-y divide-slate-100 dark:divide-slate-800">
           @for (setting of privacySettings; track setting.label) {
             <div class="p-6 flex items-center justify-between">
-              <div class="flex gap-4">
-                <lucide-icon [name]="setting.icon" class="w-5 h-5 text-slate-400 mt-0.5"></lucide-icon>
+              <div class="flex gap-3">
+                <div class="w-10 flex justify-center pt-1.5 flex-shrink-0">
+                  <lucide-icon [name]="setting.icon" class="w-5 h-5 text-slate-400"></lucide-icon>
+                </div>
                 <div>
                   <div class="font-bold text-slate-900 dark:text-white">{{ setting.label }}</div>
                   <div class="text-sm text-slate-500 dark:text-slate-400">{{ setting.description }}</div>

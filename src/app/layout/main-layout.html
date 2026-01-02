@@ -1,7 +1,77 @@
 <app-toast></app-toast>
 <app-add-to-cart-modal></app-add-to-cart-modal>
 <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-300">
-  <!-- Top Bar -->
+  <!-- Mobile Header (x-kom style) -->
+  <div class="md:hidden px-4 pt-6 pb-2">
+    @if (!pageHeaderInfo().isFunctional) {
+      <div class="flex justify-between items-center mb-4 transition-all duration-300">
+        <a routerLink="/account" class="flex flex-col no-underline active:opacity-70 transition-opacity">
+          <span class="text-xl font-black text-slate-900 dark:text-white leading-tight">
+            {{ greeting() }}, {{ authService.currentUser()?.firstName || 'Gościu' }}
+          </span>
+        </a>
+        <button class="relative p-2 text-slate-600 dark:text-slate-400">
+          <lucide-icon [name]="BellIcon" class="w-6 h-6"></lucide-icon>
+          <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+        </button>
+      </div>
+
+      <!-- Mobile Persistent Search -->
+      <div class="relative group mb-2 transition-all duration-300">
+        <div class="relative">
+          <input
+            type="text"
+            [value]="searchQuery()"
+            (input)="onSearchInput($event)"
+            (keyup.enter)="onSearch()"
+            (focus)="onSearchFocus()"
+            (blur)="hideSuggestions()"
+            placeholder="Czego szukasz?"
+            class="w-full bg-slate-100 dark:bg-slate-800/50 border-none rounded-xl py-3 pl-14 pr-12 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-primary/20 text-slate-900 dark:text-white transition-all outline-none shadow-sm text-sm"
+          />
+          <lucide-icon
+            [name]="SearchIcon"
+            class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-primary"
+          ></lucide-icon>
+          <lucide-icon
+            [name]="ScanIcon"
+            class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
+          ></lucide-icon>
+        </div>
+        
+        <!-- Mobile Search Suggestions -->
+        @if (showSuggestions() && suggestions()) {
+          <div class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-[60] overflow-hidden">
+               <div class="p-2">
+                  @for (prod of suggestions()!.products.slice(0, 5); track prod.id) {
+                      <button (click)="selectSuggestion(prod.name)" class="w-full text-left px-4 py-3 text-sm flex items-center gap-3 border-b border-slate-50 dark:border-slate-800 last:border-0">
+                          <lucide-icon [name]="SearchIcon" class="w-4 h-4 text-slate-400"></lucide-icon>
+                          <span class="text-slate-700 dark:text-slate-300">{{ prod.name }}</span>
+                      </button>
+                  }
+               </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Simplified Header for functional pages -->
+      <div class="flex items-center justify-between py-4 relative min-h-[56px] border-b border-slate-100 dark:border-slate-800 mb-2">
+        <div class="flex items-center gap-3">
+          <a routerLink="/" class="w-10 h-10 bg-primary/10 dark:bg-primary/20 rounded-xl flex items-center justify-center text-primary hover:bg-primary/20 transition-colors">
+            <lucide-icon [name]="ZapIcon" class="w-6 h-6 fill-primary/20"></lucide-icon>
+          </a>
+          <h1 class="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
+            {{ pageHeaderInfo().title }}
+          </h1>
+        </div>
+        <button class="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+          <lucide-icon [name]="BellIcon" class="w-6 h-6"></lucide-icon>
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Desktop Top Bar -->
   <div class="bg-slate-900 text-white text-[11px] py-1.5 hidden md:block">
     <div class="container-custom flex justify-between items-center">
       <div class="flex gap-4">
@@ -14,8 +84,8 @@
     </div>
   </div>
 
-  <!-- Main Header -->
-  <div class="container-custom py-4 flex items-center gap-4 lg:gap-8">
+  <!-- Main Header (Desktop focus) -->
+  <div class="container-custom py-4 hidden md:flex items-center gap-4 lg:gap-8">
     <!-- Logo -->
     <a routerLink="/" class="flex-shrink-0">
       <div class="text-2xl font-black tracking-tighter text-slate-900 dark:text-white">
@@ -23,12 +93,11 @@
       </div>
     </a>
 
-    <!-- Mobile Menu Toggle -->
     <button class="md:hidden p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400">
       <lucide-icon [name]="MenuIcon" class="w-6 h-6"></lucide-icon>
     </button>
 
-    <!-- Search Bar -->
+    <!-- Search Bar (Desktop) -->
     <div class="flex-grow max-w-2xl relative group hidden sm:block">
       <div class="relative">
         <input
@@ -48,10 +117,9 @@
         ></lucide-icon>
       </div>
 
-      <!-- Search Suggestions Dropdown -->
+      <!-- Search Suggestions Dropdown (Desktop) -->
       @if (showSuggestions() && suggestions()) {
         <div class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-[60] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-          
           <!-- Categories Section -->
           @if (suggestions()!.categories.length > 0) {
             <div class="p-3 border-b border-slate-50 dark:border-slate-800">
@@ -99,12 +167,12 @@
       }
     </div>
 
-    <!-- Actions -->
+    <!-- Actions (Desktop) -->
     <div class="flex items-center gap-2 lg:gap-4 ml-auto">
       @if (authService.isLoggedIn()) {
-      <div class="flex items-center gap-4 group relative cursor-pointer">
+      <a routerLink="/account" class="flex items-center gap-4 group relative cursor-pointer no-underline">
         <div class="flex flex-col items-end hidden sm:flex text-right">
-          <span class="text-[11px] font-bold text-slate-900 dark:text-white"
+          <span class="text-[11px] font-bold text-slate-900 dark:text-white uppercase tracking-tighter"
             >{{ authService.currentUser()?.firstName }}
             {{ authService.currentUser()?.lastName }}</span
           >
@@ -113,7 +181,6 @@
         <div class="flex flex-col items-center p-2 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
           <lucide-icon [name]="UserIcon" class="w-6 h-6"></lucide-icon>
         </div>
-        <!-- Dropdown -->
         <div
           class="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 p-2"
         >
@@ -136,7 +203,7 @@
             Wyloguj się
           </button>
         </div>
-      </div>
+      </a>
       } @else {
       <a
         routerLink="/login"
@@ -164,7 +231,7 @@
     </div>
   </div>
 
-  <!-- Navigation -->
+  <!-- Navigation (Desktop) -->
   <nav class="border-t border-slate-100 dark:border-slate-800 hidden md:block" (mouseleave)="unsuppressMenu()">
     <div class="container-custom">
       <ul class="flex gap-6 py-2">
@@ -277,3 +344,41 @@
     </div>
   </div>
 </footer>
+
+<!-- Mobile Bottom Navigation (x-kom style) -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-2 py-2 z-50 flex justify-around items-center h-16 transition-colors duration-300">
+  <a routerLink="/" class="flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all" [class.text-primary]="currentRoute() === '/'">
+    <lucide-icon [name]="HomeIcon" class="w-6 h-6"></lucide-icon>
+    <span class="text-[10px] font-bold uppercase tracking-tight">Sklep</span>
+  </a>
+  
+  <a routerLink="/products" class="flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all" [class.text-primary]="currentRoute().startsWith('/products')">
+    <lucide-icon [name]="LayoutGridIcon" class="w-6 h-6"></lucide-icon>
+    <span class="text-[10px] font-bold uppercase tracking-tight">Kategorie</span>
+  </a>
+
+  <a routerLink="/shopping-lists" class="flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all" [class.text-primary]="currentRoute().startsWith('/shopping-lists')">
+    <lucide-icon [name]="HeartIcon" class="w-6 h-6"></lucide-icon>
+    <span class="text-[10px] font-bold uppercase tracking-tight">Listy</span>
+    @if (authService.isLoggedIn()) {
+      <span class="absolute top-2 translate-x-3 bg-primary text-white text-[8px] w-4 h-4 flex items-center justify-center rounded-full font-bold">12</span>
+    }
+  </a>
+
+  <a routerLink="/cart" class="relative flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all" [class.text-primary]="currentRoute() === '/cart'">
+    <lucide-icon [name]="ShoppingCartIcon" class="w-6 h-6"></lucide-icon>
+    <span class="text-[10px] font-bold uppercase tracking-tight">Koszyk</span>
+    @if (cartCount() > 0) {
+      <span class="absolute top-2 translate-x-3 bg-red-500 text-white text-[8px] w-5 h-5 flex items-center justify-center rounded-full font-bold border-2 border-white dark:border-slate-900">
+        {{ cartCount() }}
+      </span>
+    }
+  </a>
+
+  <a routerLink="/account" class="flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all" [class.text-primary]="currentRoute().startsWith('/account') || currentRoute() === '/login'">
+    <lucide-icon [name]="UserIcon" class="w-6 h-6"></lucide-icon>
+    <span class="text-[10px] font-bold uppercase tracking-tight">Profil</span>
+  </a>
+</div>
+
+<div class="md:hidden h-16"></div>

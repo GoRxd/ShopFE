@@ -134,7 +134,6 @@ export class CartService {
 
         try {
             await firstValueFrom(this.http.post(`${this.apiUrl}/sync`, syncDto));
-            // Clear local storage
             if (isPlatformBrowser(this.platformId)) {
                 localStorage.removeItem(this.GUEST_CART_KEY);
             }
@@ -216,7 +215,6 @@ export class CartService {
               totalAmount: cart.totalAmount
           });
       } catch (err) {
-          // 404 means no cart
           this.updateState({ items: [], totalAmount: 0 });
       }
   }

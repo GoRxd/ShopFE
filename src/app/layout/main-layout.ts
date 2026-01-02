@@ -1,7 +1,7 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink, Router } from '@angular/router';
-import { LucideAngularModule, Search, ShoppingCart, User, Menu, ChevronDown, Facebook, Instagram, Youtube, LogOut, List } from 'lucide-angular';
+import { RouterOutlet, RouterLink, Router, NavigationEnd } from '@angular/router';
+import { LucideAngularModule, Search, ShoppingCart, User, Menu, ChevronDown, Facebook, Instagram, Youtube, LogOut, List, Bell, Heart, LayoutGrid, Home, Maximize, Zap } from 'lucide-angular';
 import { CategoryService, CategoryTree } from '../core/services/category.service';
 import { AuthService } from '../core/services/auth.service';
 import { ProductService } from '../core/services/product.service';
@@ -48,8 +48,13 @@ export class MainLayoutComponent implements OnInit {
   readonly UserIcon = User;
   readonly LogOutIcon = LogOut;
   readonly MenuIcon = Menu;
-  // readonly CloseIcon = X; // If X is not used, remove it or import it
   readonly ListIcon = List;
+  readonly BellIcon = Bell;
+  readonly HeartIcon = Heart;
+  readonly LayoutGridIcon = LayoutGrid;
+  readonly HomeIcon = Home;
+  readonly ScanIcon = Maximize;
+  readonly ZapIcon = Zap;
 
   readonly cartCount = this.cartService.itemCount;
   readonly ChevronIcon = ChevronDown;
@@ -60,9 +65,40 @@ export class MainLayoutComponent implements OnInit {
   categories = signal<CategoryTree[]>([]);
   isMenuSuppressed = signal(false);
 
+  greeting = computed(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Dzień dobry';
+    if (hour < 18) return 'Cześć';
+    return 'Dobry wieczór';
+  });
+
+  currentRoute = signal('');
+
+  pageHeaderInfo = computed(() => {
+    const route = this.currentRoute();
+    if (route === '/cart') {
+      return { title: 'Koszyk', isFunctional: true };
+    }
+    if (route.startsWith('/shopping-lists')) {
+      return { title: 'Twoje listy', isFunctional: true };
+    }
+    if (route.startsWith('/account/orders')) {
+      return { title: 'Zamówienia', isFunctional: true };
+    }
+    return { title: '', isFunctional: false };
+  });
+
   ngOnInit() {
     this.categoryService.getCategoriesTree().subscribe(cats => {
       this.categories.set(cats);
+    });
+
+    this.currentRoute.set(this.router.url);
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(event => {
+      this.currentRoute.set((event as NavigationEnd).urlAfterRedirects);
+      window.scrollTo(0, 0);
     });
 
     this.searchSubject.pipe(

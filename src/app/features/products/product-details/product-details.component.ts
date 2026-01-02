@@ -113,8 +113,6 @@ export class ProductDetailsComponent {
 
     if (!categoryNode) return null;
 
-    // Check if there is a subcategory executing this attribute logic
-    // e.g. "Smartphones" -> "Smartphones Xiaomi" for value "Xiaomi"
     if (categoryNode.subCategories && categoryNode.subCategories.length > 0) {
       const normalizedValue = value.toLowerCase();
       const matchingSub = categoryNode.subCategories.find(sub => 
@@ -129,7 +127,6 @@ export class ProductDetailsComponent {
       }
     }
 
-    // Default: Link to current category with query param
     return {
       path: ['/products', categoryNode.slug],
       queryParams: { [`attr_${name}`]: value }

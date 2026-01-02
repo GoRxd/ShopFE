@@ -8,7 +8,7 @@ import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { firstValueFrom, map, take } from 'rxjs';
 import { ProductSidebar } from '../product-sidebar';
-import { LucideAngularModule, ChevronRight, Home } from 'lucide-angular';
+import { LucideAngularModule, ChevronRight, Home, SlidersHorizontal, X } from 'lucide-angular';
 import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
 
 @Component({
@@ -16,7 +16,7 @@ import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
   standalone: true,
   imports: [CommonModule, ProductSidebar, LucideAngularModule, RouterLink, PlnCurrencyPipe],
   template: `
-    <div class="container-custom py-8">
+    <div class="container-custom py-8 pb-20 md:pb-8">
       <!-- Breadcrumbs -->
       <nav class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-8 overflow-x-auto whitespace-nowrap pb-2">
         <a routerLink="/" class="hover:text-primary transition-colors flex items-center gap-1">
@@ -37,19 +37,39 @@ import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
       </nav>
 
       <div class="flex flex-col lg:flex-row gap-8">
-        <!-- Sidebar -->
-        <aside class="w-full lg:w-72 flex-shrink-0">
-          <app-product-sidebar 
-            [currentCategory]="currentCategory()"
-            [categories]="allCategories()"
-            [parentCategory]="parentCategory()"
-            [subCategories]="subCategories()"
-            [applicableAttributes]="applicableAttributes()"
-            [activeAttributes]="attributes()"
-            [minPrice]="minPrice()"
-            [maxPrice]="maxPrice()"
-            (filtersChanged)="onFiltersChange($event)"
-          />
+        <!-- Sidebar / Drawer -->
+        <aside 
+          class="fixed inset-0 z-[60] lg:relative lg:inset-auto lg:z-0 lg:w-72 flex-shrink-0 transition-transform duration-300 lg:translate-x-0"
+          [class.translate-x-full]="!isSidebarVisible() && isMobile()"
+          [class.translate-x-0]="isSidebarVisible() && isMobile()"
+        >
+          <!-- Backdrop -->
+          @if (isSidebarVisible() && isMobile()) {
+            <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm lg:hidden" (click)="toggleSidebar()"></div>
+          }
+          
+          <div class="relative h-full w-4/5 ml-auto bg-white dark:bg-slate-900 lg:bg-transparent lg:w-72 lg:ml-0 shadow-2xl lg:shadow-none flex flex-col">
+            <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center lg:hidden">
+              <span class="font-black text-xl text-slate-900 dark:text-white">Filtry</span>
+              <button (click)="toggleSidebar()" class="p-2 text-slate-500 hover:text-red-500 transition-colors">
+                <lucide-icon [name]="CloseIcon" class="w-6 h-6"></lucide-icon>
+              </button>
+            </div>
+            
+            <div class="p-4 lg:p-0 overflow-y-auto flex-grow h-full">
+              <app-product-sidebar 
+                [currentCategory]="currentCategory()"
+                [categories]="allCategories()"
+                [parentCategory]="parentCategory()"
+                [subCategories]="subCategories()"
+                [applicableAttributes]="applicableAttributes()"
+                [activeAttributes]="attributes()"
+                [minPrice]="minPrice()"
+                [maxPrice]="maxPrice()"
+                (filtersChanged)="onFiltersChange($event); isMobile() && toggleSidebar()"
+              />
+            </div>
+          </div>
         </aside>
 
         <!-- Main Content -->
@@ -65,8 +85,16 @@ import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
             </div>
             
             <div class="flex items-center gap-3">
-              <select (change)="onSortChange($event)" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer">
-                <option value="">Od najtrafniejszych</option>
+              <button 
+                (click)="toggleSidebar()" 
+                class="lg:hidden flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-primary hover:text-white transition-all shadow-sm"
+              >
+                <lucide-icon [name]="FiltersIcon" class="w-4 h-4"></lucide-icon>
+                Filtry
+              </button>
+              
+              <select (change)="onSortChange($event)" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer shadow-sm">
+                <option value="">Sortowanie</option>
                 <option value="price_asc">Cena: od najniższej</option>
                 <option value="price_desc">Cena: od najwyższej</option>
                 <option value="newest">Najnowsze</option>
@@ -74,7 +102,7 @@ import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
             </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
         @if (productsResource.isLoading()) {
           @for (i of [1,2,3,4,5,6,7,8]; track i) {
             <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 shadow-sm animate-pulse">
@@ -85,8 +113,8 @@ import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
           }
         } @else {
           @for (product of products(); track product.id) {
-            <div [routerLink]="['/product', product.id]" class="group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 cursor-pointer flex flex-col">
-              <div class="relative w-full aspect-square bg-slate-50 dark:bg-slate-800 rounded-xl mb-4 overflow-hidden">
+            <div [routerLink]="['/product', product.id]" class="group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl md:rounded-2xl p-3 md:p-4 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 cursor-pointer flex flex-col">
+              <div class="relative w-full h-40 md:h-auto md:aspect-square bg-slate-50 dark:bg-slate-800 rounded-lg md:rounded-xl mb-3 md:mb-4 overflow-hidden flex items-center justify-center">
                 <img 
                   [src]="product.imageUrl || 'https://placehold.co/600x600/f8fafc/6366f1?text=' + product.name" 
                   [alt]="product.name"
@@ -110,15 +138,15 @@ import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
               </div>
               
               <div class="flex-grow">
-                <h3 class="font-bold text-slate-800 dark:text-white text-lg group-hover:text-primary transition-colors mb-1">
+                <h3 class="font-bold text-slate-800 dark:text-white text-base md:text-lg group-hover:text-primary transition-colors mb-1 line-clamp-2 leading-snug">
                   {{ product.name }}
                 </h3>
-                <p class="text-slate-400 dark:text-slate-500 text-sm mb-4">{{ product.categoryName }}</p>
+                <p class="text-slate-400 dark:text-slate-500 text-xs md:text-sm mb-3 md:mb-4">{{ product.categoryName }}</p>
               </div>
 
-              <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-50 dark:border-slate-800">
-                <span class="text-2xl font-black text-slate-900 dark:text-white">{{ product.price | plnCurrency }}</span>
-                <span class="text-xs font-bold text-primary bg-primary/10 dark:bg-primary/20 px-2 py-1 rounded-md uppercase tracking-wider">Nowość</span>
+              <div class="flex items-center justify-between mt-auto pt-3 md:pt-4 border-t border-slate-50 dark:border-slate-800">
+                <span class="text-xl md:text-2xl font-black text-slate-900 dark:text-white">{{ product.price | plnCurrency }}</span>
+                <span class="text-[10px] md:text-xs font-bold text-primary bg-primary/10 dark:bg-primary/20 px-2 py-1 rounded-md uppercase tracking-wider">Nowość</span>
               </div>
             </div>
           } @empty {
@@ -149,11 +177,21 @@ export class ProductListComponent {
 
   readonly ChevronRightIcon = ChevronRight;
   readonly HomeIcon = Home;
+  readonly FiltersIcon = SlidersHorizontal;
+  readonly CloseIcon = X;
+
+  isSidebarVisible = signal(false);
+  isMobile = signal(false);
 
   private params = toSignal(this.route.params);
   private queryParams = toSignal(this.route.queryParams);
 
   constructor() {
+    this.checkMobile();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', () => this.checkMobile());
+    }
+
     effect(() => {
       const params = this.queryParams();
       if (!params) return;
@@ -168,16 +206,8 @@ export class ProductListComponent {
         }
       });
 
-      // Update signal only if we found attributes (or to clear if none? tricky with manual filters)
-      // For now, assume URL is source of truth if specific attrs are present.
-      // Or we can just set it. 
-      // If user navigates to clean URL, attrs should receive empty object? 
-       // If no attr_ params, we might want to clear existing attributes IF they came from URL previously. 
-       // But if manual filters added them... 
-       // Simple approach: Always sync signal to URL content for attributes.
        this.attributes.set(attrs);
        
-       // Also sync Price
        const minP = params['minPrice'] ? Number(params['minPrice']) : undefined;
        const maxP = params['maxPrice'] ? Number(params['maxPrice']) : undefined;
        
@@ -201,7 +231,7 @@ export class ProductListComponent {
 
   subCategories = computed(() => {
     const slug = this.params()?.['slug'];
-    if (!slug) return this.allCategories(); // Return root categories if no slug
+    if (!slug) return this.allCategories();
 
     const category = this.findCategoryInTreeRecursive(slug, this.allCategories());
     return category?.subCategories ?? [];
@@ -211,7 +241,6 @@ export class ProductListComponent {
     const cur = this.currentCategory();
     if (!cur || !cur.parentId) return null;
     
-    // Find parent name
     return this.findCategoryByIdRecursive(cur.parentId, this.allCategories());
   });
 
@@ -264,7 +293,6 @@ export class ProductListComponent {
         this.currentCategory.set(null);
       }
 
-      // Convert attributes record to matching query params (e.g. attr_Color: 'Red')
       const queryParams: any = { 
         categoryIds, 
         q,
@@ -285,19 +313,26 @@ export class ProductListComponent {
   });
   products = computed(() => this.productsResource.value() ?? []);
 
+  toggleSidebar() {
+    this.isSidebarVisible.update(v => !v);
+  }
+
+  private checkMobile() {
+    if (typeof window !== 'undefined') {
+      this.isMobile.set(window.innerWidth < 1024);
+    }
+  }
+
   onFiltersChange(filters: { minPrice?: number, maxPrice?: number, attributes: Record<string, string> }) {
-    // 1. Get current query params to preserve non-filter ones (like 'q')
     const currentParams = this.queryParams() || {};
     const newParams: any = { ...currentParams };
 
-    // 2. Remove all existing attr_ params and min/max price to start clean for filters
     Object.keys(newParams).forEach(key => {
       if (key.startsWith('attr_') || key === 'minPrice' || key === 'maxPrice') {
         delete newParams[key];
       }
     });
 
-    // 3. Add new filter params
     if (filters.minPrice !== undefined) newParams.minPrice = filters.minPrice;
     if (filters.maxPrice !== undefined) newParams.maxPrice = filters.maxPrice;
     
@@ -307,11 +342,9 @@ export class ProductListComponent {
       }
     });
 
-    // 4. Navigate (this will trigger the effect to update signals)
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: newParams,
-      queryParamsHandling: 'replace' // We manually constructed the full set
     });
   }
 
@@ -347,9 +380,7 @@ export class ProductListComponent {
 
   addToCart(event: Event, product: ProductListItem) {
     event.stopPropagation();
-    event.preventDefault(); // Prevent navigation
-    // Cast to any to bypass strict structure if model has extra fields, 
-    // but ProductListItem has all we need (id, name, price, imageUrl)
+    event.preventDefault();
     this.cartService.addToCart(product as any);
   }
 
