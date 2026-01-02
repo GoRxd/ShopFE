@@ -11,13 +11,16 @@
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+/* Configure Tailwind 4 to use .dark class for dark: variant */
+@variant dark (&:is(.dark, .dark *));
+
 @layer base {
   html {
     overflow-y: scroll;
   }
 
   body {
-    @apply bg-white text-slate-900 antialiased;
+    @apply bg-white dark:bg-slate-950 text-slate-900 dark:text-white antialiased transition-colors duration-300;
     font-family: var(--font-sans);
   }
 

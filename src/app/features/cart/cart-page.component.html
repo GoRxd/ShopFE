@@ -1,5 +1,5 @@
 <div class="container-custom py-8">
-  <h1 class="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
+  <h1 class="text-2xl font-black text-slate-900 dark:text-white mb-8 flex items-center gap-3">
     <lucide-icon [name]="CartIcon" class="w-8 h-8 text-primary"></lucide-icon>
     Twój Koszyk
   </h1>
@@ -9,14 +9,14 @@
       <!-- Cart Items List -->
       <div class="lg:col-span-2 space-y-4">
         @for (item of cartService.items(); track item.productId) {
-          <div class="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow relative">
-            <div class="w-20 h-20 bg-slate-100 rounded-lg flex-shrink-0 flex items-center justify-center text-slate-300">
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow relative">
+            <div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-lg flex-shrink-0 flex items-center justify-center text-slate-300 dark:text-slate-700">
                <lucide-icon [name]="CartIcon" class="w-8 h-8"></lucide-icon>
             </div>
             
             <div class="flex-grow pr-8">
-               <h3 class="font-bold text-slate-700 text-lg">{{ item.productName }}</h3>
-               <div class="text-sm text-slate-400">Produkt ID: {{ item.productId }}</div>
+               <h3 class="font-bold text-slate-700 dark:text-slate-200 text-lg">{{ item.productName }}</h3>
+               <div class="text-sm text-slate-400 dark:text-slate-500">Produkt ID: {{ item.productId }}</div>
             </div>
 
             <button 
@@ -28,11 +28,11 @@
             </button>
 
             <!-- Quantity Controls (Styled like Shopping List) -->
-            <div class="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
+            <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
                <button 
                 (click)="cartService.updateQuantity(item.productId, -1)"
                 [disabled]="item.quantity <= 1"
-                class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white text-slate-500 hover:text-slate-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow"
+                class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow"
                >
                  <lucide-icon [name]="MinusIcon" class="w-3.5 h-3.5"></lucide-icon>
                </button>
@@ -44,22 +44,22 @@
                  (input)="validateInput($event, item.productId)"
                  min="1" 
                  max="100"
-                 class="w-10 text-center font-bold text-sm text-slate-700 border-none bg-transparent focus:ring-0 p-0 appearance-none [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:m-0"
+                 class="w-10 text-center font-bold text-sm text-slate-700 dark:text-slate-200 border-none bg-transparent focus:ring-0 p-0 appearance-none [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:m-0"
                >
 
                <button 
                 (click)="cartService.updateQuantity(item.productId, 1)"
-                class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white text-slate-500 hover:text-slate-900 transition-colors shadow-sm hover:shadow"
+                class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors shadow-sm hover:shadow"
                >
                  <lucide-icon [name]="PlusIcon" class="w-3.5 h-3.5"></lucide-icon>
                </button>
             </div>
 
             <div class="text-right min-w-[100px]">
-               <div class="font-black text-slate-900 text-lg">
+               <div class="font-black text-slate-900 dark:text-white text-lg">
                  {{ (item.unitPrice * item.quantity) | plnCurrency }}
                </div>
-               <div class="text-xs text-slate-400">
+               <div class="text-xs text-slate-400 dark:text-slate-500">
                  {{ item.unitPrice | plnCurrency }} / szt.
                </div>
             </div>
@@ -69,20 +69,20 @@
 
       <!-- Summary -->
       <div class="lg:col-span-1">
-         <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm sticky top-24">
-            <h2 class="font-bold text-xl text-slate-900 mb-6">Podsumowanie</h2>
+         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm sticky top-24">
+            <h2 class="font-bold text-xl text-slate-900 dark:text-white mb-6">Podsumowanie</h2>
             
             <div class="space-y-3 mb-6">
-              <div class="flex justify-between text-slate-600">
+              <div class="flex justify-between text-slate-600 dark:text-slate-400">
                 <span>Wartość produktów</span>
-                <span class="font-medium">{{ cartService.totalAmount() | plnCurrency }}</span>
+                <span class="font-medium text-slate-900 dark:text-white">{{ cartService.totalAmount() | plnCurrency }}</span>
               </div>
-              <div class="flex justify-between text-slate-600">
+              <div class="flex justify-between text-slate-600 dark:text-slate-400">
                 <span>Dostawa</span>
-                <span class="font-medium text-green-600">0,00 zł</span>
+                <span class="font-medium text-success">0,00 zł</span>
               </div>
-              <div class="border-t border-slate-100 my-2"></div>
-              <div class="flex justify-between text-lg font-black text-slate-900">
+              <div class="border-t border-slate-100 dark:border-slate-800 my-2"></div>
+              <div class="flex justify-between text-lg font-black text-slate-900 dark:text-white">
                 <span>Do zapłaty</span>
                 <span class="text-primary">{{ cartService.totalAmount() | plnCurrency }}</span>
               </div>
@@ -100,11 +100,11 @@
   } @else {
      <!-- Empty State -->
      <div class="text-center py-20">
-        <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
-           <lucide-icon [name]="CartIcon" class="w-10 h-10 text-slate-300"></lucide-icon>
+        <div class="w-24 h-24 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-6">
+           <lucide-icon [name]="CartIcon" class="w-10 h-10 text-slate-300 dark:text-slate-700"></lucide-icon>
         </div>
-        <h2 class="text-2xl font-bold text-slate-900 mb-2">Twój koszyk jest pusty</h2>
-        <p class="text-slate-500 mb-8">Dodaj produkty do koszyka, aby złożyć zamówienie</p>
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Twój koszyk jest pusty</h2>
+        <p class="text-slate-500 dark:text-slate-400 mb-8">Dodaj produkty do koszyka, aby złożyć zamówienie</p>
         <a routerLink="/" class="inline-flex items-center gap-2 bg-primary text-white font-bold px-8 py-3 rounded-xl hover:bg-primary-dark transition-colors">
            Przejdź do sklepu
         </a>

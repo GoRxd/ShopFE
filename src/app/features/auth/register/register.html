@@ -1,16 +1,16 @@
-<div class="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+<div class="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4">
   <div class="w-full max-w-[600px]">
     <!-- Logo/Brand -->
     <div class="text-center mb-8">
-      <a routerLink="/" class="text-3xl font-black tracking-tighter text-slate-900">
+      <a routerLink="/" class="text-3xl font-black tracking-tighter text-slate-900 dark:text-white">
         SHOP<span class="text-primary">X</span>
       </a>
     </div>
 
     <!-- Register Card -->
-    <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-8 md:p-10">
-      <h1 class="text-2xl font-bold text-slate-900 mb-2">Załóż konto</h1>
-      <p class="text-sm text-slate-500 mb-8">Dołącz do nas i ciesz się wygodnymi zakupami</p>
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm p-8 md:p-10">
+      <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Załóż konto</h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-8">Dołącz do nas i ciesz się wygodnymi zakupami</p>
 
       <form (ngSubmit)="onRegister()" #registerForm="ngForm" class="space-y-6">
         @if (errorMessage()) {
@@ -23,7 +23,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- First Name -->
           <div class="space-y-2">
-            <label class="text-sm font-bold text-slate-700">Imię</label>
+            <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Imię</label>
             <input 
               type="text" 
               name="firstName" 
@@ -36,7 +36,7 @@
 
           <!-- Last Name -->
           <div class="space-y-2">
-            <label class="text-sm font-bold text-slate-700">Nazwisko</label>
+            <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Nazwisko</label>
             <input 
               type="text" 
               name="lastName" 
@@ -50,7 +50,7 @@
 
         <!-- Email -->
         <div class="space-y-2">
-          <label class="text-sm font-bold text-slate-700">Email</label>
+          <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Email</label>
           <input 
             type="email" 
             name="email" 
@@ -63,7 +63,7 @@
 
         <!-- Phone -->
         <div class="space-y-2">
-          <label class="text-sm font-bold text-slate-700">Numer telefonu</label>
+          <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Numer telefonu</label>
           <input 
             type="tel" 
             name="phone" 
@@ -75,7 +75,7 @@
 
         <!-- Password -->
         <div class="space-y-2">
-          <label class="text-sm font-bold text-slate-700">Hasło</label>
+          <label class="text-sm font-bold text-slate-700 dark:text-slate-300">Hasło</label>
           <div class="relative">
             <input 
               [type]="showPassword() ? 'text' : 'password'" 
@@ -93,8 +93,8 @@
 
         <!-- Terms -->
         <div class="flex items-start gap-3">
-          <input type="checkbox" required class="mt-1 w-4 h-4 text-primary border-slate-300 rounded focus:ring-primary">
-          <label class="text-xs text-slate-500 leading-normal">
+          <input type="checkbox" required class="mt-1 w-4 h-4 text-primary border-slate-300 dark:border-slate-700 rounded focus:ring-primary bg-white dark:bg-slate-800">
+          <label class="text-xs text-slate-500 dark:text-slate-400 leading-normal">
             Akceptuję <a href="#" class="text-primary font-bold hover:underline">Regulamin</a> oraz <a href="#" class="text-primary font-bold hover:underline">Politykę prywatności</a>. Wyrażam zgodę na przetwarzanie moich danych osobowych.
           </label>
         </div>
@@ -113,8 +113,8 @@
         </button>
       </form>
 
-      <div class="mt-8 pt-6 border-t border-slate-100 text-center">
-        <p class="text-sm text-slate-500">
+      <div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
+        <p class="text-sm text-slate-500 dark:text-slate-400">
           Masz już konto? 
           <a routerLink="/login" class="text-primary font-bold hover:underline">Zaloguj się</a>
         </p>

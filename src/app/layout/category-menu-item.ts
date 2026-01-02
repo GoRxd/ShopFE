@@ -14,11 +14,11 @@ import { MainLayoutComponent } from './main-layout';
       <a 
         [routerLink]="['/products', category.slug]" 
         (click)="mainLayout.suppressMenu()"
-        class="flex items-center justify-between px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-primary transition-colors whitespace-nowrap min-w-[200px]"
+        class="flex items-center justify-between px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-primary dark:hover:text-primary transition-colors whitespace-nowrap min-w-[200px]"
       >
         <span>{{ category.name }}</span>
         @if (canHaveChildren) {
-          <lucide-icon [name]="ChevronIcon" class="w-4 h-4 opacity-50"></lucide-icon>
+          <lucide-icon [name]="ChevronIcon" class="w-4 h-4 opacity-50 dark:text-slate-500"></lucide-icon>
         }
       </a>
 
@@ -28,7 +28,7 @@ import { MainLayoutComponent } from './main-layout';
           class="absolute top-0 left-full ml-0.5 opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible transition-all z-50"
           [class.!invisible]="mainLayout.isMenuSuppressed()"
         >
-          <div class="bg-white border border-slate-200 rounded-xl shadow-xl py-2 min-w-[220px]">
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl py-2 min-w-[220px]">
             @for (sub of category.subCategories; track sub.id) {
               <app-category-menu-item [category]="sub" [depth]="depth + 1"></app-category-menu-item>
             }

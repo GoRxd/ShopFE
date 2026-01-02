@@ -18,20 +18,20 @@ import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
   template: `
     <div class="container-custom py-8">
       <!-- Breadcrumbs -->
-      <nav class="flex items-center gap-2 text-sm text-slate-500 mb-8 overflow-x-auto whitespace-nowrap pb-2">
-        <a routerLink="/" class="hover:text-indigo-600 transition-colors flex items-center gap-1">
+      <nav class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-8 overflow-x-auto whitespace-nowrap pb-2">
+        <a routerLink="/" class="hover:text-primary transition-colors flex items-center gap-1">
           <lucide-icon [name]="HomeIcon" class="w-4 h-4"></lucide-icon>
           <span>Sklep</span>
         </a>
-        <lucide-icon [name]="ChevronRightIcon" class="w-3 h-3 text-slate-300"></lucide-icon>
+        <lucide-icon [name]="ChevronRightIcon" class="w-3 h-3 text-slate-300 dark:text-slate-700"></lucide-icon>
         @for (crumb of breadcrumbs(); track crumb.slug; let last = $last) {
           @if (!last) {
-            <a [routerLink]="['/products', crumb.slug]" class="hover:text-indigo-600 transition-colors">
+            <a [routerLink]="['/products', crumb.slug]" class="hover:text-primary transition-colors">
               {{ crumb.name }}
             </a>
-            <lucide-icon [name]="ChevronRightIcon" class="w-3 h-3 text-slate-300"></lucide-icon>
+            <lucide-icon [name]="ChevronRightIcon" class="w-3 h-3 text-slate-300 dark:text-slate-700"></lucide-icon>
           } @else {
-            <span class="font-semibold text-slate-900 truncate">{{ crumb.name }}</span>
+            <span class="font-semibold text-slate-900 dark:text-white truncate">{{ crumb.name }}</span>
           }
         }
       </nav>
@@ -56,16 +56,16 @@ import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
         <div class="flex-grow">
           <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
             <div>
-              <h1 class="text-3xl font-black text-slate-900 tracking-tight leading-tight">
+              <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
                 {{ headerTitle() }}
               </h1>
-              <p class="text-slate-500 mt-1">
+              <p class="text-slate-500 dark:text-slate-400 mt-1">
                 {{ productsResource.isLoading() ? 'Szukanie produktów...' : 'Znaleźliśmy ' + products().length + ' produktów dla Ciebie' }}
               </p>
             </div>
             
             <div class="flex items-center gap-3">
-              <select (change)="onSortChange($event)" class="bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-indigo-100 outline-none cursor-pointer">
+              <select (change)="onSortChange($event)" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer">
                 <option value="">Od najtrafniejszych</option>
                 <option value="price_asc">Cena: od najniższej</option>
                 <option value="price_desc">Cena: od najwyższej</option>
@@ -77,25 +77,30 @@ import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
           <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
         @if (productsResource.isLoading()) {
           @for (i of [1,2,3,4,5,6,7,8]; track i) {
-            <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm animate-pulse">
-              <div class="w-full aspect-square bg-slate-100 rounded-xl mb-4"></div>
-              <div class="h-5 bg-slate-100 rounded-lg w-3/4 mb-3"></div>
-              <div class="h-4 bg-slate-100 rounded-lg w-1/4"></div>
+            <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 shadow-sm animate-pulse">
+              <div class="w-full aspect-square bg-slate-100 dark:bg-slate-800 rounded-xl mb-4"></div>
+              <div class="h-5 bg-slate-100 dark:bg-slate-800 rounded-lg w-3/4 mb-3"></div>
+              <div class="h-4 bg-slate-100 dark:bg-slate-800 rounded-lg w-1/4"></div>
             </div>
           }
         } @else {
           @for (product of products(); track product.id) {
-            <div [routerLink]="['/product', product.id]" class="group bg-white border border-slate-100 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:border-indigo-100 transition-all duration-300 cursor-pointer flex flex-col">
-              <div class="relative w-full aspect-square bg-slate-50 rounded-xl mb-4 overflow-hidden">
+            <div [routerLink]="['/product', product.id]" class="group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 cursor-pointer flex flex-col">
+              <div class="relative w-full aspect-square bg-slate-50 dark:bg-slate-800 rounded-xl mb-4 overflow-hidden">
                 <img 
                   [src]="product.imageUrl || 'https://placehold.co/600x600/f8fafc/6366f1?text=' + product.name" 
                   [alt]="product.name"
-                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 dark:hidden"
+                />
+                <img 
+                  [src]="product.imageUrl || 'https://placehold.co/600x600/1e293b/94a3b8?text=' + product.name" 
+                  [alt]="product.name"
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 hidden dark:block"
                 />
                 <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                   <button 
                     (click)="addToCart($event, product)"
-                    class="bg-white/90 backdrop-blur p-2 rounded-full shadow-lg text-indigo-600 hover:bg-indigo-600 hover:text-white transition-colors cursor-pointer"
+                    class="bg-white/90 dark:bg-slate-900/90 backdrop-blur p-2 rounded-full shadow-lg text-primary hover:bg-primary hover:text-white transition-colors cursor-pointer"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -105,29 +110,29 @@ import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
               </div>
               
               <div class="flex-grow">
-                <h3 class="font-bold text-slate-800 text-lg group-hover:text-indigo-600 transition-colors mb-1">
+                <h3 class="font-bold text-slate-800 dark:text-white text-lg group-hover:text-primary transition-colors mb-1">
                   {{ product.name }}
                 </h3>
-                <p class="text-slate-400 text-sm mb-4">{{ product.categoryName }}</p>
+                <p class="text-slate-400 dark:text-slate-500 text-sm mb-4">{{ product.categoryName }}</p>
               </div>
 
-              <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-50">
-                <span class="text-2xl font-black text-slate-900">{{ product.price | plnCurrency }}</span>
-                <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md uppercase tracking-wider">Nowość</span>
+              <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-50 dark:border-slate-800">
+                <span class="text-2xl font-black text-slate-900 dark:text-white">{{ product.price | plnCurrency }}</span>
+                <span class="text-xs font-bold text-primary bg-primary/10 dark:bg-primary/20 px-2 py-1 rounded-md uppercase tracking-wider">Nowość</span>
               </div>
             </div>
           } @empty {
             <div class="col-span-full py-20 text-center">
-              <div class="inline-flex items-center justify-center w-20 h-20 bg-slate-50 rounded-full mb-4 text-slate-300">
+              <div class="inline-flex items-center justify-center w-20 h-20 bg-slate-50 dark:bg-slate-900 rounded-full mb-4 text-slate-300 dark:text-slate-700">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
                   <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                 </svg>
               </div>
-              <h3 class="text-xl font-bold text-slate-800">Nie znaleziono produktów</h3>
+              <h3 class="text-xl font-bold text-slate-800 dark:text-white">Nie znaleziono produktów</h3>
               @if (headerTitle().includes('Wyniki dla')) {
-                <p class="text-slate-500">Nie znaleźliśmy produktów pasujących do Twojego wyszukiwania.</p>
+                <p class="text-slate-500 dark:text-slate-400">Nie znaleźliśmy produktów pasujących do Twojego wyszukiwania.</p>
               } @else {
-                <p class="text-slate-500">Brak produktów w tej kategorii.</p>
+                <p class="text-slate-500 dark:text-slate-400">Brak produktów w tej kategorii.</p>
               }
             </div>
           }
@@ -145,7 +150,6 @@ export class ProductListComponent {
   readonly ChevronRightIcon = ChevronRight;
   readonly HomeIcon = Home;
 
-  // Modern Angular 19+ route handling
   private params = toSignal(this.route.params);
   private queryParams = toSignal(this.route.queryParams);
 
@@ -182,13 +186,10 @@ export class ProductListComponent {
     }, { allowSignalWrites: true });
   }
 
-  // Store all categories for tree traversal
   allCategories = signal<CategoryTree[]>([]);
 
-  // Current category details (resolved from slug)
   currentCategory = signal<{ id: number, name: string, slug: string, parentId?: number } | null>(null);
 
-  // Computed signals for sidebar and breadcrumbs
   breadcrumbs = computed(() => {
     const slug = this.params()?.['slug'];
     if (!slug) return [];
@@ -222,14 +223,12 @@ export class ProductListComponent {
     return category?.applicableAttributes ?? [];
   });
 
-  // Filter signals
   minPrice = signal<number | undefined>(undefined);
   maxPrice = signal<number | undefined>(undefined);
   attributes = signal<Record<string, string>>({});
   sortBy = signal<string | undefined>(undefined);
   sortDirection = signal<string | undefined>(undefined);
 
-  // Modern Resource API for data fetching
   productsResource = resource<ProductListItem[], { slug?: string, q?: string, minPrice?: number, maxPrice?: number, attributes?: Record<string, string>, sortBy?: string, sortDirection?: string }>({
     params: () => ({
       slug: this.params()?.['slug'],
@@ -354,7 +353,6 @@ export class ProductListComponent {
     this.cartService.addToCart(product as any);
   }
 
-  // Helper methods for tree traversal
   private findCategoryInTreeRecursive(slug: string, categories: CategoryTree[]): CategoryTree | null {
     for (const category of categories) {
       if (category.slug === slug) return category;

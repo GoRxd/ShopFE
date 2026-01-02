@@ -1,12 +1,12 @@
 <div class="container-custom py-8">
-  <h1 class="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
+  <h1 class="text-2xl font-black text-slate-900 dark:text-white mb-8 flex items-center gap-3">
     <lucide-icon [name]="ListIcon" class="w-8 h-8 text-primary"></lucide-icon>
     Twoje Listy Zakupowe
   </h1>
 
   <!-- Create New List -->
-  <div class="bg-white border border-slate-200 rounded-xl p-6 mb-8 shadow-sm">
-      <label class="block text-sm font-bold text-slate-700 mb-2">Utwórz nową listę</label>
+  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 mb-8 shadow-sm">
+      <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Utwórz nową listę</label>
       <div class="flex gap-4">
           <input 
             [(ngModel)]="newListName" 
@@ -14,7 +14,7 @@
             (keyup.enter)="createList()"
             type="text" 
             placeholder="Wpisz nazwę listy (np. Prezenty)" 
-            class="flex-grow border-slate-300 rounded-lg focus:ring-primary focus:border-primary placeholder:text-slate-400 py-3 px-4"
+            class="flex-grow border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg focus:ring-primary focus:border-primary placeholder:text-slate-400 dark:placeholder:text-slate-500 py-3 px-4 outline-none"
           >
           <button 
             (click)="createList()"
@@ -32,16 +32,16 @@
     @for (list of listService.myLists(); track list.id) {
       <div 
         [routerLink]="['/shopping-lists', list.id]"
-        class="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-md transition-shadow cursor-pointer group relative"
+        class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 hover:shadow-md transition-shadow cursor-pointer group relative"
       >
          <div class="flex justify-between items-start mb-4">
             <div>
-                <h3 class="font-bold text-lg text-slate-800 group-hover:text-primary transition-colors">{{ list.name }}</h3>
-                <p class="text-sm text-slate-400">Utworzono: {{ list.createdAt | date:'shortDate' }}</p>
+                <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200 group-hover:text-primary transition-colors">{{ list.name }}</h3>
+                <p class="text-sm text-slate-400 dark:text-slate-500">Utworzono: {{ list.createdAt | date:'shortDate' }}</p>
             </div>
             <button 
               (click)="deleteList($event, list.id)"
-              class="text-slate-300 hover:text-red-500 transition-colors p-2"
+              class="text-slate-300 dark:text-slate-600 hover:text-red-500 transition-colors p-2"
               title="Usuń listę"
             >
                 <lucide-icon [name]="TrashIcon" class="w-5 h-5"></lucide-icon>
@@ -51,23 +51,29 @@
          <!-- Thumbnails Grid -->
          <div class="mt-4 grid grid-cols-6 gap-1.5">
             @for (item of list.items | slice:0:(list.items.length > 6 ? 5 : 6); track item.id) {
-               <div class="aspect-square bg-slate-50 rounded-lg border border-slate-100 p-0.5 flex items-center justify-center overflow-hidden">
+               <div class="aspect-square bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-800 p-0.5 flex items-center justify-center overflow-hidden">
                   <img 
-                    [src]="item.imageUrl || 'https://placehold.co/100x100/f8fafc/cbd5e1?text=' + (item.productName | slice:0:1)" 
+                    [src]="item.imageUrl || 'https://placehold.co/100x100/' + (item.imageUrl ? 'f8fafc' : 'f8fafc/cbd5e1') + '?text=' + (item.productName | slice:0:1)" 
                     [alt]="item.productName"
-                    class="w-full h-full object-contain mix-blend-multiply"
+                    class="w-full h-full object-contain mix-blend-multiply dark:hidden"
+                  />
+                  <!-- Dark mode specific placeholder/image -->
+                  <img 
+                    [src]="item.imageUrl || 'https://placehold.co/100x100/1e293b/94a3b8?text=' + (item.productName | slice:0:1)" 
+                    [alt]="item.productName"
+                    class="w-full h-full object-contain hidden dark:block"
                   />
                </div>
             }
             @if (list.items.length > 6) {
-               <div class="aspect-square bg-slate-100 rounded-lg flex items-center justify-center text-[10px] font-bold text-slate-500 border border-slate-200 leading-none">
+               <div class="aspect-square bg-slate-100 dark:bg-slate-800/80 rounded-lg flex items-center justify-center text-[10px] font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 leading-none">
                   +{{ list.items.length - 5 }}
                </div>
             }
          </div>
       </div>
     } @empty {
-        <div class="col-span-full py-16 text-center text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+        <div class="col-span-full py-16 text-center text-slate-400 dark:text-slate-600 bg-slate-50/50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
             <lucide-icon [name]="ListIcon" class="w-12 h-12 mx-auto mb-3 opacity-20"></lucide-icon>
             <p class="font-medium">Nie masz jeszcze żadnych list zakupowych.</p>
             <p class="text-sm mt-1">Utwórz pierwszą listę powyżej!</p>

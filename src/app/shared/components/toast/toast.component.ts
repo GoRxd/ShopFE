@@ -11,34 +11,38 @@ import { LucideAngularModule, CheckCircle, AlertCircle, Info, X } from 'lucide-a
     <div class="fixed top-4 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-3 w-full max-w-sm pointer-events-none px-4">
       @for (toast of toastService.toasts(); track toast.id) {
         <div 
-          class="pointer-events-auto bg-white rounded-xl shadow-xl border border-slate-100 p-4 flex items-center gap-3 toast-enter"
+          class="pointer-events-auto bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 p-4 flex items-center gap-3 toast-enter"
           [class.border-green-100]="toast.type === 'success'"
+          [class.dark:border-green-900/30]="toast.type === 'success'"
           [class.border-red-100]="toast.type === 'error'"
+          [class.dark:border-red-900/30]="toast.type === 'error'"
           [class.bg-green-50]="toast.type === 'success'"
+          [class.dark:bg-green-950/20]="toast.type === 'success'"
           [class.bg-red-50]="toast.type === 'error'"
+          [class.dark:bg-red-950/20]="toast.type === 'error'"
         >
           <!-- Icon -->
           @if (toast.type === 'success') {
-             <div class="bg-green-100 text-green-600 p-1.5 rounded-full shrink-0">
+             <div class="bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 p-1.5 rounded-full shrink-0">
                <lucide-icon [name]="CheckCircleIcon" class="w-5 h-5"></lucide-icon>
              </div>
           } @else if (toast.type === 'error') {
-             <div class="bg-red-100 text-red-600 p-1.5 rounded-full shrink-0">
+             <div class="bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 p-1.5 rounded-full shrink-0">
                <lucide-icon [name]="AlertCircleIcon" class="w-5 h-5"></lucide-icon>
              </div>
           } @else {
-             <div class="bg-blue-100 text-blue-600 p-1.5 rounded-full shrink-0">
+             <div class="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 p-1.5 rounded-full shrink-0">
                <lucide-icon [name]="InfoIcon" class="w-5 h-5"></lucide-icon>
              </div>
           }
 
           <!-- Message -->
-          <div class="flex-grow text-sm font-medium text-slate-800">
+          <div class="flex-grow text-sm font-medium text-slate-800 dark:text-slate-200">
             {{ toast.message }}
           </div>
 
           <!-- Close -->
-          <button (click)="toastService.remove(toast.id)" class="text-slate-400 hover:text-slate-600 transition-colors">
+          <button (click)="toastService.remove(toast.id)" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
             <lucide-icon [name]="XIcon" class="w-4 h-4"></lucide-icon>
           </button>
         </div>

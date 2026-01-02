@@ -33,6 +33,21 @@ export const routes: Routes = [
       {
         path: 'shopping-lists/:id',
         loadComponent: () => import('./features/shopping-lists/details/shopping-list-details.component').then(m => m.ShoppingListDetailsComponent)
+      },
+      {
+        path: 'account',
+        loadComponent: () => import('./features/account/layout/account-layout.component').then(m => m.AccountLayoutComponent),
+        children: [
+          {
+            path: 'orders',
+            loadComponent: () => import('./features/account/orders/orders-history.component').then(m => m.OrdersHistoryComponent)
+          },
+          {
+            path: 'settings',
+            loadComponent: () => import('./features/account/settings/account-settings.component').then(m => m.AccountSettingsComponent)
+          },
+          { path: '', redirectTo: 'orders', pathMatch: 'full' }
+        ]
       }
     ]
   },
