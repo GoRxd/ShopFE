@@ -5,8 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../../core/services/product.service';
 import { CategoryService, CategoryTree } from '../../../core/services/category.service';
 import { CartService } from '../../../core/services/cart.service';
+import { ReviewService } from '../../../core/services/review.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Product } from '../../../core/models/product.model';
-import { LucideAngularModule, Home, ChevronRight, ShoppingCart, Check, ShieldCheck, Truck, Clock, Heart, Plus } from 'lucide-angular';
+import { Review } from '../../../core/models/review.model';
+import { LucideAngularModule, Home, ChevronRight, ShoppingCart, Check, ShieldCheck, Truck, Clock, Heart, Plus, Star, MessageSquare } from 'lucide-angular';
 import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
@@ -23,6 +26,8 @@ export class ProductDetailsComponent {
   private productService = inject(ProductService);
   private categoryService = inject(CategoryService);
   private cartService = inject(CartService);
+  private reviewService = inject(ReviewService);
+  private authService = inject(AuthService);
 
   readonly HomeIcon = Home;
   readonly ChevronRightIcon = ChevronRight;
@@ -33,10 +38,26 @@ export class ProductDetailsComponent {
   readonly ClockIcon = Clock;
   readonly HeartIcon = Heart;
   readonly PlusIcon = Plus;
+  readonly StarIcon = Star;
+  readonly MessageSquareIcon = MessageSquare;
 
+  isLoggedIn = this.authService.isLoggedIn;
   product = signal<Product | null>(null);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
+  
+  reviews = signal<Review[]>([]);
+  newReviewRating = signal(5);
+  newReviewComment = signal('');
+  submittingReview = signal(false);
+  submitError = signal<string | null>(null);
+
+  hasAlreadyReviewed = computed(() => {
+    const user = this.authService.currentUser();
+    const currentReviews = this.reviews();
+    if (!user || !currentReviews.length) return false;
+    return currentReviews.some(r => r.userId === user.id);
+  });
   
   isListModalOpen = signal(false);
 
@@ -81,11 +102,49 @@ export class ProductDetailsComponent {
     try {
       const product = await firstValueFrom(this.productService.getProductDetails(id));
       this.product.set(product);
+      this.loadReviews(id);
     } catch (err) {
       this.error.set('Nie udało się pobrać szczegółów produktu.');
       console.error(err);
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  async loadReviews(productId: number) {
+    try {
+      const reviews = await firstValueFrom(this.reviewService.getProductReviews(productId));
+      this.reviews.set(reviews);
+    } catch (err) {
+      console.error('Failed to load reviews', err);
+    }
+  }
+
+  async submitReview() {
+    const product = this.product();
+    if (!product || !this.newReviewComment().trim() || this.submittingReview()) return;
+
+    this.submittingReview.set(true);
+    this.submitError.set(null);
+    try {
+      await firstValueFrom(this.reviewService.addReview({
+        productId: product.id,
+        rating: this.newReviewRating(),
+        comment: this.newReviewComment()
+      }));
+      
+      this.newReviewComment.set('');
+      this.newReviewRating.set(5);
+      this.loadReviews(product.id);
+    } catch (err: any) {
+      if (err.error?.message) {
+        this.submitError.set(err.error.message);
+      } else {
+        this.submitError.set('Wystąpił błąd podczas dodawania opinii.');
+      }
+      console.error('Failed to submit review', err);
+    } finally {
+      this.submittingReview.set(false);
     }
   }
 
