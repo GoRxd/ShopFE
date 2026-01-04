@@ -19,7 +19,7 @@
     </div>
   } @else if (product(); as product) {
     <!-- Breadcrumbs -->
-    <nav class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-6 overflow-x-auto whitespace-nowrap pb-2">
+    <nav class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-6 overflow-x-auto whitespace-nowrap pb-2 w-full min-w-0">
       <a routerLink="/" class="hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-1">
         <lucide-icon [name]="HomeIcon" class="w-4 h-4"></lucide-icon>
         <span>Sklep</span>
@@ -151,7 +151,7 @@
           <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">Specyfikacja</h2>
           <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
             @for (attr of product.attributes; track attr.name; let odd = $odd) {
-              <div class="grid grid-cols-1 sm:grid-cols-3 p-4 sm:px-6 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" [class.bg-slate-50]="odd" [class.dark:bg-slate-800\\/50]="odd">
+              <div class="grid grid-cols-1 sm:grid-cols-3 p-4 sm:px-6 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" [class.bg-slate-50]="odd" [class.dark:bg-slate-800/50]="odd">
                 <dt class="font-medium text-slate-500 dark:text-slate-400 sm:col-span-1">{{ attr.name }}</dt>
                  <dd class="sm:col-span-2 font-medium">
                   @if (getAttributeLinkParams(attr.name, attr.value); as link) {
@@ -203,7 +203,7 @@
     <div class="border-t border-slate-100 dark:border-slate-800 pt-16 mb-16">
       <div class="flex flex-col lg:flex-row gap-12 items-start">
         <!-- Left: Reviews List -->
-        <div class="lg:w-2/3">
+        <div class="w-full lg:w-2/3 min-w-0">
           <div class="flex items-center gap-4 mb-8">
             <h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
               Opinie klientów

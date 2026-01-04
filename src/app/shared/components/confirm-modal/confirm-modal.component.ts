@@ -9,7 +9,7 @@ import { LucideAngularModule, AlertTriangle, Info, HelpCircle } from 'lucide-ang
   imports: [CommonModule, LucideAngularModule],
   template: `
     @if (confirmService.isOpen()) {
-      <div class="fixed inset-0 z-[300] flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+      <div class="fixed inset-0 z-[999] flex items-center justify-center p-4 sm:p-6">
         <!-- Backdrop -->
         <div 
           class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 animate-fade-in"
@@ -18,7 +18,7 @@ import { LucideAngularModule, AlertTriangle, Info, HelpCircle } from 'lucide-ang
         
         <!-- Modal -->
         <div 
-          class="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden animate-scale-up"
+          class="relative z-10 w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden animate-scale-up"
           (click)="$event.stopPropagation()"
         >
           <!-- Header/Icon -->

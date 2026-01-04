@@ -1,0 +1,1 @@
+c:\Users\Damian\Desktop\Shop\ShopBE\Shop.Solution\src\Shop.Api\Infrastructure\Mapping\MappingProfile.cs

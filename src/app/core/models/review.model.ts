@@ -6,6 +6,7 @@ export interface Review {
     rating: number;
     comment: string;
     createdAt: string;
+    productName?: string;
 }
 
 export interface CreateReviewDto {

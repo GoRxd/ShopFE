@@ -9,8 +9,12 @@ import { LucideAngularModule,
          MapPin, 
          Settings, 
          Zap,
-         User } from 'lucide-angular';
+         User,
+         Star } from 'lucide-angular';
 import { AuthService } from '../../../core/services/auth.service';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-account-layout',
@@ -59,7 +63,7 @@ import { AuthService } from '../../../core/services/auth.service';
         </aside>
 
         <!-- Content Area -->
-        <main class="lg:col-span-3">
+        <main class="lg:col-span-3" id="account-content">
           <router-outlet></router-outlet>
         </main>
       </div>
@@ -73,16 +77,47 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class AccountLayoutComponent {
   authService = inject(AuthService);
+  private router = inject(Router);
 
   UserIcon = User;
   
   menuItems = [
     { label: 'Zamówienia', icon: Package, route: '/account/orders', exact: true },
     { label: 'Zwroty i reklamacje', icon: RefreshCcw, route: '/account/returns', exact: false },
-    { label: 'Listy zakupowe', icon: Heart, route: '/shopping-lists', exact: false },
-    { label: 'Opinie', icon: MessageSquare, route: '/account/reviews', exact: false },
+    { label: 'Listy zakupowe', icon: Heart, route: '/account/shopping-lists', exact: false },
+    { label: 'Moje opinie', icon: Star, route: '/account/reviews', exact: false },
     { label: 'Dane do zamówień', icon: MapPin, route: '/account/addresses', exact: false },
     { label: 'Ustawienia konta', icon: Settings, route: '/account/settings', exact: false },
     { label: 'SalesMasters', icon: Zap, route: '/account/sales-masters', exact: false },
   ];
+
+  constructor() {
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      takeUntilDestroyed()
+    ).subscribe((event) => {
+      const url = (event as NavigationEnd).urlAfterRedirects || (event as NavigationEnd).url || '';
+      if (url === '/account' || url === '/account/') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        this.scrollToContent();
+      }
+    });
+  }
+
+  private scrollToContent() {
+    if (window.innerWidth < 1024) {
+      setTimeout(() => {
+        const element = document.getElementById('account-content');
+        if (element) {
+          const headerHeight = 130; // Increased offset to prevent clipping by site header
+          const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+          window.scrollTo({
+            top: elementPosition - headerHeight,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+    }
+  }
 }

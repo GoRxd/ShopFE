@@ -171,19 +171,21 @@
     <!-- Actions (Desktop) -->
     <div class="flex items-center gap-2 lg:gap-4 ml-auto">
       @if (authService.isLoggedIn()) {
-      <a routerLink="/account" class="flex items-center gap-4 group relative cursor-pointer no-underline">
-        <div class="flex flex-col items-end hidden sm:flex text-right">
-          <span class="text-[11px] font-bold text-slate-900 dark:text-white uppercase tracking-tighter"
-            >{{ authService.currentUser()?.firstName }}
-            {{ authService.currentUser()?.lastName }}</span
-          >
-          <span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-tighter">Mój profil</span>
-        </div>
-        <div class="flex flex-col items-center p-2 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-          <lucide-icon [name]="UserIcon" class="w-6 h-6"></lucide-icon>
-        </div>
+      <div class="flex items-center gap-4 group relative z-50">
+        <a routerLink="/account" class="flex items-center gap-4 cursor-pointer no-underline">
+          <div class="flex flex-col items-end hidden sm:flex text-right">
+            <span class="text-[11px] font-bold text-slate-900 dark:text-white uppercase tracking-tighter"
+              >{{ authService.currentUser()?.firstName }}
+              {{ authService.currentUser()?.lastName }}</span
+            >
+            <span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-tighter">Mój profil</span>
+          </div>
+          <div class="flex flex-col items-center p-2 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
+            <lucide-icon [name]="UserIcon" class="w-6 h-6"></lucide-icon>
+          </div>
+        </a>
         <div
-          class="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 p-2"
+          class="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all p-2"
         >
           <a
             routerLink="/account/orders"
@@ -204,7 +206,7 @@
             Wyloguj się
           </button>
         </div>
-      </a>
+      </div>
       } @else {
       <a
         routerLink="/login"
@@ -225,7 +227,7 @@
       </a>
       
       @if (authService.isLoggedIn()) {
-           <a routerLink="/shopping-lists" class="hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-lg transition-colors group" title="Listy zakupowe">
+           <a routerLink="/account/shopping-lists" class="hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-lg transition-colors group" title="Listy zakupowe">
               <lucide-icon [name]="ListIcon" class="w-6 h-6 text-slate-600 dark:text-slate-400 group-hover:text-primary"></lucide-icon>
            </a>
       }
@@ -358,7 +360,7 @@
     <span class="text-[10px] font-bold uppercase tracking-tight">Kategorie</span>
   </a>
 
-  <a routerLink="/shopping-lists" class="flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all" [class.text-primary]="currentRoute().startsWith('/shopping-lists')">
+  <a routerLink="/account/shopping-lists" class="flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all" [class.text-primary]="currentRoute().startsWith('/account/shopping-lists')">
     <lucide-icon [name]="HeartIcon" class="w-6 h-6"></lucide-icon>
     <span class="text-[10px] font-bold uppercase tracking-tight">Listy</span>
     @if (authService.isLoggedIn()) {

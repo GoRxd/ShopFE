@@ -18,4 +18,8 @@ export class ReviewService {
   addReview(dto: CreateReviewDto): Observable<Review> {
     return this.http.post<Review>(this.apiUrl, dto);
   }
+
+  getMyReviews(): Observable<Review[]> {
+    return this.http.get<Review[]>(`${this.apiUrl}/my`);
+  }
 }

@@ -27,14 +27,6 @@ export const routes: Routes = [
         loadComponent: () => import('./features/cart/cart-page.component').then(m => m.CartPageComponent)
       },
       {
-        path: 'shopping-lists',
-        loadComponent: () => import('./features/shopping-lists/shopping-lists-page.component').then(m => m.ShoppingListsPageComponent)
-      },
-      {
-        path: 'shopping-lists/:id',
-        loadComponent: () => import('./features/shopping-lists/details/shopping-list-details.component').then(m => m.ShoppingListDetailsComponent)
-      },
-      {
         path: 'account',
         loadComponent: () => import('./features/account/layout/account-layout.component').then(m => m.AccountLayoutComponent),
         children: [
@@ -46,7 +38,22 @@ export const routes: Routes = [
             path: 'settings',
             loadComponent: () => import('./features/account/settings/account-settings.component').then(m => m.AccountSettingsComponent)
           },
-          { path: '', redirectTo: 'orders', pathMatch: 'full' }
+          {
+            path: 'shopping-lists',
+            loadComponent: () => import('./features/shopping-lists/shopping-lists-page.component').then(m => m.ShoppingListsPageComponent)
+          },
+          {
+            path: 'shopping-lists/:id',
+            loadComponent: () => import('./features/shopping-lists/details/shopping-list-details.component').then(m => m.ShoppingListDetailsComponent)
+          },
+          {
+            path: 'reviews',
+            loadComponent: () => import('./features/account/reviews/user-reviews.component').then(m => m.UserReviewsComponent)
+          },
+          {
+            path: '',
+            loadComponent: () => import('./features/account/dashboard/account-overview.component').then(m => m.AccountOverviewComponent)
+          }
         ]
       }
     ]

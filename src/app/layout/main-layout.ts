@@ -80,7 +80,7 @@ export class MainLayoutComponent implements OnInit {
     if (route === '/cart') {
       return { title: 'Koszyk', isFunctional: true };
     }
-    if (route.startsWith('/shopping-lists')) {
+    if (route.startsWith('/account/shopping-lists')) {
       return { title: 'Twoje listy', isFunctional: true };
     }
     if (route.startsWith('/account/orders')) {
@@ -98,7 +98,7 @@ export class MainLayoutComponent implements OnInit {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(event => {
-      this.currentRoute.set((event as NavigationEnd).urlAfterRedirects);
+      this.currentRoute.set(this.router.url);
       window.scrollTo(0, 0);
     });
 

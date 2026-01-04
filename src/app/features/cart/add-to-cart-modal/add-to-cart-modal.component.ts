@@ -14,7 +14,7 @@ import { firstValueFrom } from 'rxjs';
   imports: [CommonModule, RouterLink, LucideAngularModule, PlnCurrencyPipe],
   template: `
     @if (isOpen()) {
-      <div class="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6" role="dialog" aria-modal="true">
+      <div class="fixed inset-0 z-[999] flex items-center justify-center p-4 sm:p-6" role="dialog" aria-modal="true">
         <!-- Backdrop -->
         <div 
           class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
@@ -22,7 +22,7 @@ import { firstValueFrom } from 'rxjs';
         ></div>
 
         <!-- Modal Panel -->
-        <div class="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="relative z-10 w-full max-w-4xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] sm:max-h-[90vh]">
           
           <!-- Header -->
           <div class="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 z-10">

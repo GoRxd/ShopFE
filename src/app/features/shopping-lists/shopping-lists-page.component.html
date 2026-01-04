@@ -1,6 +1,6 @@
-<div class="container-custom py-8">
-  <h1 class="text-2xl font-black text-slate-900 dark:text-white mb-8 flex items-center gap-3">
-    <lucide-icon [name]="ListIcon" class="w-8 h-8 text-primary"></lucide-icon>
+<div>
+  <h1 class="text-2xl font-black text-slate-900 dark:text-white mb-6 flex items-center gap-3">
+    <lucide-icon [name]="ListIcon" class="w-7 h-7 text-primary"></lucide-icon>
     Twoje Listy Zakupowe
   </h1>
 
@@ -28,11 +28,11 @@
   </div>
 
   <!-- Lists Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
     @for (list of listService.myLists(); track list.id) {
       <div 
-        [routerLink]="['/shopping-lists', list.id]"
-        class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 hover:shadow-md transition-shadow cursor-pointer group relative"
+        [routerLink]="['/account/shopping-lists', list.id]"
+        class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:border-primary/30 dark:hover:border-primary/30 hover:shadow-xl transition-all cursor-pointer group relative"
       >
          <div class="flex justify-between items-start mb-4">
             <div>
