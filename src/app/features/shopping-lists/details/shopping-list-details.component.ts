@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { LucideAngularModule, Trash2, ShoppingCart, ArrowLeft, CheckCircle, Minus, Plus } from 'lucide-angular';
 import { ShoppingListService, ShoppingList, ShoppingListItem } from '../../../core/services/shopping-list.service';
+import { ConfirmService } from '../../../core/services/confirm.service';
 import { CartService } from '../../../core/services/cart.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
@@ -16,6 +17,7 @@ import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
 export class ShoppingListDetailsComponent implements OnInit {
   listService = inject(ShoppingListService);
   cartService = inject(CartService);
+  confirmService = inject(ConfirmService);
   router = inject(Router);
 
   // Routable input binding for 'id' parameter
@@ -47,7 +49,8 @@ export class ShoppingListDetailsComponent implements OnInit {
   isAddingAll = signal(false);
 
   async removeItem(productId: number) {
-     if (confirm('Usunąć produkt z listy?')) {
+     const confirmed = await this.confirmService.ask('Usunąć produkt z listy?');
+     if (confirmed) {
          await this.listService.removeItemFromList(this.listId(), productId);
          this.toastService.info('Produkt usunięty z listy');
      }
