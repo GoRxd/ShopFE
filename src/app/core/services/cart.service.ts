@@ -17,6 +17,7 @@ export interface CartItem {
 
 export interface Cart {
   items: CartItem[];
+  itemsCount: number;
   totalAmount: number;
 }
 
@@ -27,12 +28,12 @@ export class CartService {
   private apiUrl = `${environment.apiUrl}/cart`;
   private readonly GUEST_CART_KEY = 'guest_cart';
   
-  private cartState = signal<Cart>({ items: [], totalAmount: 0 });
+  private cartState = signal<Cart>({ items: [], itemsCount: 0, totalAmount: 0 });
   readonly lastAddedItem = signal<{ product: Product, quantity: number } | null>(null);
   
   readonly cart = computed(() => this.cartState());
   readonly items = computed(() => this.cartState().items);
-  readonly itemCount = computed(() => this.cartState().items.reduce((acc, item) => acc + item.quantity, 0));
+  readonly itemCount = computed(() => this.cartState().itemsCount);
   readonly totalAmount = computed(() => this.cartState().totalAmount);
 
   constructor(
@@ -152,6 +153,7 @@ export class CartService {
     const items = this.getGuestCartFromStorage();
     this.updateState({ 
         items, 
+        itemsCount: this.calculateCount(items),
         totalAmount: this.calculateTotal(items) 
     });
   }
@@ -168,6 +170,7 @@ export class CartService {
       }
       this.updateState({
           items,
+          itemsCount: this.calculateCount(items),
           totalAmount: this.calculateTotal(items)
       });
   }
@@ -212,10 +215,11 @@ export class CartService {
           
           this.updateState({
               items,
+              itemsCount: cart.itemsCount,
               totalAmount: cart.totalAmount
           });
       } catch (err) {
-          this.updateState({ items: [], totalAmount: 0 });
+          this.updateState({ items: [], itemsCount: 0, totalAmount: 0 });
       }
   }
 
@@ -234,6 +238,10 @@ export class CartService {
   
   private updateState(newState: Cart) {
       this.cartState.set(newState);
+  }
+  
+  private calculateCount(items: CartItem[]): number {
+      return items.reduce((acc, item) => acc + item.quantity, 0);
   }
   
   private calculateTotal(items: CartItem[]): number {

@@ -92,7 +92,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class UserReviewsComponent implements OnInit {
   private reviewService = inject(ReviewService);
-  
+
   reviews = signal<Review[]>([]);
   loading = signal(true);
 

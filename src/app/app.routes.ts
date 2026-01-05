@@ -51,6 +51,10 @@ export const routes: Routes = [
             loadComponent: () => import('./features/account/reviews/user-reviews.component').then(m => m.UserReviewsComponent)
           },
           {
+            path: 'addresses',
+            loadComponent: () => import('./features/account/addresses/account-addresses.component').then(m => m.AccountAddressesComponent)
+          },
+          {
             path: '',
             loadComponent: () => import('./features/account/dashboard/account-overview.component').then(m => m.AccountOverviewComponent)
           }
