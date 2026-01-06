@@ -20,7 +20,7 @@ import { ToastService } from '../../../../core/services/toast.service';
           
           <!-- Header -->
           <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
-            <h3 class="font-bold text-lg text-slate-800 dark:text-white">Dodaj do listy</h3>
+            <h3 class="font-bold text-lg text-slate-800 dark:text-white">Dodaj {{ quantity() }} szt. do listy</h3>
             <button (click)="close()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
                <lucide-icon [name]="XIcon" class="w-5 h-5 text-slate-400 dark:text-slate-500"></lucide-icon>
             </button>
@@ -78,6 +78,7 @@ import { ToastService } from '../../../../core/services/toast.service';
 })
 export class AddToShoppingListComponent {
   productId = input.required<number>();
+  quantity = input<number>(1);
   isOpen = input<boolean>(false);
   closeModal = output<void>();
 
@@ -96,7 +97,7 @@ export class AddToShoppingListComponent {
   }
 
   async addToList(listId: number) {
-      await this.listService.addItemToList(listId, this.productId());
+      await this.listService.addItemToList(listId, this.productId(), this.quantity());
       this.toastService.success('Produkt został dodany do listy!');
       this.close();
   }

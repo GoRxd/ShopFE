@@ -112,6 +112,37 @@
              </div>
           </div>
 
+          <div class="mb-4">
+             <label class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2 block">Ilość</label>
+             <div class="flex items-center gap-3">
+               <div class="flex items-center bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                 <button 
+                   (click)="decreaseQuantity()" 
+                   [disabled]="quantity() <= 1"
+                   class="p-3 hover:text-primary transition-colors disabled:opacity-30 disabled:hover:text-current"
+                 >
+                   <lucide-icon [name]="MinusIcon" class="w-5 h-5"></lucide-icon>
+                 </button>
+                 <input 
+                   type="number" 
+                   [value]="quantity()" 
+                   (change)="updateQuantity($any($event.target).value)"
+                   class="w-16 text-center bg-transparent font-bold text-lg outline-none appearance-none border-none p-0 focus:ring-0"
+                 >
+                 <button 
+                   (click)="increaseQuantity()" 
+                   [disabled]="quantity() >= 100"
+                   class="p-3 hover:text-primary transition-colors disabled:opacity-30 disabled:hover:text-current"
+                 >
+                   <lucide-icon [name]="PlusIcon" class="w-5 h-5"></lucide-icon>
+                 </button>
+               </div>
+               <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">
+                  {{ quantity() }} szt. x {{ product.price | plnCurrency }} = {{ (product.price * quantity()) | plnCurrency }}
+               </span>
+             </div>
+          </div>
+
           <div class="flex flex-col gap-3">
              <button 
                (click)="addToCart()"
@@ -333,6 +364,7 @@
 @if (product(); as p) {
   <app-add-to-shopping-list 
     [productId]="p.id" 
+    [quantity]="quantity()"
     [isOpen]="isListModalOpen()" 
     (closeModal)="closeListModal()"
   ></app-add-to-shopping-list>

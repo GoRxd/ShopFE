@@ -29,6 +29,10 @@ export class UserService extends BaseService {
     return this.http.post<number>(`${this.apiUrl}/users/me/addresses`, dto);
   }
 
+  updateAddress(id: number, dto: CreateAddressDto): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/users/me/addresses/${id}`, dto);
+  }
+
   removeAddress(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/users/me/addresses/${id}`);
   }

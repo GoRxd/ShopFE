@@ -110,7 +110,7 @@ import { ConfirmService } from '../../../core/services/confirm.service';
                <p class="text-sm text-slate-500 dark:text-slate-400">Twoje adresy do wysyłki i faktur</p>
              </div>
           </div>
-          @if (!isAddingAddress()) {
+          @if (!isAddingAddress() && !isEditingAddress()) {
             <button (click)="showAddAddressForm()" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold hover:bg-slate-800 dark:hover:bg-slate-100 transition-all">
               <lucide-icon [name]="PlusIcon" class="w-4 h-4"></lucide-icon>
               Dodaj nowy adres
@@ -119,7 +119,7 @@ import { ConfirmService } from '../../../core/services/confirm.service';
         </div>
 
         <div class="p-6">
-          @if (isAddingAddress()) {
+          @if (isAddingAddress() || isEditingAddress()) {
             <form [formGroup]="addressForm" (ngSubmit)="saveAddress()" class="space-y-6 mb-8 p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Name & Surname -->
@@ -202,13 +202,13 @@ import { ConfirmService } from '../../../core/services/confirm.service';
               <div class="flex justify-end gap-3 pt-6 border-t border-slate-100 dark:border-slate-700">
                 <button type="button" (click)="cancelAddingAddress()" class="px-6 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Anuluj</button>
                 <button type="submit" [disabled]="addressForm.invalid || isSubmitting()" class="px-6 py-2.5 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 transition-all disabled:opacity-50">
-                    {{ isSubmitting() ? 'Zapisywanie...' : 'Zapisz nowy adres' }}
+                    {{ isSubmitting() ? 'Zapisywanie...' : (isEditingAddress() ? 'Zapisz zmiany' : 'Zapisz nowy adres') }}
                 </button>
               </div>
             </form>
           }
 
-          @if (addresses().length === 0 && !isAddingAddress()) {
+          @if (addresses().length === 0 && !isAddingAddress() && !isEditingAddress()) {
             <div class="text-center py-12">
               <div class="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4 text-slate-300">
                 <lucide-icon [name]="MapPinIcon" class="w-8 h-8"></lucide-icon>
@@ -216,7 +216,7 @@ import { ConfirmService } from '../../../core/services/confirm.service';
               <p class="text-slate-500 dark:text-slate-400 font-bold">Brak zapisanych adresów</p>
               <p class="text-sm text-slate-400 dark:text-slate-500">Dodaj swój pierwszy adres dostawy, aby szybciej składać zamówienia.</p>
             </div>
-          } @else if (!isAddingAddress()) {
+          } @else if (!isAddingAddress() && !isEditingAddress()) {
             <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
               @for (address of addresses(); track address.id) {
                 <div class="p-6 rounded-2xl border bg-white dark:bg-slate-900 shadow-sm transition-all relative overflow-hidden flex flex-col h-full"
@@ -233,6 +233,9 @@ import { ConfirmService } from '../../../core/services/confirm.service';
                       <lucide-icon [name]="MapPinIcon" class="w-6 h-6"></lucide-icon>
                     </div>
                     <div class="flex gap-2">
+                       <button (click)="startEditingAddress(address)" class="p-2 text-slate-300 hover:text-primary hover:bg-primary/5 dark:hover:bg-primary/10 rounded-lg transition-all" title="Edytuj adres">
+                        <lucide-icon [name]="EditIcon" class="w-5 h-5"></lucide-icon>
+                      </button>
                        <button (click)="deleteAddress(address.id)" class="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-all" title="Usuń adres">
                         <lucide-icon [name]="TrashIcon" class="w-5 h-5"></lucide-icon>
                       </button>
@@ -295,6 +298,8 @@ export class AccountAddressesComponent implements OnInit {
   
   isEditingProfile = signal(false);
   isAddingAddress = signal(false);
+  isEditingAddress = signal(false);
+  editingAddressId = signal<number | null>(null);
   isSubmitting = signal(false);
 
   profileForm: FormGroup;
@@ -393,28 +398,72 @@ export class AccountAddressesComponent implements OnInit {
       isDefaultBilling: false
     });
     this.isAddingAddress.set(true);
+    this.isEditingAddress.set(false);
+    this.editingAddressId.set(null);
+  }
+
+  startEditingAddress(address: Address) {
+    this.addressForm.reset({
+      firstName: address.firstName,
+      lastName: address.lastName,
+      companyName: address.companyName,
+      nip: address.nip,
+      street: address.street,
+      houseNumber: address.houseNumber,
+      apartmentNumber: address.apartmentNumber,
+      city: address.city,
+      zipCode: address.zipCode,
+      country: address.country,
+      phone: address.phone,
+      addressType: 'Shipping', // logic fallback
+      isDefaultShipping: address.isDefaultShipping,
+      isDefaultBilling: address.isDefaultBilling
+    });
+    this.isEditingAddress.set(true);
+    this.editingAddressId.set(address.id);
+    this.isAddingAddress.set(false);
   }
 
   cancelAddingAddress() {
     this.isAddingAddress.set(false);
+    this.isEditingAddress.set(false);
+    this.editingAddressId.set(null);
   }
 
   saveAddress() {
     if (this.addressForm.invalid) return;
 
     this.isSubmitting.set(true);
-    this.userService.addAddress(this.addressForm.value).subscribe({
-      next: () => {
-        this.toastService.success('Adres został dodany');
-        this.isAddingAddress.set(false);
-        this.isSubmitting.set(false);
-        this.loadData();
-      },
-      error: () => {
-        this.toastService.error('Wystąpił błąd podczas dodawania adresu');
-        this.isSubmitting.set(false);
-      }
-    });
+    const formValue = this.addressForm.value;
+
+    if (this.isEditingAddress() && this.editingAddressId()) {
+      this.userService.updateAddress(this.editingAddressId()!, formValue).subscribe({
+        next: () => {
+          this.toastService.success('Adres został zaktualizowany');
+          this.isEditingAddress.set(false);
+          this.editingAddressId.set(null);
+          this.isSubmitting.set(false);
+          this.loadData();
+        },
+        error: () => {
+          this.toastService.error('Wystąpił błąd podczas aktualizacji adresu');
+          this.isSubmitting.set(false);
+        }
+      });
+    } else {
+      this.userService.addAddress(formValue).subscribe({
+        next: () => {
+          this.toastService.success('Adres został dodany');
+          this.isAddingAddress.set(false);
+          this.isSubmitting.set(false);
+          this.loadData();
+        },
+        error: () => {
+          this.toastService.error('Wystąpił błąd podczas dodawania adresu');
+          this.isSubmitting.set(false);
+        }
+      });
+    }
   }
 
   setDefault(id: number, type: 'Shipping' | 'Billing') {

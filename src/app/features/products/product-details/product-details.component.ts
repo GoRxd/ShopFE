@@ -9,7 +9,7 @@ import { ReviewService } from '../../../core/services/review.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Product } from '../../../core/models/product.model';
 import { Review } from '../../../core/models/review.model';
-import { LucideAngularModule, Home, ChevronRight, ShoppingCart, Check, ShieldCheck, Truck, Clock, Heart, Plus, Star, MessageSquare } from 'lucide-angular';
+import { LucideAngularModule, Home, ChevronRight, ShoppingCart, Check, ShieldCheck, Truck, Clock, Heart, Plus, Minus, Star, MessageSquare } from 'lucide-angular';
 import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
@@ -38,6 +38,7 @@ export class ProductDetailsComponent {
   readonly ClockIcon = Clock;
   readonly HeartIcon = Heart;
   readonly PlusIcon = Plus;
+  readonly MinusIcon = Minus;
   readonly StarIcon = Star;
   readonly MessageSquareIcon = MessageSquare;
 
@@ -60,6 +61,29 @@ export class ProductDetailsComponent {
   });
   
   isListModalOpen = signal(false);
+  quantity = signal(1);
+
+  increaseQuantity() {
+    if (this.quantity() < 100) {
+      this.quantity.update(q => q + 1);
+    }
+  }
+
+  decreaseQuantity() {
+    if (this.quantity() > 1) {
+      this.quantity.update(q => q - 1);
+    }
+  }
+  
+  updateQuantity(value: string) {
+      const q = parseInt(value);
+      if (!isNaN(q) && q >= 1 && q <= 100) {
+          this.quantity.set(q);
+      } else {
+          // Reset to current valid value if invalid
+          this.quantity.set(this.quantity()); 
+      }
+  }
 
   categories = signal<CategoryTree[]>([]);
 
@@ -151,7 +175,7 @@ export class ProductDetailsComponent {
   addToCart() {
       const product = this.product();
       if (product) {
-          this.cartService.addToCart(product);
+          this.cartService.addToCart(product, this.quantity());
       }
   }
 

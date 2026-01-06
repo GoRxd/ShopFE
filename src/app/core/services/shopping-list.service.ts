@@ -55,8 +55,8 @@ export class ShoppingListService {
     await this.loadLists();
   }
 
-  async addItemToList(listId: number, productId: number) {
-    await firstValueFrom(this.http.post(`${this.apiUrl}/${listId}/items`, { productId }));
+  async addItemToList(listId: number, productId: number, quantity: number = 1) {
+    await firstValueFrom(this.http.post(`${this.apiUrl}/${listId}/items`, { productId, quantity }));
     await this.loadLists();
   }
 
