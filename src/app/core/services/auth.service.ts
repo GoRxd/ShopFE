@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
 import { Observable, tap, catchError, of } from 'rxjs';
 import { BaseService } from './base.service';
+import { UserRole } from '../enums/user-role.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,11 @@ export class AuthService extends BaseService {
   private _currentUser = signal<any>(null);
   currentUser = computed(() => this._currentUser());
   isLoggedIn = computed(() => !!this._currentUser());
+  isAdmin = computed(() => {
+    const user = this._currentUser();
+    // Backend Enum: User=1, Admin=2
+    return user?.role === UserRole.Admin;
+  });
 
   constructor(http: HttpClient) {
     super(http);

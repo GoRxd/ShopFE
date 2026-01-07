@@ -88,10 +88,13 @@
   <!-- Main Header (Desktop focus) -->
   <div class="container-custom py-4 hidden md:flex items-center gap-4 lg:gap-8">
     <!-- Logo -->
-    <a routerLink="/" class="flex-shrink-0">
+    <a routerLink="/" class="flex-shrink-0 flex items-center gap-2">
       <div class="text-2xl font-black tracking-tighter text-slate-900 dark:text-white">
         SHOP<span class="text-primary">X</span>
       </div>
+      @if (authService.isAdmin()) {
+        <span class="bg-amber-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-widest shadow-sm shadow-amber-500/50">Admin</span>
+      }
     </a>
 
     <button class="md:hidden p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400">
@@ -230,6 +233,26 @@
            <a routerLink="/account/shopping-lists" class="hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-lg transition-colors group" title="Listy zakupowe">
               <lucide-icon [name]="ListIcon" class="w-6 h-6 text-slate-600 dark:text-slate-400 group-hover:text-primary"></lucide-icon>
            </a>
+      }
+      
+      @if (authService.isAdmin()) {
+        <div class="relative group z-50">
+           <button class="hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-lg transition-colors group text-amber-500">
+              <lucide-icon [name]="ShieldIcon" class="w-6 h-6"></lucide-icon>
+           </button>
+           
+           <div class="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all p-2">
+              <div class="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Admin Panel</div>
+              <a routerLink="/admin/products" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors flex items-center gap-2">
+                  <lucide-icon [name]="LayoutGridIcon" class="w-4 h-4"></lucide-icon>
+                  Produkty
+              </a>
+               <a routerLink="/admin/categories" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors flex items-center gap-2">
+                  <lucide-icon [name]="MenuIcon" class="w-4 h-4"></lucide-icon>
+                  Kategorie
+              </a>
+           </div>
+        </div>
       }
     </div>
   </div>

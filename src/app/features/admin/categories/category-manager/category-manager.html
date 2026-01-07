@@ -1,0 +1,171 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+      <lucide-icon [name]="FolderIcon" class="w-8 h-8 text-primary"></lucide-icon>
+      Zarządzanie Kategoriami
+    </h1>
+    <button 
+      (click)="openCreateModal(null)" 
+      class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium text-sm"
+    >
+      <lucide-icon [name]="PlusIcon" class="w-4 h-4"></lucide-icon>
+      Nowa Kategoria Główna
+    </button>
+  </div>
+
+  <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+    <div class="p-6">
+      <ng-container *ngTemplateOutlet="categoryTree; context: { $implicit: categories() }"></ng-container>
+    </div>
+  </div>
+</div>
+
+<!-- Recursive Tree Template -->
+<ng-template #categoryTree let-items>
+  <ul class="space-y-1">
+    @for (cat of items; track cat.id) {
+      <li>
+        <div class="flex items-center group hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg p-2 transition-colors">
+          <!-- Expand/Collapse Button -->
+          <button 
+            (click)="toggleExpand(cat.id)"
+            class="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 mr-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-0"
+            [disabled]="!cat.subCategories || cat.subCategories.length === 0"
+          >
+             @if (cat.subCategories && cat.subCategories.length > 0) {
+                @if (isExpanded(cat.id)) {
+                  <lucide-icon [name]="ChevronDownIcon" class="w-4 h-4"></lucide-icon>
+                } @else {
+                  <lucide-icon [name]="ChevronRightIcon" class="w-4 h-4"></lucide-icon>
+                }
+             } @else {
+               <div class="w-4 h-4"></div> 
+             }
+          </button>
+
+          <!-- Icon & Name -->
+          <div class="flex-1 flex items-center gap-3">
+             <div class="w-8 h-8 rounded bg-primary/10 flex items-center justify-center text-primary">
+                @if (isExpanded(cat.id)) {
+                   <lucide-icon [name]="FolderOpenIcon" class="w-4 h-4"></lucide-icon>
+                } @else {
+                   <lucide-icon [name]="FolderIcon" class="w-4 h-4"></lucide-icon>
+                }
+             </div>
+             <div>
+                <div class="font-medium text-slate-700 dark:text-slate-200 text-sm">{{ cat.name }}</div>
+                <div class="text-[10px] text-slate-400 font-mono">/{{ cat.slug }}</div>
+             </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button 
+              (click)="openCreateModal(cat.id)"
+              class="p-1.5 text-slate-500 hover:text-green-600 hover:bg-green-50 rounded"
+              title="Dodaj podkategorię"
+            >
+              <lucide-icon [name]="PlusIcon" class="w-4 h-4"></lucide-icon>
+            </button>
+            <button 
+              (click)="openEditModal(cat)"
+              class="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded"
+              title="Edytuj"
+            >
+              <lucide-icon [name]="PencilIcon" class="w-4 h-4"></lucide-icon>
+            </button>
+            <button 
+              (click)="openDeleteModal(cat.id)"
+              class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded"
+              title="Usuń"
+            >
+              <lucide-icon [name]="TrashIcon" class="w-4 h-4"></lucide-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Children Recursion -->
+        @if (isExpanded(cat.id) && cat.subCategories && cat.subCategories.length > 0) {
+          <div class="ml-6 border-l border-slate-200 dark:border-slate-800 pl-2 mt-1">
+             <ng-container *ngTemplateOutlet="categoryTree; context: { $implicit: cat.subCategories }"></ng-container>
+          </div>
+        }
+      </li>
+    }
+  </ul>
+</ng-template>
+
+<!-- Create/Edit Modal -->
+<div *ngIf="isModalOpen()" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+  <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white">
+        {{ modalMode() === 'create' ? 'Nowa Kategoria' : 'Edytuj Kategorię' }}
+      </h3>
+      <button (click)="closeModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+        <lucide-icon [name]="XIcon" class="w-5 h-5"></lucide-icon>
+      </button>
+    </div>
+    
+    <div class="p-6 space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nazwa</label>
+        <input 
+          type="text" 
+          [ngModel]="formName()" 
+          (ngModelChange)="formName.set($event); generateSlug()"
+          class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Slug (URL)</label>
+        <input 
+          type="text" 
+          [ngModel]="formSlug()" 
+          (ngModelChange)="formSlug.set($event)"
+          class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-sm font-mono text-slate-500 focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+        />
+      </div>
+    </div>
+
+    <div class="p-4 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3">
+      <button (click)="closeModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors">
+        Anuluj
+      </button>
+      <button (click)="saveCategory()" class="px-4 py-2 text-sm bg-primary text-white hover:bg-primary/90 rounded-lg transition-colors font-medium">
+        Zapisz
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div *ngIf="isDeleteModalOpen()" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+  <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div class="p-6 text-center">
+      <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+        <lucide-icon [name]="TrashIcon" class="w-6 h-6"></lucide-icon>
+      </div>
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Usunąć kategorię?</h3>
+      <p class="text-sm text-slate-500 mb-6">
+        Ta operacja jest nieodwracalna. Jeśli kategoria ma podkategorie lub produkty, musisz zaznaczyć wymuszenie.
+      </p>
+      
+      <div class="flex items-center gap-2 justify-center mb-6">
+        <input type="checkbox" id="forceDelete" [ngModel]="deleteForce()" (ngModelChange)="deleteForce.set($event)" class="rounded border-slate-300 text-red-600 focus:ring-red-500">
+        <label for="forceDelete" class="text-sm text-slate-700 dark:text-slate-300 select-none cursor-pointer">
+          Wymuś usunięcie (wraz z dziećmi)
+        </label>
+      </div>
+
+      <div class="flex gap-3 justify-center">
+        <button (click)="isDeleteModalOpen.set(false)" class="flex-1 px-4 py-2 text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
+          Anuluj
+        </button>
+        <button (click)="confirmDelete()" class="flex-1 px-4 py-2 text-sm bg-red-600 text-white hover:bg-red-700 rounded-xl transition-colors font-medium">
+          Usuń
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

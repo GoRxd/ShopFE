@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastService, Toast } from '../../../core/services/toast.service';
-import { LucideAngularModule, CheckCircle, AlertCircle, Info, X } from 'lucide-angular';
+import { LucideAngularModule, CheckCircle, AlertCircle, Info, X, AlertTriangle } from 'lucide-angular';
 
 @Component({
   selector: 'app-toast',
@@ -20,6 +20,10 @@ import { LucideAngularModule, CheckCircle, AlertCircle, Info, X } from 'lucide-a
           [class.dark:bg-green-950/20]="toast.type === 'success'"
           [class.bg-red-50]="toast.type === 'error'"
           [class.dark:bg-red-950/20]="toast.type === 'error'"
+          [class.border-amber-100]="toast.type === 'warning'"
+          [class.dark:border-amber-900/30]="toast.type === 'warning'"
+          [class.bg-amber-50]="toast.type === 'warning'"
+          [class.dark:bg-amber-950/20]="toast.type === 'warning'"
         >
           <!-- Icon -->
           @if (toast.type === 'success') {
@@ -29,6 +33,10 @@ import { LucideAngularModule, CheckCircle, AlertCircle, Info, X } from 'lucide-a
           } @else if (toast.type === 'error') {
              <div class="bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 p-1.5 rounded-full shrink-0">
                <lucide-icon [name]="AlertCircleIcon" class="w-5 h-5"></lucide-icon>
+             </div>
+          } @else if (toast.type === 'warning') {
+             <div class="bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 p-1.5 rounded-full shrink-0">
+               <lucide-icon [name]="AlertTriangleIcon" class="w-5 h-5"></lucide-icon>
              </div>
           } @else {
              <div class="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 p-1.5 rounded-full shrink-0">
@@ -70,6 +78,7 @@ export class ToastComponent {
 
   readonly CheckCircleIcon = CheckCircle;
   readonly AlertCircleIcon = AlertCircle;
+  readonly AlertTriangleIcon = AlertTriangle;
   readonly InfoIcon = Info;
   readonly XIcon = X;
 }

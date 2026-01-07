@@ -59,6 +59,10 @@ export const routes: Routes = [
             loadComponent: () => import('./features/account/dashboard/account-overview.component').then(m => m.AccountOverviewComponent)
           }
         ]
+      },
+      {
+        path: 'admin',
+        loadChildren: () => import('./features/admin/admin-module').then(m => m.AdminModule)
       }
     ]
   },
