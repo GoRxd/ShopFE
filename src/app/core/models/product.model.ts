@@ -3,12 +3,15 @@ export interface ProductListItem {
   name: string;
   price: number;
   categoryName: string;
+  stockQuantity: number;
   imageUrl?: string;
 }
 
 export interface ProductAttribute {
   name: string;
   value: string;
+  attributeId: number;
+  optionId: number;
 }
 
 export interface Product {
@@ -17,6 +20,7 @@ export interface Product {
   price: number;
   description: string;
   categoryId?: number;
+  stockQuantity: number;
   attributes: ProductAttribute[];
   imageUrl?: string;
 }

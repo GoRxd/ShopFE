@@ -13,6 +13,7 @@ export interface CategoryTree {
   slug: string;
   subCategories: CategoryTree[];
   applicableAttributes: AttributeFilter[];
+  assignedAttributeIds: number[];
 }
 
 export interface CreateCategoryDto {
@@ -25,6 +26,7 @@ export interface UpdateCategoryDto {
   id: number;
   name: string;
   slug: string;
+  attributeIds?: number[];
 }
 
 @Injectable({

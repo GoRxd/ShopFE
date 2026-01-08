@@ -11,6 +11,7 @@ import { CategoryMenuItemComponent } from './category-menu-item';
 import { AddToCartModalComponent } from '../features/cart/add-to-cart-modal/add-to-cart-modal.component';
 import { ToastComponent } from '../shared/components/toast/toast.component';
 import { ConfirmModalComponent } from '../shared/components/confirm-modal/confirm-modal.component';
+import { SearchInputComponent } from '../shared/components/search-input/search-input.component';
 import { ThemeService } from '../core/services/theme.service';
 import { debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs';
@@ -20,7 +21,8 @@ import { Subject } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule, RouterOutlet, RouterLink, LucideAngularModule, 
-    CategoryMenuItemComponent, AddToCartModalComponent, ToastComponent, ConfirmModalComponent
+    CategoryMenuItemComponent, AddToCartModalComponent, ToastComponent, ConfirmModalComponent,
+    SearchInputComponent
   ],
   templateUrl: './main-layout.html',
   styles: [`
@@ -122,6 +124,10 @@ export class MainLayoutComponent implements OnInit {
 
   onSearchInput(event: Event) {
     const value = (event.target as HTMLInputElement).value;
+    this.onSearchQueryChange(value);
+  }
+
+  onSearchQueryChange(value: string) {
     this.searchQuery.set(value);
     this.searchSubject.next(value);
   }

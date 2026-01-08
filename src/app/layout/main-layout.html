@@ -103,23 +103,16 @@
 
     <!-- Search Bar (Desktop) -->
     <div class="flex-grow max-w-2xl relative group hidden sm:block">
-      <div class="relative">
-        <input
-          type="text"
-          [value]="searchQuery()"
-          (input)="onSearchInput($event)"
-          (keyup.enter)="onSearch()"
-          (focus)="onSearchFocus()"
-          (blur)="hideSuggestions()"
-          placeholder="Czego szukasz?"
-          class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-full py-2.5 pl-16 pr-4 focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-primary/20 text-slate-900 dark:text-white transition-all outline-none shadow-sm"
-        />
-        <lucide-icon
-          [name]="SearchIcon"
-          class="absolute left-4.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-primary transition-colors cursor-pointer"
-          (click)="onSearch()"
-        ></lucide-icon>
-      </div>
+      <app-search-input
+        [value]="searchQuery()"
+        [placeholder]="'Czego szukasz?'"
+        inputClass="rounded-full !py-2.5 !pl-16 !pr-4"
+        (valueChange)="onSearchQueryChange($event)"
+        (search)="onSearch()"
+        (focus)="onSearchFocus()"
+        (blur)="hideSuggestions()"
+      >
+      </app-search-input>
 
       <!-- Search Suggestions Dropdown (Desktop) -->
       @if (showSuggestions() && suggestions()) {
@@ -250,6 +243,10 @@
                <a routerLink="/admin/categories" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors flex items-center gap-2">
                   <lucide-icon [name]="MenuIcon" class="w-4 h-4"></lucide-icon>
                   Kategorie
+              </a>
+               <a routerLink="/admin/attributes" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors flex items-center gap-2">
+                  <lucide-icon [name]="ListIcon" class="w-4 h-4"></lucide-icon>
+                  Atrybuty
               </a>
            </div>
         </div>

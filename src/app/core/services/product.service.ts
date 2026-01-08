@@ -56,4 +56,16 @@ export class ProductService extends BaseService {
       params: new HttpParams().set('q', query)
     });
   }
+
+  createProduct(data: any): Observable<number> {
+    return this.http.post<number>(`${this.apiUrl}/products`, data);
+  }
+
+  updateProduct(id: number, data: any): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/products/${id}`, data);
+  }
+
+  deleteProduct(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/products/${id}`);
+  }
 }
