@@ -10,6 +10,7 @@ import { firstValueFrom, map, take } from 'rxjs';
 import { ProductSidebar } from '../product-sidebar';
 import { LucideAngularModule, ChevronRight, Home, SlidersHorizontal, X } from 'lucide-angular';
 import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
+import { StockService } from '../../../core/services/stock.service';
 
 @Component({
   selector: 'app-product-list',
@@ -128,7 +129,8 @@ import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
                 <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                   <button 
                     (click)="addToCart($event, product)"
-                    class="bg-white/90 dark:bg-slate-900/90 backdrop-blur p-2 rounded-full shadow-lg text-primary hover:bg-primary hover:text-white transition-colors cursor-pointer"
+                    [disabled]="product.stockQuantity <= 0"
+                    class="bg-white/90 dark:bg-slate-900/90 backdrop-blur p-2 rounded-full shadow-lg text-primary hover:bg-primary hover:text-white transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -146,7 +148,11 @@ import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
 
               <div class="flex items-center justify-between mt-auto pt-3 md:pt-4 border-t border-slate-50 dark:border-slate-800">
                 <span class="text-xl md:text-2xl font-black text-slate-900 dark:text-white">{{ product.price | plnCurrency }}</span>
-                <span class="text-[10px] md:text-xs font-bold text-primary bg-primary/10 dark:bg-primary/20 px-2 py-1 rounded-md uppercase tracking-wider">Nowość</span>
+                @if (product.stockQuantity > 0 && product.stockQuantity <= 5) {
+                   <span class="text-[10px] md:text-xs font-bold text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/30 px-2 py-1 rounded-md uppercase tracking-wider animate-pulse">Ostatnie {{ product.stockQuantity }} szt.</span>
+                } @else {
+                   <span class="text-[10px] md:text-xs font-bold text-primary bg-primary/10 dark:bg-primary/20 px-2 py-1 rounded-md uppercase tracking-wider">Nowość</span>
+                }
               </div>
             </div>
           } @empty {
@@ -174,6 +180,7 @@ export class ProductListComponent {
   private cartService = inject(CartService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private stockService = inject(StockService);
 
   readonly ChevronRightIcon = ChevronRight;
   readonly HomeIcon = Home;
@@ -311,7 +318,17 @@ export class ProductListComponent {
       return firstValueFrom(this.productService.getProducts(queryParams));
     }
   });
-  products = computed(() => this.productsResource.value() ?? []);
+  products = computed(() => {
+    const baseProducts = this.productsResource.value() ?? [];
+    const updates = this.stockService.stockUpdates();
+
+    return baseProducts.map((p) => {
+      if (updates[p.id] !== undefined) {
+        return { ...p, stockQuantity: updates[p.id] };
+      }
+      return p;
+    });
+  });
 
   toggleSidebar() {
     this.isSidebarVisible.update(v => !v);

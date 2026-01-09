@@ -94,11 +94,28 @@
           </div>
 
           <div class="space-y-4 mb-6">
-             <div class="flex items-center gap-3 text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-4 py-3 rounded-xl border border-green-100 dark:border-green-900/30">
-               <lucide-icon [name]="ClockIcon" class="w-5 h-5 flex-shrink-0"></lucide-icon>
+             <div class="flex items-center gap-3 text-sm px-4 py-3 rounded-xl border" 
+                  [ngClass]="{
+                    'text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-900/30': product.stockQuantity > 5,
+                    'text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 border-orange-100 dark:border-orange-900/30': product.stockQuantity > 0 && product.stockQuantity <= 5,
+                    'text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-900/30': product.stockQuantity <= 0
+                  }">
+               <lucide-icon [name]="ClockIcon" class="w-5 h-5 flex-shrink-0" 
+                  [class.text-red-500]="product.stockQuantity <= 0"
+                  [class.text-orange-500]="product.stockQuantity > 0 && product.stockQuantity <= 5"></lucide-icon>
                <div>
-                  <span class="font-bold block">Dostępny od ręki</span>
-                  <span class="text-green-600/80 dark:text-green-400/80">Kup teraz, wyślemy dzisiaj!</span>
+                @if (product.stockQuantity > 0) {
+                  @if (product.stockQuantity <= 5) {
+                    <span class="font-bold block text-orange-600 dark:text-orange-400 animate-pulse">Ostatnie sztuki! ({{ product.stockQuantity }})</span>
+                    <span class="text-orange-500/80 dark:text-orange-400/80">Kup teraz, póki jest dostępny!</span>
+                  } @else {
+                    <span class="font-bold block">Dostępny od ręki</span>
+                    <span class="text-green-600/80 dark:text-green-400/80">Kup teraz, wyślemy dzisiaj!</span>
+                  }
+                } @else {
+                  <span class="font-bold block text-red-600 dark:text-red-400">Produkt niedostępny</span>
+                  <span class="text-red-500/80 dark:text-red-400/80">Obecnie brak w magazynie.</span>
+                }
                </div>
              </div>
              
@@ -131,7 +148,7 @@
                  >
                  <button 
                    (click)="increaseQuantity()" 
-                   [disabled]="quantity() >= 100"
+                   [disabled]="quantity() >= 100 || quantity() >= product.stockQuantity"
                    class="p-3 hover:text-primary transition-colors disabled:opacity-30 disabled:hover:text-current"
                  >
                    <lucide-icon [name]="PlusIcon" class="w-5 h-5"></lucide-icon>
@@ -146,10 +163,11 @@
           <div class="flex flex-col gap-3">
              <button 
                (click)="addToCart()"
-               class="w-full bg-success hover:bg-green-700 text-white font-bold h-14 rounded-xl text-lg transition-all shadow-lg hover:shadow-green-200 dark:hover:shadow-green-900/20 flex items-center justify-center gap-3 group active:scale-[0.98] cursor-pointer"
+               [disabled]="product.stockQuantity <= 0"
+               class="w-full bg-success hover:bg-green-700 text-white font-bold h-14 rounded-xl text-lg transition-all shadow-lg hover:shadow-green-200 dark:hover:shadow-green-900/20 flex items-center justify-center gap-3 group active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-400 disabled:shadow-none"
              >
                <lucide-icon [name]="ShoppingCartIcon" class="w-6 h-6 group-hover:scale-110 transition-transform"></lucide-icon>
-               <span>Dodaj do koszyka</span>
+               <span>{{ product.stockQuantity > 0 ? 'Dodaj do koszyka' : 'Brak w magazynie' }}</span>
              </button>
              <button 
                (click)="openListModal()"
@@ -319,7 +337,7 @@
                 <div class="space-y-4">
                   @if (submitError()) {
                     <div class="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-xl text-xs text-center">
-                      {{ submitError() }}
+                      {{ submitError() | translate }}
                     </div>
                   }
                   <div>

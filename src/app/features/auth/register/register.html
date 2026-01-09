@@ -16,7 +16,7 @@
         @if (errorMessage()) {
           <div class="bg-red-50 border border-red-100 text-red-600 p-4 rounded-lg text-sm flex items-start gap-3">
             <div class="mt-0.5">⚠️</div>
-            <div>{{ errorMessage() }}</div>
+            <div>{{ errorMessage() | translate }}</div>
           </div>
         }
 

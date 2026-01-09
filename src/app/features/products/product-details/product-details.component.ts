@@ -14,11 +14,14 @@ import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
 import { AddToShoppingListComponent } from '../../shopping-lists/components/add-to-shopping-list/add-to-shopping-list.component';
+import { StockService } from '../../../core/services/stock.service';
+import { TranslateService } from '../../../core/services/translate.service';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, LucideAngularModule, PlnCurrencyPipe, FormsModule, AddToShoppingListComponent],
+  imports: [CommonModule, RouterLink, LucideAngularModule, PlnCurrencyPipe, FormsModule, AddToShoppingListComponent, TranslatePipe],
   templateUrl: './product-details.component.html'
 })
 export class ProductDetailsComponent {
@@ -28,6 +31,8 @@ export class ProductDetailsComponent {
   private cartService = inject(CartService);
   private reviewService = inject(ReviewService);
   private authService = inject(AuthService);
+  private stockService = inject(StockService);
+  private translateService = inject(TranslateService);
 
   readonly HomeIcon = Home;
   readonly ChevronRightIcon = ChevronRight;
@@ -109,6 +114,17 @@ export class ProductDetailsComponent {
     });
 
     this.loadCategories();
+
+    effect(() => {
+      const updates = this.stockService.stockUpdates();
+      const currentProduct = this.product();
+      if (currentProduct && updates[currentProduct.id] !== undefined) {
+        const newStock = updates[currentProduct.id];
+        if (currentProduct.stockQuantity !== newStock) {
+          this.product.update(p => p ? { ...p, stockQuantity: newStock } : null);
+        }
+      }
+    }, { allowSignalWrites: true });
   }
 
   async loadCategories() {
@@ -161,11 +177,8 @@ export class ProductDetailsComponent {
       this.newReviewRating.set(5);
       this.loadReviews(product.id);
     } catch (err: any) {
-      if (err.error?.message) {
-        this.submitError.set(err.error.message);
-      } else {
-        this.submitError.set('Wystąpił błąd podczas dodawania opinii.');
-      }
+      const msg = err.error?.message || err.message;
+      this.submitError.set(msg || 'error submitting review');
       console.error('Failed to submit review', err);
     } finally {
       this.submittingReview.set(false);

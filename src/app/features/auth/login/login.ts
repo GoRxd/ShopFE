@@ -5,10 +5,12 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { LucideAngularModule, LogIn, Mail, Lock, Eye, EyeOff, Loader2, ChevronRight } from 'lucide-angular';
 
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
+
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, LucideAngularModule],
+  imports: [CommonModule, FormsModule, RouterLink, LucideAngularModule, TranslatePipe],
   templateUrl: './login.html',
   styleUrls: []
 })

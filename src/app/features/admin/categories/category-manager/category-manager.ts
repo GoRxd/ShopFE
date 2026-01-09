@@ -5,6 +5,7 @@ import { CategoryService, CategoryTree, CreateCategoryDto, UpdateCategoryDto } f
 import { AttributeService, Attribute } from '../../../../core/services/attribute.service';
 import { LucideAngularModule, Plus, Pencil, Trash2, Folder, FolderOpen, ChevronRight, ChevronDown, Check, X } from 'lucide-angular';
 import { ToastService } from '../../../../core/services/toast.service';
+import { TranslateService } from '../../../../core/services/translate.service';
 
 @Component({
   selector: 'app-category-manager',
@@ -18,6 +19,7 @@ export class CategoryManager implements OnInit {
   categoryService = inject(CategoryService);
   attributeService = inject(AttributeService); // Inject AttributeService
   toastService = inject(ToastService);
+  translateService = inject(TranslateService);
 
   categories = signal<CategoryTree[]>([]);
   attributes = signal<Attribute[]>([]); // Store available attributes
@@ -139,22 +141,17 @@ export class CategoryManager implements OnInit {
         name: this.formName(),
         slug: this.formSlug(),
         parentCategoryId: this.selectedParentId()
-        // Note: CreateCategoryDto doesn't strictly support attributes yet in backend Create logic usually,
-        // but if we added it to CreateCategoryHandler we could send it.
-        // For now, let's assume attributes are only editable in Update or we need to update Create logic too.
-        // The user request was "add attributes to *given* categories", implying update.
-        // But for completeness, let's leave valid logic.
       };
       this.categoryService.createCategory(dto).subscribe({
         next: (newId) => {
-           // If we want to save attributes on create, we'd need to call update immediately or change Create handler.
-           // For MVP, if user selected attributes, we warn or handle it.
-           // Let's assume for now attributes are only saved on Edit, or we ignore them here.
            this.toastService.show('Kategoria dodana', 'success');
            this.closeModal();
            this.loadCategories();
         },
-        error: (err) => this.toastService.show('Błąd dodawania: ' + err.message, 'error')
+        error: (err) => {
+          const msg = err.error?.message || err.message;
+          this.toastService.show('Błąd dodawania: ' + this.translateService.translate(msg), 'error');
+        }
       });
     } else {
       const id = this.editingCategoryId();
@@ -172,7 +169,10 @@ export class CategoryManager implements OnInit {
           this.closeModal();
           this.loadCategories();
         },
-        error: (err) => this.toastService.show('Błąd aktualizacji: ' + err.message, 'error')
+        error: (err) => {
+          const msg = err.error?.message || err.message;
+          this.toastService.show('Błąd aktualizacji: ' + this.translateService.translate(msg), 'error');
+        }
       });
     }
   }
@@ -200,11 +200,10 @@ export class CategoryManager implements OnInit {
       },
       error: (err) => {
         if (err.error?.detail && err.error.detail.includes("force")) {
-             // If error suggests using force, we could prompt user.
-             // But simpler for MVP: User must tick "Force" if they know it has children.
              this.toastService.show('Nie można usunąć: Ma dzieci lub produkty. Użyj trybu wymuszonego.', 'warning');
         } else {
-             this.toastService.show('Błąd usuwania: ' + err.message, 'error');
+             const msg = err.error?.message || err.message;
+             this.toastService.show('Błąd usuwania: ' + this.translateService.translate(msg), 'error');
         }
       }
     });

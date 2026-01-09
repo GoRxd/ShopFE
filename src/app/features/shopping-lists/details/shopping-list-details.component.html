@@ -49,6 +49,11 @@
                               {{ item.productName }}
                             </h3>
                             <p class="text-sm text-primary dark:text-primary-light font-medium">{{ item.unitPrice | plnCurrency }}</p>
+                            @if (item.stockQuantity <= 0) {
+                                <p class="text-[10px] font-bold text-red-500 uppercase tracking-tighter">Brak w magazynie</p>
+                            } @else if (item.stockQuantity < 5) {
+                                <p class="text-[10px] font-bold text-orange-500 uppercase tracking-tighter">Ostatnie sztuki: {{ item.stockQuantity }}</p>
+                            }
                             <p class="text-xs text-slate-400 dark:text-slate-500">Dodano: {{ item.addedAt | date:'shortDate' }}</p>
                         </div>
 
@@ -74,6 +79,7 @@
                                 <button 
                                     (click)="increaseQuantity(item)"
                                     class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+                                    [disabled]="item.quantity >= 100 || item.quantity >= item.stockQuantity"
                                 >
                                     <lucide-icon [name]="PlusIcon" class="w-3.5 h-3.5"></lucide-icon>
                                 </button>
@@ -82,10 +88,11 @@
                             <div class="flex items-center gap-2 w-full sm:w-auto">
                                 <button 
                                     (click)="addToCart(item)"
-                                    class="flex-grow sm:flex-grow-0 bg-primary text-white hover:bg-primary-dark px-4 py-2 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-md shadow-primary/10"
+                                    [disabled]="item.stockQuantity <= 0"
+                                    class="flex-grow sm:flex-grow-0 bg-primary text-white hover:bg-primary-dark px-4 py-2 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-md shadow-primary/10 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-400"
                                 >
                                     <lucide-icon [name]="CartIcon" class="w-4 h-4"></lucide-icon>
-                                    Do koszyka
+                                    {{ item.stockQuantity > 0 ? 'Do koszyka' : 'Brak' }}
                                 </button>
                                 <button 
                                     (click)="removeItem(item.productId)"

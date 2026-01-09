@@ -75,13 +75,6 @@ export class ProductForm implements OnInit {
 
     const catNode = findCat(this.categories());
     if (!catNode) return [];
-
-    // Ideally we walk up the tree to find ALL inherited assigned attributes
-    // But `CategoryTree` structure is nested children. Parent reference isn't direct in frontend `CategoryTree` usually unless we map it.
-    // However, `category.service` has `CategoryTree` which *contains* `assignedAttributeIds`.
-    // Valid attributes = assigned to this category OR its parents.
-    
-    // To implement "inherit from parent", we need to traverse from root to selected node.
     
     const collectAttributes = (nodes: CategoryTree[], targetId: number, accumulatedAttrs: number[]): number[] | null => {
       for (const node of nodes) {
@@ -97,8 +90,6 @@ export class ProductForm implements OnInit {
     };
 
     const validAttrIds = collectAttributes(this.categories(), catId, []) || [];
-    
-    // Include attributes that already have a value selected (handles legacy/migrated data)
     const selectedIds = Object.keys(this.selectedAttributeOptions()).map(id => +id);
     const combinedIds = [...validAttrIds, ...selectedIds];
 

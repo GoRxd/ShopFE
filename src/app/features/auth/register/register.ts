@@ -5,10 +5,12 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { LucideAngularModule, UserPlus, Mail, Lock, User, Phone, Eye, EyeOff, Loader2, ChevronRight } from 'lucide-angular';
 
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
+
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, LucideAngularModule],
+  imports: [CommonModule, FormsModule, RouterLink, LucideAngularModule, TranslatePipe],
   templateUrl: './register.html',
   styleUrls: []
 })

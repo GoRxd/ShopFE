@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from './auth.service';
 import { ToastService } from './toast.service';
+import { TranslateService } from './translate.service';
 import { Product } from '../models/product.model';
 import { environment } from '../../../environments/environment';
 import { firstValueFrom } from 'rxjs';
@@ -40,6 +41,7 @@ export class CartService {
     private http: HttpClient,
     private authService: AuthService,
     private toastService: ToastService,
+    private translateService: TranslateService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     effect(() => {
@@ -59,10 +61,21 @@ export class CartService {
         return false;
     }
 
-    if (this.authService.isLoggedIn()) {
-      await this.addToUserCart(product.id, quantity);
-    } else {
-      this.addToGuestCart(product, quantity);
+    try {
+      if (this.authService.isLoggedIn()) {
+        await this.addToUserCart(product.id, quantity);
+      } else {
+        // Guest check if possible
+        if (product.stockQuantity !== undefined && product.stockQuantity < quantity) {
+           this.toastService.error(`Niewystarczająca ilość produktu w magazynie.`);
+           return false;
+        }
+        this.addToGuestCart(product, quantity);
+      }
+    } catch (err: any) {
+      const msg = err.error?.message || err.message;
+      this.toastService.error(this.translateService.translate(msg) || 'Błąd podczas dodawania do koszyka');
+      return false;
     }
     
     if (options.openModal) {
@@ -246,5 +259,14 @@ export class CartService {
   
   private calculateTotal(items: CartItem[]): number {
       return items.reduce((acc, item) => acc + (item.unitPrice * item.quantity), 0);
+  }
+
+  async clearCart() {
+    if (this.authService.isLoggedIn()) {
+      await firstValueFrom(this.http.delete(this.apiUrl));
+      await this.loadUserCart();
+    } else {
+      this.saveGuestCartToStorage([]);
+    }
   }
 }

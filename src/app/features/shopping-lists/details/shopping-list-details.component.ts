@@ -7,6 +7,7 @@ import { ConfirmService } from '../../../core/services/confirm.service';
 import { CartService } from '../../../core/services/cart.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
+import { StockService } from '../../../core/services/stock.service';
 
 @Component({
   selector: 'app-shopping-list-details',
@@ -19,6 +20,7 @@ export class ShoppingListDetailsComponent implements OnInit {
   cartService = inject(CartService);
   confirmService = inject(ConfirmService);
   router = inject(Router);
+  stockService = inject(StockService);
 
   // Routable input binding for 'id' parameter
   @Input({ transform: numberAttribute }) 
@@ -30,9 +32,20 @@ export class ShoppingListDetailsComponent implements OnInit {
   
   // Reactive Selection
   currentList = computed(() => {
-      const all = this.listService.myLists();
-      const id = this.listId();
-      return all.find(l => l.id === id) || null;
+    const all = this.listService.myLists();
+    const id = this.listId();
+    const list = all.find(l => l.id === id) || null;
+    
+    if (!list) return null;
+
+    const updates = this.stockService.stockUpdates();
+    return {
+      ...list,
+      items: list.items.map(item => ({
+        ...item,
+        stockQuantity: updates[item.productId] !== undefined ? updates[item.productId] : item.stockQuantity
+      }))
+    };
   });
 
   readonly TrashIcon = Trash2;
@@ -96,7 +109,8 @@ export class ShoppingListDetailsComponent implements OnInit {
           id: item.productId,
           name: item.productName,
           price: item.unitPrice,
-          imageUrl: item.imageUrl
+          imageUrl: item.imageUrl,
+          stockQuantity: item.stockQuantity
       };
       
       const success = await this.cartService.addToCart(productMock, item.quantity, { openModal: false });
@@ -112,17 +126,29 @@ export class ShoppingListDetailsComponent implements OnInit {
 
       this.isAddingAll.set(true);
       try {
-          // Process sequentially to be safe, or Promise.all
-          for (const item of list.items) {
+          const availableItems = list.items.filter(i => i.stockQuantity > 0);
+          
+          if (availableItems.length === 0) {
+              this.toastService.warning('Wszystkie produkty z tej listy są obecnie niedostępne.');
+              return;
+          }
+
+          for (const item of availableItems) {
               const productMock: any = {
                   id: item.productId,
                   name: item.productName,
                   price: item.unitPrice,
-                  imageUrl: item.imageUrl
+                  imageUrl: item.imageUrl,
+                  stockQuantity: item.stockQuantity
               };
               await this.cartService.addToCart(productMock, item.quantity, { openModal: false });
           }
-          this.toastService.success(`Pomyślnie dodano produkty do koszyka!`);
+          
+          if (availableItems.length < list.items.length) {
+              this.toastService.info('Dodano tylko dostępne produkty.');
+          } else {
+              this.toastService.success(`Pomyślnie dodano produkty do koszyka!`);
+          }
       } catch (err) {
           this.toastService.error('Wystąpił błąd podczas dodawania produktów.');
       } finally {

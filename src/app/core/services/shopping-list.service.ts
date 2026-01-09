@@ -12,6 +12,7 @@ export interface ShoppingListItem {
   unitPrice: number;
   addedAt: string;
   quantity: number;
+  stockQuantity: number;
 }
 
 export interface ShoppingList {

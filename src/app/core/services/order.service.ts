@@ -28,4 +28,12 @@ export class OrderService {
   getOrderHistory(): Observable<OrderHistoryItem[]> {
     return this.http.get<OrderHistoryItem[]>(`${this.apiUrl}/history`);
   }
+
+  placeOrder(address: any): Observable<number> {
+    return this.http.post<number>(this.apiUrl, { shippingAddress: address });
+  }
+
+  guestPlaceOrder(data: any): Observable<number> {
+    return this.http.post<number>(`${environment.apiUrl}/guest/orders`, data);
+  }
 }
