@@ -181,18 +181,59 @@
           </div>
         </a>
         <div
-          class="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all p-2"
+          class="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all p-2 z-[100]"
         >
+          <div class="px-4 py-2 mb-1">
+            <div class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Twoje konto</div>
+          </div>
+          
           <a
             routerLink="/account/orders"
-            class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
-            >Moje zamówienia</a
+            class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
           >
+            <lucide-icon [name]="PackageIcon" class="w-4 h-4 text-slate-400 group-hover/item:text-primary transition-colors"></lucide-icon>
+            <span class="font-medium">Zamówienia</span>
+          </a>
+          
+          <a
+            routerLink="/account/returns"
+            class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
+          >
+            <lucide-icon [name]="RefreshIcon" class="w-4 h-4 text-slate-400 group-hover/item:text-primary transition-colors"></lucide-icon>
+            <span class="font-medium">Zwroty i reklamacje</span>
+          </a>
+          
+          <a
+            routerLink="/account/shopping-lists"
+            class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
+          >
+            <lucide-icon [name]="HeartIcon" class="w-4 h-4 text-slate-400 group-hover/item:text-primary transition-colors"></lucide-icon>
+            <span class="font-medium">Listy zakupowe</span>
+          </a>
+          
+          <a
+            routerLink="/account/reviews"
+            class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
+          >
+            <lucide-icon [name]="StarIcon" class="w-4 h-4 text-slate-400 group-hover/item:text-primary transition-colors"></lucide-icon>
+            <span class="font-medium">Moje opinie</span>
+          </a>
+          
+          <a
+            routerLink="/account/addresses"
+            class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
+          >
+            <lucide-icon [name]="MapPinIcon" class="w-4 h-4 text-slate-400 group-hover/item:text-primary transition-colors"></lucide-icon>
+            <span class="font-medium">Dane do zamówień</span>
+          </a>
+          
           <a
             routerLink="/account/settings"
-            class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
-            >Ustawienia</a
+            class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
           >
+            <lucide-icon [name]="SettingsIcon" class="w-4 h-4 text-slate-400 group-hover/item:text-primary transition-colors"></lucide-icon>
+            <span class="font-medium">Ustawienia konta</span>
+          </a>
           <div class="border-t border-slate-100 dark:border-slate-800 my-2"></div>
           <button
             (click)="logout()"
@@ -206,10 +247,15 @@
       } @else {
       <a
         routerLink="/login"
-        class="flex flex-col items-center p-2 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors group"
+        class="flex items-center gap-4 cursor-pointer no-underline group"
       >
-        <lucide-icon [name]="UserIcon" class="w-6 h-6"></lucide-icon>
-        <span class="text-[10px] font-bold mt-1 uppercase">Zaloguj się</span>
+        <div class="flex flex-col items-end hidden sm:flex text-right">
+          <span class="text-[11px] font-bold text-slate-900 dark:text-white uppercase tracking-tighter">Zaloguj się</span>
+          <span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-tighter">Twoje konto</span>
+        </div>
+        <div class="flex flex-col items-center p-2 text-slate-600 dark:text-slate-400 group-hover:text-primary transition-colors">
+          <lucide-icon [name]="UserIcon" class="w-6 h-6"></lucide-icon>
+        </div>
       </a>
       }
 

@@ -67,6 +67,8 @@ import { StockService } from '../../../core/services/stock.service';
                 [activeAttributes]="attributes()"
                 [minPrice]="minPrice()"
                 [maxPrice]="maxPrice()"
+                [hideUnavailable]="hideUnavailable()"
+                [unavailableCount]="unavailableCount()"
                 (filtersChanged)="onFiltersChange($event); isMobile() && toggleSidebar()"
               />
             </div>
@@ -114,29 +116,46 @@ import { StockService } from '../../../core/services/stock.service';
           }
         } @else {
           @for (product of products(); track product.id) {
-            <div [routerLink]="['/product', product.id]" class="group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl md:rounded-2xl p-3 md:p-4 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 cursor-pointer flex flex-col">
+            <div 
+              [routerLink]="['/product', product.id]" 
+              class="group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl md:rounded-2xl p-3 md:p-4 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 cursor-pointer flex flex-col relative overflow-hidden"
+              [class.opacity-60]="product.stockQuantity <= 0"
+            >
+              <!-- Unavailable Overlay -->
+              @if (product.stockQuantity <= 0) {
+                <div class="absolute inset-0 bg-slate-50/40 dark:bg-slate-950/40 backdrop-grayscale-[0.5] pointer-events-none z-[5]"></div>
+              }
+
               <div class="relative w-full h-40 md:h-auto md:aspect-square bg-slate-50 dark:bg-slate-800 rounded-lg md:rounded-xl mb-3 md:mb-4 overflow-hidden flex items-center justify-center">
                 <img 
                   [src]="product.imageUrl || 'https://placehold.co/600x600/f8fafc/6366f1?text=' + product.name" 
                   [alt]="product.name"
                   class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 dark:hidden"
+                  [class.grayscale]="product.stockQuantity <= 0"
                 />
                 <img 
                   [src]="product.imageUrl || 'https://placehold.co/600x600/1e293b/94a3b8?text=' + product.name" 
                   [alt]="product.name"
                   class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 hidden dark:block"
+                  [class.grayscale]="product.stockQuantity <= 0"
                 />
-                <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                  <button 
-                    (click)="addToCart($event, product)"
-                    [disabled]="product.stockQuantity <= 0"
-                    class="bg-white/90 dark:bg-slate-900/90 backdrop-blur p-2 rounded-full shadow-lg text-primary hover:bg-primary hover:text-white transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg>
-                  </button>
-                </div>
+                
+                @if (product.stockQuantity > 0) {
+                  <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                    <button 
+                      (click)="addToCart($event, product)"
+                      class="bg-white/90 dark:bg-slate-900/90 backdrop-blur p-2 rounded-full shadow-lg text-primary hover:bg-primary hover:text-white transition-colors cursor-pointer"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                      </svg>
+                    </button>
+                  </div>
+                } @else {
+                  <div class="absolute inset-0 flex items-center justify-center z-10">
+                    <span class="bg-slate-900/80 dark:bg-slate-800/80 backdrop-blur-sm text-white text-[10px] md:text-xs font-black px-4 py-2 rounded-full uppercase tracking-widest shadow-xl">Chwilowy brak</span>
+                  </div>
+                }
               </div>
               
               <div class="flex-grow">
@@ -147,8 +166,10 @@ import { StockService } from '../../../core/services/stock.service';
               </div>
 
               <div class="flex items-center justify-between mt-auto pt-3 md:pt-4 border-t border-slate-50 dark:border-slate-800">
-                <span class="text-xl md:text-2xl font-black text-slate-900 dark:text-white">{{ product.price | plnCurrency }}</span>
-                @if (product.stockQuantity > 0 && product.stockQuantity <= 5) {
+                <span class="text-xl md:text-2xl font-black text-slate-900 dark:text-white" [class.!text-slate-400]="product.stockQuantity <= 0" [class.dark:!text-slate-500]="product.stockQuantity <= 0">{{ product.price | plnCurrency }}</span>
+                @if (product.stockQuantity <= 0) {
+                   <span class="text-[10px] md:text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md uppercase tracking-wider border border-slate-200 dark:border-slate-700">Niedostępny</span>
+                } @else if (product.stockQuantity <= 5) {
                    <span class="text-[10px] md:text-xs font-bold text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/30 px-2 py-1 rounded-md uppercase tracking-wider animate-pulse">Ostatnie {{ product.stockQuantity }} szt.</span>
                 } @else {
                    <span class="text-[10px] md:text-xs font-bold text-primary bg-primary/10 dark:bg-primary/20 px-2 py-1 rounded-md uppercase tracking-wider">Nowość</span>
@@ -220,6 +241,7 @@ export class ProductListComponent {
        
        this.minPrice.set(minP);
        this.maxPrice.set(maxP);
+       this.hideUnavailable.set(params['hideUnavailable'] === 'true');
     }, { allowSignalWrites: true });
   }
 
@@ -264,6 +286,7 @@ export class ProductListComponent {
   attributes = signal<Record<string, string>>({});
   sortBy = signal<string | undefined>(undefined);
   sortDirection = signal<string | undefined>(undefined);
+  hideUnavailable = signal<boolean>(false);
 
   productsResource = resource<ProductListItem[], { slug?: string, q?: string, minPrice?: number, maxPrice?: number, attributes?: Record<string, string>, sortBy?: string, sortDirection?: string }>({
     params: () => ({
@@ -318,7 +341,8 @@ export class ProductListComponent {
       return firstValueFrom(this.productService.getProducts(queryParams));
     }
   });
-  products = computed(() => {
+  
+  allProducts = computed(() => {
     const baseProducts = this.productsResource.value() ?? [];
     const updates = this.stockService.stockUpdates();
 
@@ -328,6 +352,18 @@ export class ProductListComponent {
       }
       return p;
     });
+  });
+
+  unavailableCount = computed(() => {
+    return this.allProducts().filter(p => (p.stockQuantity ?? 0) <= 0).length;
+  });
+
+  products = computed(() => {
+    let prods = this.allProducts();
+    if (this.hideUnavailable()) {
+      prods = prods.filter(p => (p.stockQuantity ?? 0) > 0);
+    }
+    return prods;
   });
 
   toggleSidebar() {
@@ -340,18 +376,19 @@ export class ProductListComponent {
     }
   }
 
-  onFiltersChange(filters: { minPrice?: number, maxPrice?: number, attributes: Record<string, string> }) {
+  onFiltersChange(filters: { minPrice?: number, maxPrice?: number, hideUnavailable: boolean, attributes: Record<string, string> }) {
     const currentParams = this.queryParams() || {};
     const newParams: any = { ...currentParams };
 
     Object.keys(newParams).forEach(key => {
-      if (key.startsWith('attr_') || key === 'minPrice' || key === 'maxPrice') {
+      if (key.startsWith('attr_') || key === 'minPrice' || key === 'maxPrice' || key === 'hideUnavailable') {
         delete newParams[key];
       }
     });
 
     if (filters.minPrice !== undefined) newParams.minPrice = filters.minPrice;
     if (filters.maxPrice !== undefined) newParams.maxPrice = filters.maxPrice;
+    if (filters.hideUnavailable) newParams.hideUnavailable = 'true';
     
     Object.entries(filters.attributes).forEach(([key, value]) => {
       if (value) {

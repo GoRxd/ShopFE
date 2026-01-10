@@ -61,27 +61,27 @@ import { PlnCurrencyPipe } from '../../core/pipes/pln-currency.pipe';
         </section>
 
         <!-- Hot Shot Section -->
-        <section class="bg-slate-900 rounded-[2rem] md:rounded-[3rem] p-6 md:p-12 overflow-hidden relative">
+        <section class="bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] md:rounded-[3rem] p-6 md:p-12 overflow-hidden relative transition-colors duration-300">
           <div class="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[100px] rounded-full -mr-20 -mt-20"></div>
           
           <div class="flex flex-col md:flex-row items-center gap-8 md:gap-16 relative z-10">
             <div class="flex-grow text-center md:text-left">
               <div class="flex flex-col md:flex-row items-center gap-4 mb-6">
-                <h2 class="text-3xl md:text-4xl font-black text-white">Gorący strzał</h2>
+                <h2 class="text-3xl md:text-4xl font-black text-slate-900 dark:text-white">Gorący strzał</h2>
                 <div class="flex gap-2">
                   @for (part of ['03', '21', '17']; track $index) {
-                    <div class="bg-slate-800 text-white font-mono text-xl md:text-2xl px-3 py-2 rounded-xl border border-slate-700 shadow-lg">{{ part }}</div>
-                    @if (!$last) { <span class="text-white text-2xl self-center text-slate-600">:</span> }
+                    <div class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono text-xl md:text-2xl px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-lg">{{ part }}</div>
+                    @if (!$last) { <span class="text-slate-400 dark:text-slate-600 text-2xl self-center">:</span> }
                   }
                 </div>
               </div>
-              <p class="text-slate-400 text-lg mb-8 max-w-md mx-auto md:mx-0 font-medium">Złap ostatnie sztuki w niesamowitych cenach. Oferta ograniczona czasowo i ilościowo!</p>
+              <p class="text-slate-500 dark:text-slate-400 text-lg mb-8 max-w-md mx-auto md:mx-0 font-medium">Złap ostatnie sztuki w niesamowitych cenach. Oferta ograniczona czasowo i ilościowo!</p>
               <button routerLink="/products" class="bg-primary hover:bg-primary-dark text-white font-black px-10 py-4 rounded-2xl shadow-xl shadow-primary/30 transition-all hover:-translate-y-1 active:scale-95">Sprawdź okazję</button>
             </div>
             
-            <div class="w-full md:w-96 aspect-square bg-slate-800/50 backdrop-blur rounded-[2.5rem] p-8 flex items-center justify-center relative group border border-slate-700/50 shadow-2xl">
+            <div class="w-full md:w-96 aspect-square bg-white dark:bg-slate-800/50 backdrop-blur rounded-[2.5rem] p-8 flex items-center justify-center relative group border border-slate-200 dark:border-slate-700/50 shadow-xl dark:shadow-2xl">
                <div class="absolute top-4 right-4 bg-red-500 text-white text-xs font-black px-3 py-1.5 rounded-full z-10 shadow-lg tracking-wider animate-pulse">OSZCZĘDŹ 500 ZŁ</div>
-               <lucide-icon [name]="LaptopIcon" class="w-32 h-32 text-slate-600 group-hover:scale-110 group-hover:text-slate-500 transition-all duration-700"></lucide-icon>
+               <lucide-icon [name]="LaptopIcon" class="w-32 h-32 text-slate-300 dark:text-slate-600 group-hover:scale-110 group-hover:text-primary transition-all duration-700"></lucide-icon>
             </div>
           </div>
         </section>

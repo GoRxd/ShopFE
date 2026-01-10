@@ -35,7 +35,7 @@
   }
 
   .input-field {
-    @apply w-full px-4 py-3 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-slate-400;
+    @apply w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-slate-400 dark:text-white;
   }
 }
 

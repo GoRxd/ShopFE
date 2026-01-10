@@ -58,7 +58,7 @@ import { FormsModule } from '@angular/forms';
       </section>
 
       <!-- Filters Section -->
-      @if (applicableAttributes().length > 0) {
+      @if (applicableAttributes().length > 0 || unavailableCount() > 0) {
         <section class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm">
           <div class="p-5 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50">
             <h2 class="font-bold text-slate-900 dark:text-white tracking-tight">Filtry</h2>
@@ -66,6 +66,27 @@ import { FormsModule } from '@angular/forms';
           </div>
 
           <div class="p-5 space-y-8">
+            <!-- Availability Toggle -->
+            @if (unavailableCount() > 0) {
+              <div class="pb-6 border-b border-slate-50 dark:border-slate-800">
+                <h3 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">Dostępność</h3>
+                <label class="flex items-center gap-3 cursor-pointer group">
+                  <div class="w-10 h-6 bg-slate-200 dark:bg-slate-700 rounded-full relative transition-colors group-hover:bg-slate-300 dark:group-hover:bg-slate-600"
+                      [class.!bg-primary]="hideUnavailable()">
+                    <div class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform duration-200"
+                        [class.translate-x-4]="hideUnavailable()"></div>
+                    <input type="checkbox" class="hidden" 
+                          [checked]="hideUnavailable()"
+                          (change)="toggleHideUnavailable()">
+                  </div>
+                  <div class="flex flex-col">
+                    <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Wyklucz niedostępne</span>
+                    <span class="text-[10px] text-slate-500 font-medium">Ukryj produkty ({{ unavailableCount() }})</span>
+                  </div>
+                </label>
+              </div>
+            }
+
             @for (attr of applicableAttributes(); track attr.name) {
               <div>
                 <h3 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">{{ attr.name }}</h3>
@@ -129,8 +150,10 @@ export class ProductSidebar {
   activeAttributes = input<Record<string, string>>({});
   inputMinPrice = input<number | undefined>(undefined, { alias: 'minPrice' });
   inputMaxPrice = input<number | undefined>(undefined, { alias: 'maxPrice' });
+  hideUnavailable = input<boolean>(false);
+  unavailableCount = input<number>(0);
 
-  filtersChanged = output<{ minPrice?: number, maxPrice?: number, attributes: Record<string, string> }>();
+  filtersChanged = output<{ minPrice?: number, maxPrice?: number, hideUnavailable: boolean, attributes: Record<string, string> }>();
 
 
 
@@ -189,7 +212,11 @@ export class ProductSidebar {
     this.applyFilters();
   }
 
-  applyFilters() {
+  toggleHideUnavailable() {
+    this.applyFilters(!this.hideUnavailable());
+  }
+
+  applyFilters(newHideUnavailable?: boolean) {
     // Flatten arrays to comma-separated strings for the output
     const flatAttributes: Record<string, string> = {};
     for (const [key, values] of Object.entries(this.selectedAttributes)) {
@@ -201,6 +228,7 @@ export class ProductSidebar {
     this.filtersChanged.emit({
       minPrice: this.minPrice ?? undefined,
       maxPrice: this.maxPrice ?? undefined,
+      hideUnavailable: newHideUnavailable ?? this.hideUnavailable(),
       attributes: flatAttributes
     });
   }
