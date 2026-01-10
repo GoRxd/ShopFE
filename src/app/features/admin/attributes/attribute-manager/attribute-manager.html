@@ -19,11 +19,11 @@
     } @else {
         <div class="divide-y divide-slate-100 dark:divide-slate-800">
             @for (attr of attributes(); track attr.id) {
-                <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                <div (click)="openEdit(attr)" class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group">
                     <div>
                         <div class="font-medium text-slate-900 dark:text-white">{{ attr.name }}</div>
                         <div class="text-xs text-slate-500 mt-1">
-                            {{ attr.options?.length || 0 }} wariantów: 
+                            {{ attr.options.length || 0 }} wariantów: 
                             <span class="text-slate-400 truncate max-w-md inline-block align-bottom">
                                 @for (opt of attr.options; track opt.id; let last = $last) {
                                     {{ opt.value }}{{ last ? '' : ', ' }}
@@ -49,8 +49,8 @@
 
 <!-- Create/Edit Modal -->
 @if (isModalOpen()) {
-  <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+  <div (click)="closeModal()" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm cursor-pointer">
+    <div (click)="$event.stopPropagation()" class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200 cursor-default">
       <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
         <h3 class="text-lg font-bold text-slate-900 dark:text-white">
           {{ modalMode() === 'create' ? 'Nowy Atrybut' : 'Edycja: ' + formName() }}
@@ -68,12 +68,12 @@
             type="text" 
             [ngModel]="formName()" 
             (ngModelChange)="formName.set($event)"
-            [disabled]="modalMode() === 'edit'" 
-            class="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all disabled:opacity-50"
+            [disabled]="false" 
+            class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all disabled:opacity-50 dark:text-white"
             placeholder="np. Kolor, RAM"
           />
           @if (modalMode() === 'edit') {
-            <p class="text-xs text-slate-400 mt-1">Edycja nazwy systemowej jest obecnie zablokowana.</p>
+            <p class="text-xs text-slate-400 mt-1">Możesz zmienić nazwę tego atrybutu.</p>
           }
         </div>
 
@@ -118,18 +118,12 @@
       </div>
 
       <div class="p-4 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3">
-        @if (modalMode() === 'create') {
-            <button (click)="closeModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors">
+        <button (click)="closeModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors">
             Anuluj
-            </button>
-            <button (click)="saveAttribute()" class="px-4 py-2 text-sm bg-primary text-white hover:bg-primary/90 rounded-lg transition-colors font-medium">
-            Utwórz
-            </button>
-        } @else {
-            <button (click)="closeModal()" class="px-4 py-2 text-sm bg-slate-800 text-white hover:bg-slate-700 rounded-lg transition-colors font-medium">
-            Zamknij
-            </button>
-        }
+        </button>
+        <button (click)="saveAttribute()" class="px-4 py-2 text-sm bg-primary text-white hover:bg-primary/90 rounded-lg transition-colors font-medium">
+            {{ modalMode() === 'create' ? 'Utwórz' : 'Zapisz zmiany' }}
+        </button>
       </div>
     </div>
   </div>

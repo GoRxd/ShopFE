@@ -19,7 +19,7 @@ import { StockService } from '../../../core/services/stock.service';
   template: `
     <div class="container-custom py-8 pb-20 md:pb-8">
       <!-- Breadcrumbs -->
-      <nav class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-8 overflow-x-auto whitespace-nowrap pb-2">
+      <nav class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-8 overflow-x-auto scrollbar-hide whitespace-nowrap pb-2">
         <a routerLink="/" class="hover:text-primary transition-colors flex items-center gap-1">
           <lucide-icon [name]="HomeIcon" class="w-4 h-4"></lucide-icon>
           <span>Sklep</span>

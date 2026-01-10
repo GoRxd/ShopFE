@@ -25,10 +25,10 @@
   <ul class="space-y-1">
     @for (cat of items; track cat.id) {
       <li>
-        <div class="flex items-center group hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg p-2 transition-colors">
+        <div (click)="openEditModal(cat)" class="flex items-center group hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg p-2 transition-colors cursor-pointer">
           <!-- Expand/Collapse Button -->
           <button 
-            (click)="toggleExpand(cat.id)"
+            (click)="toggleExpand(cat.id); $event.stopPropagation()"
             class="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 mr-2 rounded hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-0"
             [disabled]="!cat.subCategories || cat.subCategories.length === 0"
           >
@@ -61,21 +61,21 @@
           <!-- Actions -->
           <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button 
-              (click)="openCreateModal(cat.id)"
+              (click)="openCreateModal(cat.id); $event.stopPropagation()"
               class="p-1.5 text-slate-500 hover:text-green-600 hover:bg-green-50 rounded"
               title="Dodaj podkategorię"
             >
               <lucide-icon [name]="PlusIcon" class="w-4 h-4"></lucide-icon>
             </button>
             <button 
-              (click)="openEditModal(cat)"
+              (click)="openEditModal(cat); $event.stopPropagation()"
               class="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded"
               title="Edytuj"
             >
               <lucide-icon [name]="PencilIcon" class="w-4 h-4"></lucide-icon>
             </button>
             <button 
-              (click)="openDeleteModal(cat.id)"
+              (click)="openDeleteModal(cat.id); $event.stopPropagation()"
               class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded"
               title="Usuń"
             >
@@ -98,8 +98,8 @@
 <!-- Create/Edit Modal -->
 <!-- Create/Edit Modal -->
 @if (isModalOpen()) {
-  <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-  <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+  <div (click)="closeModal()" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm cursor-pointer">
+  <div (click)="$event.stopPropagation()" class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200 cursor-default">
     <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
       <h3 class="text-lg font-bold text-slate-900 dark:text-white">
         {{ modalMode() === 'create' ? 'Nowa Kategoria' : 'Edytuj Kategorię' }}
@@ -176,8 +176,8 @@
 
 <!-- Delete Confirmation Modal -->
 @if (isDeleteModalOpen()) {
-  <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-  <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+  <div (click)="isDeleteModalOpen.set(false)" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm cursor-pointer">
+  <div (click)="$event.stopPropagation()" class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200 cursor-default">
     <div class="p-6 text-center">
       <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
         <lucide-icon [name]="TrashIcon" class="w-6 h-6"></lucide-icon>

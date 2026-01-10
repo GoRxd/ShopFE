@@ -59,4 +59,38 @@
     }
     -moz-appearance: textfield;
   }
+  /* Custom Scrollbar Utilities */
+  .custom-scrollbar {
+    &::-webkit-scrollbar {
+      height: 10px;
+      width: 10px;
+    }
+    &::-webkit-scrollbar-track {
+      @apply bg-slate-100 dark:bg-slate-900/50 rounded-full;
+    }
+    &::-webkit-scrollbar-thumb {
+      @apply bg-slate-400 dark:bg-slate-600 rounded-full border-2 border-transparent bg-clip-padding hover:bg-slate-500 dark:hover:bg-slate-500 transition-colors;
+    }
+    &:hover::-webkit-scrollbar-thumb {
+      @apply bg-slate-500 dark:bg-slate-500;
+    }
+  }
+
+  .scroll-grab {
+    cursor: grab;
+    user-select: none;
+    &.dragging {
+      cursor: grabbing;
+      scroll-snap-type: none !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
 }

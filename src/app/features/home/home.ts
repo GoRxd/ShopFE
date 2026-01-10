@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule, ChevronRight, Laptop, Smartphone, Cpu, Gamepad2, Headphones, Watch, MousePointer2, Camera, LayoutGrid } from 'lucide-angular';
 import { RouterLink } from '@angular/router';
@@ -24,17 +24,26 @@ import { PlnCurrencyPipe } from '../../core/pipes/pln-currency.pipe';
             </a>
           </div>
           
-          <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x -mx-4 px-4 md:mx-0 md:px-0">
-            @for (promo of promos; track promo.id) {
-              <div class="min-w-[85%] md:min-w-[450px] aspect-[16/9] md:aspect-[21/9] bg-slate-900 rounded-2xl md:rounded-3xl overflow-hidden snap-center relative group cursor-pointer shadow-xl shadow-slate-200/50 dark:shadow-none transition-transform hover:scale-[1.01]">
-                <img [src]="promo.image" class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" [alt]="promo.title">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent p-6 flex flex-col justify-end">
-                   <div class="bg-primary text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded w-fit mb-2">{{ promo.tag }}</div>
-                   <h3 class="text-white text-xl md:text-2xl font-black leading-tight">{{ promo.title }}</h3>
-                   <p class="text-slate-300 text-sm mt-1 font-medium">{{ promo.subtitle }}</p>
+          <div 
+            #promoContainer
+            class="overflow-x-auto pb-6 custom-scrollbar snap-x md:snap-none -mx-4 px-4 md:mx-0 md:px-0"
+            (mousedown)="startDragging($event)"
+            (mousemove)="drag($event)"
+            (mouseup)="stopDragging()"
+            (mouseleave)="stopDragging()"
+          >
+            <div class="flex gap-4 scroll-grab w-max">
+              @for (promo of promos; track promo.id) {
+                <div class="w-[85vw] md:w-[450px] aspect-[16/9] md:aspect-[21/9] bg-slate-900 rounded-2xl md:rounded-3xl overflow-hidden snap-center md:snap-align-none relative group cursor-pointer shadow-xl shadow-slate-200/50 dark:shadow-none transition-transform hover:scale-[1.01] select-none">
+                  <img [src]="promo.image" class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" [alt]="promo.title" draggable="false">
+                  <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent p-6 flex flex-col justify-end">
+                     <div class="bg-primary text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded w-fit mb-2">{{ promo.tag }}</div>
+                     <h3 class="text-white text-xl md:text-2xl font-black leading-tight">{{ promo.title }}</h3>
+                     <p class="text-slate-300 text-sm mt-1 font-medium">{{ promo.subtitle }}</p>
+                  </div>
                 </div>
-              </div>
-            }
+              }
+            </div>
           </div>
         </section>
 
@@ -91,6 +100,8 @@ import { PlnCurrencyPipe } from '../../core/pipes/pln-currency.pipe';
   `
 })
 export class HomeComponent implements OnInit {
+  @ViewChild('promoContainer') promoContainer!: ElementRef<HTMLDivElement>;
+  
   private categoryService = inject(CategoryService);
   
   categories = signal<CategoryTree[]>([]);
@@ -105,6 +116,10 @@ export class HomeComponent implements OnInit {
   readonly CameraIcon = Camera;
   readonly LayoutGridIcon = LayoutGrid;
 
+  private isDragging = false;
+  private startX = 0;
+  private scrollLeft = 0;
+
   promos = [
     { id: 1, title: 'Wielka noworoczna wyprzedaż', subtitle: 'Rabaty do -45% na laptopy i peryferia', tag: 'Wyprzedaż', image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&q=80&w=1000' },
     { id: 2, title: 'Smartfony Apple w super cenach', subtitle: 'Sprawdź najnowszą ofertę na iPhone', tag: 'Super Cena', image: 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&q=80&w=1000' },
@@ -115,6 +130,31 @@ export class HomeComponent implements OnInit {
     this.categoryService.getCategoriesTree().subscribe(cats => {
       this.categories.set(cats.slice(0, 8));
     });
+  }
+
+  startDragging(e: MouseEvent) {
+    const el = this.promoContainer.nativeElement;
+    // Don't start dragging if clicking on the scrollbar (check if click is below content area)
+    if (e.offsetY > el.clientHeight) return;
+
+    this.isDragging = true;
+    el.classList.add('dragging');
+    this.startX = e.pageX - el.offsetLeft;
+    this.scrollLeft = el.scrollLeft;
+  }
+
+  stopDragging() {
+    this.isDragging = false;
+    this.promoContainer.nativeElement.classList.remove('dragging');
+  }
+
+  drag(e: MouseEvent) {
+    if (!this.isDragging) return;
+    e.preventDefault();
+    const el = this.promoContainer.nativeElement;
+    const x = e.pageX - el.offsetLeft;
+    const walk = (x - this.startX) * 2; // scroll speed multiplier
+    el.scrollLeft = this.scrollLeft - walk;
   }
 
   getIconForCategory(name: string): any {

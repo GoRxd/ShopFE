@@ -89,17 +89,16 @@ export class AttributeManager implements OnInit {
             error: () => this.toastService.show('Błąd zapisu', 'error')
         });
     } else {
-        // Edit name logic if separate endpoint exists (e.g. PUT /attributes/{id}).
-        // Currently we only implemented Create and Add Option.
-        // Assuming we might not have Update Attribute Name yet?
-        // Checking Controller... we don't have Update logic.
-        // Let's assume for now user wants to primarily Manage Options or Create New.
-        // If we want to rename, we'd need a backend handler.
-        // For MVP based on user request "creating new attributes, editing (options)", renaming might be secondary or implicit.
-        // I will focus on adding options.
-        if (this.editingAttributeId()) {
-            // Check if name changed - if so, we'd need an update endpoint. SKIP for now, just closing.
-            this.closeModal();
+        const id = this.editingAttributeId();
+        if (id) {
+            this.attributeService.updateAttribute(id, name).subscribe({
+                next: () => {
+                    this.toastService.show('Zaktualizowano nazwę', 'success');
+                    this.closeModal();
+                    this.loadAttributes();
+                },
+                error: () => this.toastService.show('Błąd aktualizacji', 'error')
+            });
         }
     }
   }

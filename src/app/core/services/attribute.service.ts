@@ -29,6 +29,10 @@ export class AttributeService {
     return this.http.post<number>(this.apiUrl, { name });
   }
 
+  updateAttribute(id: number, name: string): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${id}`, { id, name });
+  }
+
   addOption(attributeId: number, value: string): Observable<number> {
     return this.http.post<number>(`${this.apiUrl}/${attributeId}/options`, { attributeId, value });
   }
