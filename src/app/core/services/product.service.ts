@@ -68,4 +68,10 @@ export class ProductService extends BaseService {
   deleteProduct(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/products/${id}`);
   }
+
+  uploadImage(file: File): Observable<{ url: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<{ url: string }>(`${this.apiUrl}/products/images/upload`, formData);
+  }
 }

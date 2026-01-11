@@ -14,6 +14,12 @@ export interface ProductAttribute {
   optionId: number;
 }
 
+export interface ProductImage {
+  id: number;
+  url: string;
+  isMain: boolean;
+}
+
 export interface Product {
   id: number;
   name: string;
@@ -23,6 +29,7 @@ export interface Product {
   stockQuantity: number;
   attributes: ProductAttribute[];
   imageUrl?: string;
+  images?: ProductImage[];
 }
 
 export interface ProductSearchQuery {

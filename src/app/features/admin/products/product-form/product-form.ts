@@ -6,7 +6,7 @@ import { ProductService } from '../../../../core/services/product.service';
 import { CategoryService, CategoryTree } from '../../../../core/services/category.service';
 import { AttributeService, Attribute } from '../../../../core/services/attribute.service';
 import { ToastService } from '../../../../core/services/toast.service';
-import { LucideAngularModule, Save, X, ChevronLeft, Loader2 } from 'lucide-angular';
+import { LucideAngularModule, Save, X, ChevronLeft, Loader2, Upload } from 'lucide-angular';
 
 @Component({
   selector: 'app-product-form',
@@ -28,6 +28,7 @@ export class ProductForm implements OnInit {
   productId = signal<number | null>(null);
   isLoading = signal(false);
   isSaving = signal(false);
+  isUploading = signal(false);
 
   // Data
   categories = signal<CategoryTree[]>([]);
@@ -55,6 +56,7 @@ export class ProductForm implements OnInit {
   categoryId = signal<number | null>(null);
   
   selectedAttributeOptions = signal<Record<number, number>>({}); 
+  imageUrls = signal<string[]>([]);
 
   // Derived: Active Attributes for selected category
   activeAttributes = computed(() => {
@@ -102,6 +104,7 @@ export class ProductForm implements OnInit {
   readonly XIcon = X;
   readonly BackIcon = ChevronLeft;
   readonly LoaderIcon = Loader2;
+  readonly UploadIcon = Upload;
 
   ngOnInit() {
     this.isLoading.set(true);
@@ -171,6 +174,14 @@ export class ProductForm implements OnInit {
           });
         }
         this.selectedAttributeOptions.set(selections);
+
+        // Map existing images
+        if (product.images) {
+          this.imageUrls.set(product.images.map(img => img.url));
+        } else if (product.imageUrl) {
+          this.imageUrls.set([product.imageUrl]);
+        }
+        
         this.isLoading.set(false);
       },
       error: () => {
@@ -190,6 +201,46 @@ export class ProductForm implements OnInit {
      this.selectedAttributeOptions.set(current);
   }
 
+  addImageUrl() {
+    this.imageUrls.set([...this.imageUrls(), '']);
+  }
+
+  removeImageUrl(index: number) {
+    const current = [...this.imageUrls()];
+    current.splice(index, 1);
+    this.imageUrls.set(current);
+  }
+
+  updateImageUrl(index: number, value: string) {
+    const current = [...this.imageUrls()];
+    current[index] = value;
+    this.imageUrls.set(current);
+  }
+
+  triggerFileUpload() {
+    const input = document.getElementById('file-upload') as HTMLInputElement;
+    input?.click();
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    this.isUploading.set(true);
+    this.productService.uploadImage(file).subscribe({
+      next: (res) => {
+        this.imageUrls.set([...this.imageUrls(), res.url]);
+        this.isUploading.set(false);
+        // Reset input
+        event.target.value = '';
+      },
+      error: (err) => {
+        this.toastService.show('Błąd przesyłania pliku', 'error');
+        this.isUploading.set(false);
+      }
+    });
+  }
+
   save() {
     if (!this.name() || !this.price() || !this.categoryId()) {
       this.toastService.show('Wypełnij wymagane pola', 'error');
@@ -206,7 +257,8 @@ export class ProductForm implements OnInit {
       stockQuantity: this.stock() || 0,
       description: this.description(),
       categoryId: this.categoryId(),
-      attributeOptionIds: attributeOptionIds
+      attributeOptionIds: attributeOptionIds,
+      imageUrls: this.imageUrls().filter(url => !!url.trim())
     };
 
     const observer = {

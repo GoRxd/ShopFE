@@ -1,4 +1,4 @@
-import { Component, inject, input, signal, computed, effect } from '@angular/core';
+import { Component, inject, input, signal, computed, effect, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -9,7 +9,7 @@ import { ReviewService } from '../../../core/services/review.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Product } from '../../../core/models/product.model';
 import { Review } from '../../../core/models/review.model';
-import { LucideAngularModule, Home, ChevronRight, ShoppingCart, Check, ShieldCheck, Truck, Clock, Heart, Plus, Minus, Star, MessageSquare } from 'lucide-angular';
+import { LucideAngularModule, Home, ChevronRight, ChevronLeft, X, ShoppingCart, Check, ShieldCheck, Truck, Clock, Heart, Plus, Minus, Star, MessageSquare } from 'lucide-angular';
 import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
@@ -36,6 +36,8 @@ export class ProductDetailsComponent {
 
   readonly HomeIcon = Home;
   readonly ChevronRightIcon = ChevronRight;
+  readonly ChevronLeftIcon = ChevronLeft;
+  readonly XIcon = X;
   readonly ShoppingCartIcon = ShoppingCart;
   readonly CheckIcon = Check;
   readonly ShieldCheckIcon = ShieldCheck;
@@ -67,6 +69,69 @@ export class ProductDetailsComponent {
   
   isListModalOpen = signal(false);
   quantity = signal(1);
+  selectedImageIndex = signal(0);
+  isLightboxOpen = signal(false);
+  isZoomed = signal(false);
+  
+  currentImageUrl = computed(() => {
+    const p = this.product();
+    if (!p) return '';
+    
+    if (p.images && p.images.length > 0) {
+      return p.images[this.selectedImageIndex()].url;
+    }
+    
+    return p.imageUrl || '';
+  });
+
+  selectImage(index: number) {
+    this.selectedImageIndex.set(index);
+    this.isZoomed.set(false);
+  }
+
+  nextImage() {
+    const p = this.product();
+    if (p && p.images && p.images.length > 0) {
+      this.selectedImageIndex.update(i => (i + 1) % p.images!.length);
+      this.isZoomed.set(false);
+    }
+  }
+
+  prevImage() {
+    const p = this.product();
+    if (p && p.images && p.images.length > 0) {
+      this.selectedImageIndex.update(i => i === 0 ? p.images!.length - 1 : i - 1);
+      this.isZoomed.set(false);
+    }
+  }
+
+  openLightbox() {
+    this.isLightboxOpen.set(true);
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeLightbox() {
+    this.isLightboxOpen.set(false);
+    this.isZoomed.set(false);
+    document.body.style.overflow = '';
+  }
+
+  toggleZoom() {
+    this.isZoomed.update(z => !z);
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleKeyDown(event: KeyboardEvent) {
+    if (!this.isLightboxOpen()) return;
+
+    if (event.key === 'Escape') {
+      this.closeLightbox();
+    } else if (event.key === 'ArrowRight') {
+      this.nextImage();
+    } else if (event.key === 'ArrowLeft') {
+      this.prevImage();
+    }
+  }
 
   increaseQuantity() {
     if (this.quantity() < 100) {
@@ -142,6 +207,7 @@ export class ProductDetailsComponent {
     try {
       const product = await firstValueFrom(this.productService.getProductDetails(id));
       this.product.set(product);
+      this.selectedImageIndex.set(0); 
       this.loadReviews(id);
     } catch (err) {
       this.error.set('Nie udało się pobrać szczegółów produktu.');

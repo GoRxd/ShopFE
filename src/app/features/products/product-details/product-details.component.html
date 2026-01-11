@@ -43,19 +43,55 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 mb-16 items-start">
       
       <!-- Left Column: Gallery -->
-      <div class="lg:col-span-7">
+      <div class="lg:col-span-7 space-y-4">
         <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl md:rounded-3xl p-4 md:p-8 flex items-center justify-center min-h-[250px] md:min-h-[400px] lg:min-h-[500px] relative group overflow-hidden">
+           <!-- Main Image -->
            <img 
-            [src]="product.imageUrl || 'https://placehold.co/600x600/f8fafc/6366f1?text=' + product.name" 
+            [src]="currentImageUrl() || 'https://placehold.co/600x600/f8fafc/6366f1?text=' + product.name" 
             [alt]="product.name"
-            class="max-w-full max-h-[230px] md:max-h-[400px] object-contain transition-transform duration-500 group-hover:scale-105 dark:hidden"
+            class="max-w-full max-h-[230px] md:max-h-[400px] object-contain transition-transform duration-500 group-hover:scale-105 cursor-zoom-in"
+            (click)="openLightbox()"
           />
-          <img 
-            [src]="product.imageUrl || 'https://placehold.co/600x600/1e293b/94a3b8?text=' + product.name" 
-            [alt]="product.name"
-            class="max-w-full max-h-[230px] md:max-h-[400px] object-contain transition-transform duration-500 group-hover:scale-105 hidden dark:block"
-          />
+
+          @if (product.images && product.images.length > 1) {
+            <!-- Navigation Arrows -->
+            <button 
+              (click)="prevImage()"
+              class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow-lg flex items-center justify-center text-slate-800 dark:text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-slate-700"
+            >
+              <lucide-icon [name]="ChevronRightIcon" class="w-6 h-6 rotate-180"></lucide-icon>
+            </button>
+            <button 
+              (click)="nextImage()"
+              class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow-lg flex items-center justify-center text-slate-800 dark:text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-slate-700"
+            >
+              <lucide-icon [name]="ChevronRightIcon" class="w-6 h-6"></lucide-icon>
+            </button>
+
+            <!-- Image Counter -->
+            <div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/10 dark:bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-slate-800 dark:text-white">
+              {{ selectedImageIndex() + 1 }} / {{ product.images.length }}
+            </div>
+          }
         </div>
+
+        <!-- Thumbnails -->
+        @if (product.images && product.images.length > 1) {
+          <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            @for (image of product.images; track image.id; let i = $index) {
+              <button 
+                (click)="selectImage(i)"
+                class="flex-shrink-0 w-20 h-20 rounded-xl border-2 transition-all overflow-hidden"
+                [class.border-primary]="selectedImageIndex() === i"
+                [class.border-transparent]="selectedImageIndex() !== i"
+                [class.opacity-50]="selectedImageIndex() !== i"
+                [class.hover:opacity-100]="selectedImageIndex() !== i"
+              >
+                <img [src]="image.url" class="w-full h-full object-cover" [alt]="product.name" />
+              </button>
+            }
+          </div>
+        }
       </div>
 
       <!-- Right Column: Info & Buy Box -->
@@ -386,4 +422,57 @@
     [isOpen]="isListModalOpen()" 
     (closeModal)="closeListModal()"
   ></app-add-to-shopping-list>
+}
+
+<!-- Lightbox Overlay -->
+@if (isLightboxOpen()) {
+  <div 
+    class="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl animate-in fade-in duration-300"
+    (click)="closeLightbox()"
+  >
+    <!-- Close Button -->
+    <button 
+      (click)="closeLightbox(); $event.stopPropagation()"
+      class="fixed top-6 right-6 w-12 h-12 rounded-full bg-slate-900/10 dark:bg-white/10 hover:bg-slate-900/20 dark:hover:bg-white/20 flex items-center justify-center text-slate-900 dark:text-white transition-all active:scale-95 cursor-pointer z-[110]"
+    >
+      <lucide-icon [name]="XIcon" class="w-6 h-6"></lucide-icon>
+    </button>
+
+    <!-- Main Lightbox Image Container -->
+    <div 
+      class="relative w-full h-full flex items-center justify-center p-4 overflow-auto scrollbar-hide z-[105]" 
+      (click)="closeLightbox()"
+    >
+      <img 
+        [src]="currentImageUrl()" 
+        [alt]="product()?.name"
+        class="max-w-full max-h-full object-contain rounded-xl shadow-2xl animate-in zoom-in-95 duration-300 transition-transform duration-500 origin-center"
+        [style.transform]="isZoomed() ? 'scale(2.5)' : 'scale(1)'"
+        [class.cursor-zoom-out]="isZoomed()"
+        [class.cursor-zoom-in]="!isZoomed()"
+        (click)="toggleZoom(); $event.stopPropagation()"
+      />
+
+      @if (product()?.images && product()?.images!.length > 1) {
+        <!-- Navigation Arrows In Lightbox -->
+        <button 
+          (click)="prevImage(); $event.stopPropagation()"
+          class="fixed left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 md:w-16 h-12 md:h-16 rounded-full bg-white dark:bg-slate-800 shadow-xl flex items-center justify-center text-slate-800 dark:text-white hover:bg-primary hover:text-white transition-all active:scale-95 cursor-pointer z-[110]"
+        >
+          <lucide-icon [name]="ChevronLeftIcon" class="w-6 md:w-8 h-6 md:h-8"></lucide-icon>
+        </button>
+        <button 
+          (click)="nextImage(); $event.stopPropagation()"
+          class="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 md:w-16 h-12 md:h-16 rounded-full bg-white dark:bg-slate-800 shadow-xl flex items-center justify-center text-slate-800 dark:text-white hover:bg-primary hover:text-white transition-all active:scale-95 cursor-pointer z-[110]"
+        >
+          <lucide-icon [name]="ChevronRightIcon" class="w-6 md:w-8 h-6 md:h-8"></lucide-icon>
+        </button>
+
+        <!-- Image Counter In Lightbox -->
+        <div class="fixed bottom-6 left-1/2 -translate-x-1/2 text-slate-900 dark:text-white font-black tracking-widest text-sm uppercase z-[110] bg-white/20 dark:bg-slate-900/20 backdrop-blur px-4 py-1 rounded-full">
+          {{ selectedImageIndex() + 1 }} / {{ product()?.images?.length }}
+        </div>
+      }
+    </div>
+  </div>
 }
