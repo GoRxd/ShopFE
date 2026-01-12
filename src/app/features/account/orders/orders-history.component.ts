@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { OrderService, OrderHistoryItem } from '../../../core/services/order.service';
 import { LucideAngularModule, MoreVertical, Package, Search, ChevronDown } from 'lucide-angular';
 import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-orders-history',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, PlnCurrencyPipe],
+  imports: [CommonModule, LucideAngularModule, PlnCurrencyPipe, RouterModule],
   template: `
     <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
       <div>
@@ -51,9 +52,11 @@ import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
               <h2 class="text-xl font-black text-slate-900 dark:text-white">{{ group.month }}</h2>
               
               <div class="space-y-4">
-                @for (order of group.orders; track order.id) {
-                  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group/order">
-                    <div class="flex flex-col md:flex-row">
+                @for (order of group.orders; track order.orderId) {
+                  @let isExpanded = expandedOrders().includes(order.orderId);
+                  
+                  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all group/order">
+                    <div class="flex flex-col md:flex-row cursor-pointer" (click)="toggleExpand(order.orderId)">
                       <!-- Order Info -->
                       <div class="p-6 md:w-64 border-b md:border-b-0 md:border-r border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
                         <div 
@@ -67,10 +70,10 @@ import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
                         </div>
                         <div class="text-sm font-black text-slate-900 dark:text-white mb-1">{{ order.orderDate | date:'d MMMM yyyy' }}</div>
                         <div class="text-xs text-slate-500 dark:text-slate-400 mb-4">nr {{ order.orderNumber }}</div>
-                        <div class="text-lg font-black text-slate-900 dark:text-white">{{ order.totalAmount | plnCurrency }}</div>
+                        <div class="text-lg font-black text-slate-900 dark:text-white">{{ order.total | plnCurrency }}</div>
                       </div>
 
-                      <!-- Order Products -->
+                      <!-- Order Products Summary -->
                       <div class="flex-grow p-6 flex items-center justify-between">
                         <div class="flex items-center gap-6">
                            <!-- Product Thumbnails -->
@@ -99,11 +102,60 @@ import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
                            </div>
                         </div>
 
-                        <button class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors">
-                          <lucide-icon [name]="MoreIcon" class="w-5 h-5"></lucide-icon>
+                        <button 
+                          class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-all"
+                          [class.rotate-180]="isExpanded"
+                        >
+                          <lucide-icon [name]="ChevronDownIcon" class="w-5 h-5"></lucide-icon>
                         </button>
                       </div>
                     </div>
+
+                    <!-- Expanded Details -->
+                    @if (isExpanded) {
+                      <div class="border-t border-slate-100 dark:border-slate-800 animate-in slide-in-from-top-4 duration-300">
+                        <div class="p-6 space-y-6">
+                          <!-- Products List -->
+                          <div class="space-y-4">
+                            <h4 class="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Lista produktów</h4>
+                            <div class="divide-y divide-slate-100 dark:divide-slate-800">
+                              @for (item of order.items; track item.productId) {
+                                <div class="py-4 flex items-center justify-between">
+                                  <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-lg bg-slate-50 dark:bg-slate-800 p-2 flex items-center justify-center">
+                                      @if (item.imageUrl) {
+                                        <img [src]="item.imageUrl" class="w-full h-full object-contain" [alt]="item.productName">
+                                      } @else {
+                                        <lucide-icon [name]="PackageIcon" class="w-5 h-5 text-slate-300"></lucide-icon>
+                                      }
+                                    </div>
+                                    <div>
+                                      <div class="text-sm font-bold text-slate-900 dark:text-white">{{ item.productName }}</div>
+                                      <div class="text-xs text-slate-500">{{ item.quantity }} szt. × {{ item.unitPrice | plnCurrency }}</div>
+                                    </div>
+                                  </div>
+                                  <div class="text-sm font-black text-slate-900 dark:text-white">
+                                    {{ (item.quantity * item.unitPrice) | plnCurrency }}
+                                  </div>
+                                </div>
+                              }
+                            </div>
+                          </div>
+
+                          <!-- Actions -->
+                          <div class="flex flex-wrap gap-3 pt-4 border-t border-slate-50 dark:border-slate-800">
+                            <button class="px-6 py-2.5 rounded-xl text-xs font-black bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors uppercase tracking-wider">
+                              Zgłoś reklamację
+                            </button>
+                            @if (order.canReturn) {
+                              <button class="px-6 py-2.5 rounded-xl text-xs font-black bg-primary/10 text-primary hover:bg-primary/20 transition-colors uppercase tracking-wider">
+                                Zwróć produkt
+                              </button>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    }
                   </div>
                 }
               </div>
@@ -130,61 +182,29 @@ export class OrdersHistoryComponent implements OnInit {
   private orderService = inject(OrderService);
 
   orders = signal<OrderHistoryItem[]>([]);
+  expandedOrders = signal<number[]>([]);
   
   ChevronDownIcon = ChevronDown;
   PackageIcon = Package;
-  MoreIcon = MoreVertical;
 
   ngOnInit() {
     this.orderService.getOrderHistory().subscribe({
       next: (data) => {
-        if (data.length === 0) {
-           this.orders.set([
-             {
-               id: 1,
-               orderNumber: '700012776717',
-               orderDate: '2025-12-16',
-               totalAmount: 199.00,
-               status: 'Anulowane',
-               items: [{ productId: 101, productName: 'Targus Sagano 15.6" EcoSmart Travel Backpack Black/Grey', quantity: 1, unitPrice: 199.00 }]
-             },
-             {
-               id: 2,
-               orderNumber: '700012771979',
-               orderDate: '2025-12-16',
-               totalAmount: 199.00,
-               status: 'Anulowane',
-               items: [{ productId: 101, productName: 'Targus Sagano 15.6" EcoSmart Travel Backpack Black/Grey', quantity: 1, unitPrice: 199.00 }]
-             },
-             {
-               id: 3,
-               orderNumber: '700011662120',
-               orderDate: '2025-06-03',
-               totalAmount: 698.00,
-               status: 'Zakończone',
-               items: [
-                 { productId: 201, productName: 'Słuchawki bezprzewodowe Logitech G733', quantity: 1, unitPrice: 499.00 },
-                 { productId: 202, productName: 'Klawiatura mechaniczna Keychron K2', quantity: 1, unitPrice: 199.00 }
-               ]
-             }
-           ]);
-        } else {
-          this.orders.set(data);
-        }
+        this.orders.set(data);
       },
-      error: () => {
-        this.orders.set([
-          {
-            id: 1,
-            orderNumber: '700012776717',
-            orderDate: '2025-12-16',
-            totalAmount: 199.00,
-            status: 'Anulowane',
-            items: [{ productId: 101, productName: 'Targus Sagano 15.6" EcoSmart Travel Backpack Black/Grey', quantity: 1, unitPrice: 199.00 }]
-          }
-        ]);
+      error: (err) => {
+        console.error('Error fetching order history', err);
+        this.orders.set([]);
       }
     });
+  }
+
+  toggleExpand(orderId: number) {
+    this.expandedOrders.update(prev => 
+      prev.includes(orderId) 
+        ? prev.filter(id => id !== orderId) 
+        : [...prev, orderId]
+    );
   }
 
   groupedOrders() {

@@ -4,11 +4,12 @@ import { environment } from '../../../environments/environment';
 import { Observable, of } from 'rxjs';
 
 export interface OrderHistoryItem {
-  id: number;
+  orderId: number;
   orderNumber: string;
   orderDate: string;
-  totalAmount: number;
+  total: number;
   status: string;
+  canReturn: boolean;
   items: {
     productId: number;
     productName: string;
