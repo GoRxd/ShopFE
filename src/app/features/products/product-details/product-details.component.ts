@@ -9,7 +9,7 @@ import { ReviewService } from '../../../core/services/review.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Product } from '../../../core/models/product.model';
 import { Review } from '../../../core/models/review.model';
-import { LucideAngularModule, Home, ChevronRight, ChevronLeft, X, ShoppingCart, Check, ShieldCheck, Truck, Clock, Heart, Plus, Minus, Star, MessageSquare } from 'lucide-angular';
+import { LucideAngularModule, Home, ChevronRight, ChevronLeft, X, ShoppingCart, Check, ShieldCheck, Truck, Clock, Heart, Plus, Minus, Star, MessageSquare, Flag } from 'lucide-angular';
 import { PlnCurrencyPipe } from '../../../core/pipes/pln-currency.pipe';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
@@ -17,6 +17,7 @@ import { AddToShoppingListComponent } from '../../shopping-lists/components/add-
 import { StockService } from '../../../core/services/stock.service';
 import { TranslateService } from '../../../core/services/translate.service';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-product-details',
@@ -33,6 +34,7 @@ export class ProductDetailsComponent {
   private authService = inject(AuthService);
   private stockService = inject(StockService);
   private translateService = inject(TranslateService);
+  private toastService = inject(ToastService);
 
   readonly HomeIcon = Home;
   readonly ChevronRightIcon = ChevronRight;
@@ -48,12 +50,13 @@ export class ProductDetailsComponent {
   readonly MinusIcon = Minus;
   readonly StarIcon = Star;
   readonly MessageSquareIcon = MessageSquare;
+  readonly FlagIcon = Flag;
 
   isLoggedIn = this.authService.isLoggedIn;
   product = signal<Product | null>(null);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
-  
+
   reviews = signal<Review[]>([]);
   newReviewRating = signal(5);
   newReviewComment = signal('');
@@ -66,21 +69,21 @@ export class ProductDetailsComponent {
     if (!user || !currentReviews.length) return false;
     return currentReviews.some(r => r.userId === user.id);
   });
-  
+
   isListModalOpen = signal(false);
   quantity = signal(1);
   selectedImageIndex = signal(0);
   isLightboxOpen = signal(false);
   isZoomed = signal(false);
-  
+
   currentImageUrl = computed(() => {
     const p = this.product();
     if (!p) return '';
-    
+
     if (p.images && p.images.length > 0) {
       return p.images[this.selectedImageIndex()].url;
     }
-    
+
     return p.imageUrl || '';
   });
 
@@ -144,25 +147,25 @@ export class ProductDetailsComponent {
       this.quantity.update(q => q - 1);
     }
   }
-  
+
   updateQuantity(value: string) {
-      const q = parseInt(value);
-      if (!isNaN(q) && q >= 1 && q <= 100) {
-          this.quantity.set(q);
-      } else {
-          // Reset to current valid value if invalid
-          this.quantity.set(this.quantity()); 
-      }
+    const q = parseInt(value);
+    if (!isNaN(q) && q >= 1 && q <= 100) {
+      this.quantity.set(q);
+    } else {
+      // Reset to current valid value if invalid
+      this.quantity.set(this.quantity());
+    }
   }
 
   categories = signal<CategoryTree[]>([]);
 
   private params = toSignal(this.route.params);
-  
+
   breadcrumbs = computed(() => {
     const product = this.product();
     const allCats = this.categories();
-    
+
     if (!product || !product.categoryId || allCats.length === 0) return [];
 
     const path: { name: string, slug: string }[] = [];
@@ -207,7 +210,7 @@ export class ProductDetailsComponent {
     try {
       const product = await firstValueFrom(this.productService.getProductDetails(id));
       this.product.set(product);
-      this.selectedImageIndex.set(0); 
+      this.selectedImageIndex.set(0);
       this.loadReviews(id);
     } catch (err) {
       this.error.set('Nie udało się pobrać szczegółów produktu.');
@@ -238,7 +241,7 @@ export class ProductDetailsComponent {
         rating: this.newReviewRating(),
         comment: this.newReviewComment()
       }));
-      
+
       this.newReviewComment.set('');
       this.newReviewRating.set(5);
       this.loadReviews(product.id);
@@ -251,15 +254,31 @@ export class ProductDetailsComponent {
     }
   }
 
-  addToCart() {
-      const product = this.product();
-      if (product) {
-          this.cartService.addToCart(product, this.quantity());
+  reportReview(id: number) {
+    if (!this.isLoggedIn()) {
+      this.toastService.show('Zaloguj się, aby zgłosić opinię', 'error');
+      return;
+    }
+
+    this.reviewService.reportReview(id).subscribe({
+      next: () => {
+        this.toastService.show('Opinia została zgłoszona do moderacji', 'success');
+      },
+      error: () => {
+        this.toastService.show('Błąd podczas zgłaszania opinii', 'error');
       }
+    });
+  }
+
+  addToCart() {
+    const product = this.product();
+    if (product) {
+      this.cartService.addToCart(product, this.quantity());
+    }
   }
 
   openListModal() {
-     this.isListModalOpen.set(true);
+    this.isListModalOpen.set(true);
   }
 
   closeListModal() {
@@ -277,7 +296,7 @@ export class ProductDetailsComponent {
 
     if (categoryNode.subCategories && categoryNode.subCategories.length > 0) {
       const normalizedValue = value.toLowerCase();
-      const matchingSub = categoryNode.subCategories.find(sub => 
+      const matchingSub = categoryNode.subCategories.find(sub =>
         sub.name.toLowerCase().includes(normalizedValue)
       );
 
@@ -298,13 +317,13 @@ export class ProductDetailsComponent {
   private findPathInTreeById(targetId: number, categories: CategoryTree[], path: { name: string, slug: string }[]): boolean {
     for (const category of categories) {
       path.push({ name: category.name, slug: category.slug });
-      
+
       if (category.id === targetId) return true;
-      
+
       if (category.subCategories && this.findPathInTreeById(targetId, category.subCategories, path)) {
         return true;
       }
-      
+
       path.pop();
     }
     return false;

@@ -103,7 +103,7 @@ export class UserReviewsComponent implements OnInit {
 
   async ngOnInit() {
     try {
-      const data = await firstValueFrom(this.reviewService.getMyReviews());
+      const data: Review[] = await firstValueFrom(this.reviewService.getMyReviews());
       this.reviews.set(data);
     } catch (err) {
       console.error('Failed to load user reviews', err);

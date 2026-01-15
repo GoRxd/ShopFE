@@ -5,13 +5,16 @@ import { ProductForm } from './products/product-form/product-form';
 import { CategoryManager } from './categories/category-manager/category-manager';
 import { AttributeManager } from './attributes/attribute-manager/attribute-manager';
 
+import { ReviewManager } from './reviews/review-manager/review-manager';
+
 const routes: Routes = [
   { path: '', redirectTo: 'products', pathMatch: 'full' },
   { path: 'products', component: ProductList },
   { path: 'products/new', component: ProductForm },
   { path: 'products/:id', component: ProductForm },
   { path: 'categories', component: CategoryManager },
-  { path: 'attributes', component: AttributeManager }
+  { path: 'attributes', component: AttributeManager },
+  { path: 'reviews', component: ReviewManager }
 ];
 
 @NgModule({

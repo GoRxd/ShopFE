@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, Router, NavigationEnd } from '@angular/router';
-import { LucideAngularModule, Search, ShoppingCart, User, Menu, ChevronDown, Facebook, Instagram, Youtube, LogOut, List, Bell, Heart, LayoutGrid, Home, Maximize, Zap, Shield, House, Package, RefreshCcw, Star, MapPin, Settings } from 'lucide-angular';
+import { LucideAngularModule, Search, ShoppingCart, User, Menu, ChevronDown, Facebook, Instagram, Youtube, LogOut, List, Bell, Heart, LayoutGrid, Home, Maximize, Zap, Shield, House, Package, RefreshCcw, Star, MapPin, Settings, MessageSquare } from 'lucide-angular';
 import { CategoryService, CategoryTree } from '../core/services/category.service';
 import { AuthService } from '../core/services/auth.service';
 import { ProductService } from '../core/services/product.service';
@@ -20,7 +20,7 @@ import { Subject } from 'rxjs';
   selector: 'app-main-layout',
   standalone: true,
   imports: [
-    CommonModule, RouterOutlet, RouterLink, LucideAngularModule, 
+    CommonModule, RouterOutlet, RouterLink, LucideAngularModule,
     CategoryMenuItemComponent, AddToCartModalComponent, ToastComponent, ConfirmModalComponent,
     SearchInputComponent
   ],
@@ -55,7 +55,7 @@ export class MainLayoutComponent implements OnInit {
   readonly BellIcon = Bell;
   readonly HeartIcon = Heart;
   readonly LayoutGridIcon = LayoutGrid;
-  readonly HomeIcon = House ;
+  readonly HomeIcon = House;
   readonly ScanIcon = Maximize;
   readonly ZapIcon = Zap;
   readonly ShieldIcon = Shield;
@@ -64,6 +64,7 @@ export class MainLayoutComponent implements OnInit {
   readonly StarIcon = Star;
   readonly MapPinIcon = MapPin;
   readonly SettingsIcon = Settings;
+  readonly MessageSquareIcon = MessageSquare;
 
   readonly cartCount = this.cartService.itemCount;
   readonly ChevronIcon = ChevronDown;

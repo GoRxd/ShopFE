@@ -7,6 +7,7 @@ export interface Review {
     comment: string;
     createdAt: string;
     productName?: string;
+    isReported?: boolean;
 }
 
 export interface CreateReviewDto {
