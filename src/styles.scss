@@ -1,14 +1,45 @@
 @import 'tailwindcss';
 
-@theme {
-  --color-primary: #0082fa;
-  --color-primary-dark: #0066cc;
-  --color-secondary: #4d4d4d;
-  --color-accent: #f5f5f5;
-  --color-success: #00a835;
-  --color-error: #d90000;
+/* ========================================
+   SHOPX PREMIUM DESIGN SYSTEM
+   Inspired by x-kom.pl professional styling
+   ======================================== */
 
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+@theme {
+  /* Premium Color Palette */
+  --color-primary: #1a56db;
+  --color-primary-dark: #1e40af;
+  --color-primary-light: #3b82f6;
+  --color-primary-glow: rgba(26, 86, 219, 0.4);
+
+  --color-secondary: #374151;
+  --color-accent: #f59e0b;
+  --color-accent-light: #fbbf24;
+
+  --color-success: #059669;
+  --color-success-light: #10b981;
+  --color-error: #dc2626;
+  --color-error-light: #ef4444;
+
+  /* Premium Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Premium Shadows - Multi-layered for depth */
+  --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-elegant: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-elevated: 0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-dramatic: 0 20px 60px rgba(0, 0, 0, 0.15), 0 8px 20px rgba(0, 0, 0, 0.1);
+
+  /* Primary Glow Shadows */
+  --shadow-glow-sm: 0 4px 14px rgba(26, 86, 219, 0.25);
+  --shadow-glow: 0 8px 30px rgba(26, 86, 219, 0.35);
+  --shadow-glow-lg: 0 12px 40px rgba(26, 86, 219, 0.4);
+
+  /* Animation Timings */
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 /* Configure Tailwind 4 to use .dark class for dark: variant */
@@ -17,11 +48,25 @@
 @layer base {
   html {
     overflow-y: scroll;
+    scroll-behavior: smooth;
   }
 
   body {
-    @apply bg-white dark:bg-slate-950 text-slate-900 dark:text-white antialiased transition-colors duration-300;
+    @apply bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white antialiased;
     font-family: var(--font-sans);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Premium link styles */
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  /* Premium selection */
+  ::selection {
+    @apply bg-primary/20 text-primary-dark;
   }
 
   .container-custom {
@@ -30,55 +75,115 @@
 }
 
 @layer components {
+
+  /* Premium Button Styles */
   .btn-primary {
-    @apply bg-primary hover:bg-primary-dark text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply relative overflow-hidden bg-gradient-to-br from-primary to-primary-dark text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    box-shadow: var(--shadow-glow-sm);
   }
 
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+  }
+
+  /* Premium Input Styles */
   .input-field {
-    @apply w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-lg focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-slate-400 dark:text-white;
+    @apply w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all duration-200 placeholder:text-slate-400 dark:text-white;
+    box-shadow: var(--shadow-subtle);
+  }
+
+  .input-field:focus {
+    box-shadow: var(--shadow-soft), 0 0 0 3px rgba(26, 86, 219, 0.1);
+  }
+
+  /* Premium Card Styles */
+  .card-premium {
+    @apply bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl transition-all duration-300;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .card-premium:hover {
+    @apply border-primary/20;
+    box-shadow: var(--shadow-elevated);
+    transform: translateY(-4px);
+  }
+
+  /* Glassmorphism Card */
+  .card-glass {
+    @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-slate-700/30 rounded-2xl;
+    box-shadow: var(--shadow-elegant);
+  }
+
+  /* Premium Badge */
+  .badge-premium {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider;
+    box-shadow: var(--shadow-subtle);
+  }
+
+  /* Gradient Text */
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary via-primary-light to-primary bg-clip-text text-transparent;
+  }
+
+  .text-gradient-warm {
+    @apply bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent;
   }
 }
 
-/* Global utility to hide spin buttons in number inputs */
 @layer utilities {
+
+  /* Hide spin buttons in number inputs */
   .no-spin-buttons {
+
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
+
     -moz-appearance: textfield;
   }
-  
-  /* Apply implicitly to all number inputs if desired, or just use the class */
+
   input[type=number] {
+
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
+
     -moz-appearance: textfield;
   }
-  /* Custom Scrollbar Utilities */
+
+  /* Premium Custom Scrollbar */
   .custom-scrollbar {
     &::-webkit-scrollbar {
-      height: 10px;
-      width: 10px;
+      height: 8px;
+      width: 8px;
     }
+
     &::-webkit-scrollbar-track {
       @apply bg-slate-100 dark:bg-slate-900/50 rounded-full;
     }
+
     &::-webkit-scrollbar-thumb {
-      @apply bg-slate-400 dark:bg-slate-600 rounded-full border-2 border-transparent bg-clip-padding hover:bg-slate-500 dark:hover:bg-slate-500 transition-colors;
-    }
-    &:hover::-webkit-scrollbar-thumb {
-      @apply bg-slate-500 dark:bg-slate-500;
+      @apply bg-slate-300 dark:bg-slate-600 rounded-full transition-colors;
+
+      &:hover {
+        @apply bg-slate-400 dark:bg-slate-500;
+      }
     }
   }
 
   .scroll-grab {
     cursor: grab;
     user-select: none;
+
     &.dragging {
       cursor: grabbing;
       scroll-snap-type: none !important;
@@ -89,8 +194,154 @@
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
+
     &::-webkit-scrollbar {
       display: none;
     }
   }
+
+  /* Premium Hover Effects */
+  .hover-lift {
+    @apply transition-all duration-300;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-elevated);
+    }
+  }
+
+  .hover-scale {
+    @apply transition-transform duration-300;
+
+    &:hover {
+      transform: scale(1.02);
+    }
+  }
+
+  .hover-glow {
+    @apply transition-all duration-300;
+
+    &:hover {
+      box-shadow: var(--shadow-glow);
+    }
+  }
+
+  /* Premium Animations */
+  .animate-fade-in {
+    animation: fadeIn 0.4s var(--ease-smooth) forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.4s var(--ease-out-expo) forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s var(--ease-bounce) forwards;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    background-size: 200% 100%;
+  }
+
+  /* Glow pulse for CTAs */
+  .animate-glow-pulse {
+    animation: glowPulse 2s ease-in-out infinite;
+  }
+
+  /* Premium gradient backgrounds */
+  .bg-gradient-premium {
+    @apply bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950;
+  }
+
+  .bg-gradient-hero {
+    @apply bg-gradient-to-br from-primary/5 via-transparent to-accent/5;
+  }
+
+  /* Premium borders */
+  .border-gradient {
+    border: 1px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+      linear-gradient(135deg, rgba(26, 86, 219, 0.3), rgba(245, 158, 11, 0.3)) border-box;
+  }
+
+  .dark .border-gradient {
+    background: linear-gradient(theme('colors.slate.900'), theme('colors.slate.900')) padding-box,
+      linear-gradient(135deg, rgba(26, 86, 219, 0.5), rgba(245, 158, 11, 0.5)) border-box;
+  }
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes glowPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 8px 30px rgba(26, 86, 219, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 8px 40px rgba(26, 86, 219, 0.5);
+  }
+}
+
+/* Loading skeleton enhancement */
+@keyframes skeletonPulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.skeleton-pulse {
+  animation: skeletonPulse 1.5s ease-in-out infinite;
 }

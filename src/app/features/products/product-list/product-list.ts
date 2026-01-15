@@ -118,7 +118,10 @@ import { StockService } from '../../../core/services/stock.service';
           @for (product of products(); track product.id) {
             <div 
               [routerLink]="['/product', product.id]" 
-              class="group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl md:rounded-2xl p-3 md:p-4 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 cursor-pointer flex flex-col relative overflow-hidden"
+              class="group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl md:rounded-2xl p-3 md:p-4 cursor-pointer flex flex-col relative overflow-hidden transition-all duration-300 hover:-translate-y-1"
+              style="box-shadow: var(--shadow-soft);"
+              onmouseover="this.style.boxShadow='var(--shadow-elevated)'; this.style.borderColor='rgba(26, 86, 219, 0.2)'"
+              onmouseout="this.style.boxShadow='var(--shadow-soft)'; this.style.borderColor=''"
               [class.opacity-60]="product.stockQuantity <= 0"
             >
               <!-- Unavailable Overlay -->
@@ -126,25 +129,26 @@ import { StockService } from '../../../core/services/stock.service';
                 <div class="absolute inset-0 bg-slate-50/40 dark:bg-slate-950/40 backdrop-grayscale-[0.5] pointer-events-none z-[5]"></div>
               }
 
-              <div class="relative w-full h-40 md:h-auto md:aspect-square bg-slate-50 dark:bg-slate-800 rounded-lg md:rounded-xl mb-3 md:mb-4 overflow-hidden flex items-center justify-center">
+              <div class="relative w-full h-40 md:h-auto md:aspect-square bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-800/50 rounded-lg md:rounded-xl mb-3 md:mb-4 overflow-hidden flex items-center justify-center">
                 <img 
                   [src]="product.imageUrl || 'https://placehold.co/600x600/f8fafc/6366f1?text=' + product.name" 
                   [alt]="product.name"
-                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 dark:hidden"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 dark:hidden"
                   [class.grayscale]="product.stockQuantity <= 0"
                 />
                 <img 
                   [src]="product.imageUrl || 'https://placehold.co/600x600/1e293b/94a3b8?text=' + product.name" 
                   [alt]="product.name"
-                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 hidden dark:block"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 hidden dark:block"
                   [class.grayscale]="product.stockQuantity <= 0"
                 />
                 
                 @if (product.stockQuantity > 0) {
-                  <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                  <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-10 group-hover:scale-100 scale-90">
                     <button 
                       (click)="addToCart($event, product)"
-                      class="bg-white/90 dark:bg-slate-900/90 backdrop-blur p-2 rounded-full shadow-lg text-primary hover:bg-primary hover:text-white transition-colors cursor-pointer"
+                      class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm p-2.5 rounded-full text-primary hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer hover:scale-110"
+                      style="box-shadow: var(--shadow-elegant);"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -153,7 +157,7 @@ import { StockService } from '../../../core/services/stock.service';
                   </div>
                 } @else {
                   <div class="absolute inset-0 flex items-center justify-center z-10">
-                    <span class="bg-slate-900/80 dark:bg-slate-800/80 backdrop-blur-sm text-white text-[10px] md:text-xs font-black px-4 py-2 rounded-full uppercase tracking-widest shadow-xl">Chwilowy brak</span>
+                    <span class="bg-slate-900/85 dark:bg-slate-800/90 backdrop-blur-sm text-white text-[10px] md:text-xs font-black px-4 py-2 rounded-full uppercase tracking-widest" style="box-shadow: var(--shadow-elevated);">Chwilowy brak</span>
                   </div>
                 }
               </div>
@@ -165,14 +169,14 @@ import { StockService } from '../../../core/services/stock.service';
                 <p class="text-slate-400 dark:text-slate-500 text-xs md:text-sm mb-3 md:mb-4">{{ product.categoryName }}</p>
               </div>
 
-              <div class="flex items-center justify-between mt-auto pt-3 md:pt-4 border-t border-slate-50 dark:border-slate-800">
+              <div class="flex items-center justify-between mt-auto pt-3 md:pt-4 border-t border-slate-100 dark:border-slate-800">
                 <span class="text-xl md:text-2xl font-black text-slate-900 dark:text-white" [class.!text-slate-400]="product.stockQuantity <= 0" [class.dark:!text-slate-500]="product.stockQuantity <= 0">{{ product.price | plnCurrency }}</span>
                 @if (product.stockQuantity <= 0) {
-                   <span class="text-[10px] md:text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md uppercase tracking-wider border border-slate-200 dark:border-slate-700">Niedostępny</span>
+                   <span class="text-[10px] md:text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full uppercase tracking-wider">Niedostępny</span>
                 } @else if (product.stockQuantity <= 5) {
-                   <span class="text-[10px] md:text-xs font-bold text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/30 px-2 py-1 rounded-md uppercase tracking-wider animate-pulse">Ostatnie {{ product.stockQuantity }} szt.</span>
+                   <span class="text-[10px] md:text-xs font-bold text-amber-600 dark:text-amber-400 bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 px-2.5 py-1 rounded-full uppercase tracking-wider animate-pulse">Ostatnie {{ product.stockQuantity }} szt.</span>
                 } @else {
-                   <span class="text-[10px] md:text-xs font-bold text-primary bg-primary/10 dark:bg-primary/20 px-2 py-1 rounded-md uppercase tracking-wider">Nowość</span>
+                   <span class="text-[10px] md:text-xs font-bold text-primary bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 px-2.5 py-1 rounded-full uppercase tracking-wider">Nowość</span>
                 }
               </div>
             </div>
@@ -234,14 +238,14 @@ export class ProductListComponent {
         }
       });
 
-       this.attributes.set(attrs);
-       
-       const minP = params['minPrice'] ? Number(params['minPrice']) : undefined;
-       const maxP = params['maxPrice'] ? Number(params['maxPrice']) : undefined;
-       
-       this.minPrice.set(minP);
-       this.maxPrice.set(maxP);
-       this.hideUnavailable.set(params['hideUnavailable'] === 'true');
+      this.attributes.set(attrs);
+
+      const minP = params['minPrice'] ? Number(params['minPrice']) : undefined;
+      const maxP = params['maxPrice'] ? Number(params['maxPrice']) : undefined;
+
+      this.minPrice.set(minP);
+      this.maxPrice.set(maxP);
+      this.hideUnavailable.set(params['hideUnavailable'] === 'true');
     }, { allowSignalWrites: true });
   }
 
@@ -252,7 +256,7 @@ export class ProductListComponent {
   breadcrumbs = computed(() => {
     const slug = this.params()?.['slug'];
     if (!slug) return [];
-    
+
     const path: { name: string, slug: string }[] = [];
     this.findPathInTree(slug, this.allCategories(), path);
     return path;
@@ -269,7 +273,7 @@ export class ProductListComponent {
   parentCategory = computed(() => {
     const cur = this.currentCategory();
     if (!cur || !cur.parentId) return null;
-    
+
     return this.findCategoryByIdRecursive(cur.parentId, this.allCategories());
   });
 
@@ -300,19 +304,19 @@ export class ProductListComponent {
     }),
     loader: async ({ params }) => {
       const { slug, q, minPrice, maxPrice, attributes, sortBy, sortDirection } = params;
-      
+
       const categories = await firstValueFrom(this.categoryService.getCategoriesTree().pipe(take(1)));
       this.allCategories.set(categories);
-      
+
       let categoryIds: number[] | undefined;
-      
+
       if (slug) {
         const category = this.findCategoryInTreeRecursive(slug, categories);
         if (category) {
           categoryIds = [category.id];
-          this.currentCategory.set({ 
-            id: category.id, 
-            name: category.name, 
+          this.currentCategory.set({
+            id: category.id,
+            name: category.name,
             slug: category.slug, // Fix: Changed from parentId logic which might be buggy if parentId is not populated correctly in findCategory
             parentId: this.findParentIdInTree(category.id, categories)
           });
@@ -323,8 +327,8 @@ export class ProductListComponent {
         this.currentCategory.set(null);
       }
 
-      const queryParams: any = { 
-        categoryIds, 
+      const queryParams: any = {
+        categoryIds,
         q,
         minPrice,
         maxPrice,
@@ -341,7 +345,7 @@ export class ProductListComponent {
       return firstValueFrom(this.productService.getProducts(queryParams));
     }
   });
-  
+
   allProducts = computed(() => {
     const baseProducts = this.productsResource.value() ?? [];
     const updates = this.stockService.stockUpdates();
@@ -389,7 +393,7 @@ export class ProductListComponent {
     if (filters.minPrice !== undefined) newParams.minPrice = filters.minPrice;
     if (filters.maxPrice !== undefined) newParams.maxPrice = filters.maxPrice;
     if (filters.hideUnavailable) newParams.hideUnavailable = 'true';
-    
+
     Object.entries(filters.attributes).forEach(([key, value]) => {
       if (value) {
         newParams[`attr_${key}`] = value;
@@ -422,11 +426,11 @@ export class ProductListComponent {
         this.sortDirection.set(undefined);
     }
   }
-  
+
   headerTitle = computed(() => {
     const categoryName = this.currentCategory()?.name;
     const searchTerm = this.queryParams()?.['q'];
-    
+
     if (searchTerm && categoryName) return `Wyniki dla "${searchTerm}" w ${categoryName}`;
     if (searchTerm) return `Wyniki dla "${searchTerm}"`;
     return categoryName || 'Nasze Produkty';
@@ -464,7 +468,7 @@ export class ProductListComponent {
     for (const category of categories) {
       path.push({ name: category.name, slug: category.slug });
       if (category.slug === slug) return true;
-      
+
       if (category.subCategories && this.findPathInTree(slug, category.subCategories, path)) {
         return true;
       }

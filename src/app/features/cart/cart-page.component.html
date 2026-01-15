@@ -1,5 +1,5 @@
 <div class="container-custom py-8">
-  <h1 class="text-2xl font-black text-slate-900 dark:text-white mb-8 flex items-center gap-3">
+  <h1 class="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-8 flex items-center gap-3 tracking-tight">
     <lucide-icon [name]="CartIcon" class="w-8 h-8 text-primary"></lucide-icon>
     Twój Koszyk
   </h1>
@@ -9,8 +9,8 @@
       <!-- Cart Items List -->
       <div class="lg:col-span-2 space-y-4">
         @for (item of cartService.items(); track item.productId) {
-          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
-            <div class="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-xl flex-shrink-0 flex items-center justify-center text-slate-300 dark:text-slate-700">
+          <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 relative overflow-hidden transition-all duration-300 hover:-translate-y-0.5" style="box-shadow: var(--shadow-soft);" onmouseover="this.style.boxShadow='var(--shadow-elegant)'" onmouseout="this.style.boxShadow='var(--shadow-soft)'">
+            <div class="w-20 h-20 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-800/50 rounded-xl flex-shrink-0 flex items-center justify-center text-slate-300 dark:text-slate-600">
                <lucide-icon [name]="CartIcon" class="w-10 h-10"></lucide-icon>
             </div>
             
@@ -21,7 +21,7 @@
 
             <button 
              (click)="cartService.removeFromCart(item.productId)"
-             class="absolute top-2 right-2 text-slate-300 hover:text-red-500 transition-colors"
+             class="absolute top-3 right-3 text-slate-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 transition-all duration-200 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
              title="Usuń z koszyka"
             >
               <lucide-icon [name]="TrashIcon" class="w-5 h-5"></lucide-icon>
@@ -29,13 +29,13 @@
 
             <div class="flex items-center justify-between w-full sm:w-auto gap-4 mt-2 sm:mt-0">
               <!-- Quantity Controls -->
-              <div class="flex items-center gap-1 bg-slate-50 dark:bg-slate-800 rounded-xl p-1 border border-slate-100 dark:border-slate-700/50">
+              <div class="flex items-center gap-1 bg-slate-50 dark:bg-slate-800 rounded-xl p-1 border border-slate-100 dark:border-slate-700/50" style="box-shadow: var(--shadow-subtle);">
                  <button 
                   (click)="cartService.updateQuantity(item.productId, -1)"
                   [disabled]="item.quantity <= 1"
-                  class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all disabled:opacity-50 shadow-sm"
+                  class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                  >
-                   <lucide-icon [name]="MinusIcon" class="w-3.5 h-3.5"></lucide-icon>
+                   <lucide-icon [name]="MinusIcon" class="w-4 h-4"></lucide-icon>
                  </button>
                  
                  <input 
@@ -50,9 +50,9 @@
 
                  <button 
                   (click)="cartService.updateQuantity(item.productId, 1)"
-                  class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all shadow-sm"
+                  class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all"
                  >
-                   <lucide-icon [name]="PlusIcon" class="w-3.5 h-3.5"></lucide-icon>
+                   <lucide-icon [name]="PlusIcon" class="w-4 h-4"></lucide-icon>
                  </button>
               </div>
 
@@ -60,7 +60,7 @@
                  <div class="font-black text-slate-900 dark:text-white text-xl">
                    {{ (item.unitPrice * item.quantity) | plnCurrency }}
                  </div>
-                 <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">
+                 <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
                    {{ item.unitPrice | plnCurrency }} / szt.
                  </div>
               </div>
@@ -71,20 +71,20 @@
 
       <!-- Summary -->
       <div class="lg:col-span-1">
-         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm sticky top-24">
-            <h2 class="font-bold text-xl text-slate-900 dark:text-white mb-6">Podsumowanie</h2>
+         <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 sticky top-24 transition-all duration-300" style="box-shadow: var(--shadow-elegant);">
+            <h2 class="font-black text-xl text-slate-900 dark:text-white mb-6 tracking-tight">Podsumowanie</h2>
             
-            <div class="space-y-3 mb-6">
+            <div class="space-y-4 mb-6">
               <div class="flex justify-between text-slate-600 dark:text-slate-400">
                 <span>Wartość produktów</span>
-                <span class="font-medium text-slate-900 dark:text-white">{{ cartService.totalAmount() | plnCurrency }}</span>
+                <span class="font-semibold text-slate-900 dark:text-white">{{ cartService.totalAmount() | plnCurrency }}</span>
               </div>
               <div class="flex justify-between text-slate-600 dark:text-slate-400">
                 <span>Dostawa</span>
-                <span class="font-medium text-success">0,00 zł</span>
+                <span class="font-semibold text-success">0,00 zł</span>
               </div>
-              <div class="border-t border-slate-100 dark:border-slate-800 my-2"></div>
-              <div class="flex justify-between text-lg font-black text-slate-900 dark:text-white">
+              <div class="border-t border-slate-100 dark:border-slate-800 my-3"></div>
+              <div class="flex justify-between text-xl font-black text-slate-900 dark:text-white">
                 <span>Do zapłaty</span>
                 <span class="text-primary">{{ cartService.totalAmount() | plnCurrency }}</span>
               </div>
@@ -93,7 +93,8 @@
             <button 
               (click)="checkout()"
               [disabled]="isProcessing() || cartService.items().length === 0"
-              class="w-full bg-primary text-white font-bold py-3.5 rounded-xl hover:bg-primary-dark transition-all shadow-lg shadow-primary/30 flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none cursor-pointer"
+              class="w-full bg-gradient-to-r from-primary to-primary-dark text-white font-bold py-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:-translate-y-0.5 animate-glow-pulse"
+              style="box-shadow: var(--shadow-glow);"
             >
                @if (isProcessing()) {
                  <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -108,14 +109,15 @@
   } @else {
      <!-- Empty State -->
      <div class="text-center py-20">
-        <div class="w-24 h-24 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-6">
-           <lucide-icon [name]="CartIcon" class="w-10 h-10 text-slate-300 dark:text-slate-700"></lucide-icon>
+        <div class="w-28 h-28 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 rounded-full flex items-center justify-center mx-auto mb-8" style="box-shadow: var(--shadow-soft);">
+           <lucide-icon [name]="CartIcon" class="w-12 h-12 text-slate-300 dark:text-slate-600"></lucide-icon>
         </div>
-        <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Twój koszyk jest pusty</h2>
-        <p class="text-slate-500 dark:text-slate-400 mb-8">Dodaj produkty do koszyka, aby złożyć zamówienie</p>
-        <a routerLink="/" class="inline-flex items-center gap-2 bg-primary text-white font-bold px-8 py-3 rounded-xl hover:bg-primary-dark transition-colors">
+        <h2 class="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">Twój koszyk jest pusty</h2>
+        <p class="text-slate-500 dark:text-slate-400 mb-8 max-w-md mx-auto">Dodaj produkty do koszyka, aby złożyć zamówienie</p>
+        <a routerLink="/" class="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-primary-dark text-white font-bold px-8 py-4 rounded-xl transition-all duration-300 hover:-translate-y-1" style="box-shadow: var(--shadow-glow-sm);">
            Przejdź do sklepu
         </a>
      </div>
   }
 </div>
+

@@ -1,74 +1,71 @@
 <app-toast></app-toast>
 <app-confirm-modal></app-confirm-modal>
 <app-add-to-cart-modal></app-add-to-cart-modal>
-<header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-300">
+<header
+  class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-50 transition-all duration-300"
+  style="box-shadow: 0 1px 0 rgba(0,0,0,0.03), 0 4px 12px rgba(0,0,0,0.03);">
   <!-- Mobile Header (x-kom style) -->
   <div class="md:hidden px-4 pt-6 pb-2">
     @if (!pageHeaderInfo().isFunctional) {
-      <div class="flex justify-between items-center mb-4 transition-all duration-300">
-        <a routerLink="/account" class="flex flex-col no-underline active:opacity-70 transition-opacity">
-          <span class="text-xl font-black text-slate-900 dark:text-white leading-tight">
-            {{ greeting() }}, {{ authService.currentUser()?.firstName || 'Gościu' }}
-          </span>
-        </a>
-        <button class="relative p-2 text-slate-600 dark:text-slate-400">
-          <lucide-icon [name]="BellIcon" class="w-6 h-6"></lucide-icon>
-          <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
-        </button>
+    <div class="flex justify-between items-center mb-4 transition-all duration-300">
+      <a routerLink="/account" class="flex flex-col no-underline active:opacity-70 transition-opacity">
+        <span class="text-xl font-black text-slate-900 dark:text-white leading-tight">
+          {{ greeting() }}, {{ authService.currentUser()?.firstName || 'Gościu' }}
+        </span>
+      </a>
+      <button class="relative p-2 text-slate-600 dark:text-slate-400">
+        <lucide-icon [name]="BellIcon" class="w-6 h-6"></lucide-icon>
+        <span
+          class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+      </button>
+    </div>
+
+    <!-- Mobile Persistent Search -->
+    <div class="relative group mb-2 transition-all duration-300">
+      <div class="relative">
+        <input type="text" [value]="searchQuery()" (input)="onSearchInput($event)" (keyup.enter)="onSearch()"
+          (focus)="onSearchFocus()" (blur)="hideSuggestions()" placeholder="Czego szukasz?"
+          class="w-full bg-slate-100 dark:bg-slate-800/50 border-none rounded-xl py-3 pl-14 pr-12 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-primary/20 text-slate-900 dark:text-white transition-all outline-none shadow-sm text-sm" />
+        <lucide-icon [name]="SearchIcon"
+          class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-primary"></lucide-icon>
+        <lucide-icon [name]="ScanIcon"
+          class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></lucide-icon>
       </div>
 
-      <!-- Mobile Persistent Search -->
-      <div class="relative group mb-2 transition-all duration-300">
-        <div class="relative">
-          <input
-            type="text"
-            [value]="searchQuery()"
-            (input)="onSearchInput($event)"
-            (keyup.enter)="onSearch()"
-            (focus)="onSearchFocus()"
-            (blur)="hideSuggestions()"
-            placeholder="Czego szukasz?"
-            class="w-full bg-slate-100 dark:bg-slate-800/50 border-none rounded-xl py-3 pl-14 pr-12 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-primary/20 text-slate-900 dark:text-white transition-all outline-none shadow-sm text-sm"
-          />
-          <lucide-icon
-            [name]="SearchIcon"
-            class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-primary"
-          ></lucide-icon>
-          <lucide-icon
-            [name]="ScanIcon"
-            class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
-          ></lucide-icon>
+      <!-- Mobile Search Suggestions -->
+      @if (showSuggestions() && suggestions()) {
+      <div
+        class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-[60] overflow-hidden">
+        <div class="p-2">
+          @for (prod of suggestions()!.products.slice(0, 5); track prod.id) {
+          <button (click)="selectSuggestion(prod.name)"
+            class="w-full text-left px-4 py-3 text-sm flex items-center gap-3 border-b border-slate-50 dark:border-slate-800 last:border-0">
+            <lucide-icon [name]="SearchIcon" class="w-4 h-4 text-slate-400"></lucide-icon>
+            <span class="text-slate-700 dark:text-slate-300">{{ prod.name }}</span>
+          </button>
+          }
         </div>
-        
-        <!-- Mobile Search Suggestions -->
-        @if (showSuggestions() && suggestions()) {
-          <div class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-[60] overflow-hidden">
-               <div class="p-2">
-                  @for (prod of suggestions()!.products.slice(0, 5); track prod.id) {
-                      <button (click)="selectSuggestion(prod.name)" class="w-full text-left px-4 py-3 text-sm flex items-center gap-3 border-b border-slate-50 dark:border-slate-800 last:border-0">
-                          <lucide-icon [name]="SearchIcon" class="w-4 h-4 text-slate-400"></lucide-icon>
-                          <span class="text-slate-700 dark:text-slate-300">{{ prod.name }}</span>
-                      </button>
-                  }
-               </div>
-          </div>
-        }
       </div>
+      }
+    </div>
     } @else {
-      <!-- Simplified Header for functional pages -->
-      <div class="flex items-center justify-between py-4 relative min-h-[56px] border-b border-slate-100 dark:border-slate-800 mb-2">
-        <div class="flex items-center gap-3">
-          <a routerLink="/" class="w-10 h-10 bg-primary/10 dark:bg-primary/20 rounded-xl flex items-center justify-center text-primary hover:bg-primary/20 transition-colors">
-            <lucide-icon [name]="ZapIcon" class="w-6 h-6 fill-primary/20"></lucide-icon>
-          </a>
-          <h1 class="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
-            {{ pageHeaderInfo().title }}
-          </h1>
-        </div>
-        <button class="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-          <lucide-icon [name]="BellIcon" class="w-6 h-6"></lucide-icon>
-        </button>
+    <!-- Simplified Header for functional pages -->
+    <div
+      class="flex items-center justify-between py-4 relative min-h-[56px] border-b border-slate-100 dark:border-slate-800 mb-2">
+      <div class="flex items-center gap-3">
+        <a routerLink="/"
+          class="w-10 h-10 bg-primary/10 dark:bg-primary/20 rounded-xl flex items-center justify-center text-primary hover:bg-primary/20 transition-colors">
+          <lucide-icon [name]="ZapIcon" class="w-6 h-6 fill-primary/20"></lucide-icon>
+        </a>
+        <h1 class="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
+          {{ pageHeaderInfo().title }}
+        </h1>
       </div>
+      <button
+        class="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+        <lucide-icon [name]="BellIcon" class="w-6 h-6"></lucide-icon>
+      </button>
+    </div>
     }
   </div>
 
@@ -88,79 +85,76 @@
   <!-- Main Header (Desktop focus) -->
   <div class="container-custom py-4 hidden md:flex items-center gap-4 lg:gap-8">
     <!-- Logo -->
-    <a routerLink="/" class="flex-shrink-0 flex items-center gap-2">
-      <div class="text-2xl font-black tracking-tighter text-slate-900 dark:text-white">
-        SHOP<span class="text-primary">X</span>
+    <a routerLink="/" class="flex-shrink-0 flex items-center gap-2.5 group">
+      <div class="text-2xl font-black tracking-tighter text-slate-900 dark:text-white transition-colors">
+        SHOP<span class="text-primary group-hover:text-primary-light transition-colors">X</span>
       </div>
       @if (authService.isAdmin()) {
-        <span class="bg-amber-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-widest shadow-sm shadow-amber-500/50">Admin</span>
+      <span
+        class="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest"
+        style="box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);">Admin</span>
       }
     </a>
 
-    <button class="md:hidden p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400">
+    <button
+      class="md:hidden p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400">
       <lucide-icon [name]="MenuIcon" class="w-6 h-6"></lucide-icon>
     </button>
 
     <!-- Search Bar (Desktop) -->
     <div class="flex-grow max-w-2xl relative group hidden sm:block">
-      <app-search-input
-        [value]="searchQuery()"
-        [placeholder]="'Czego szukasz?'"
-        inputClass="rounded-full !py-2.5 !pl-16 !pr-4"
-        (valueChange)="onSearchQueryChange($event)"
-        (search)="onSearch()"
-        (focus)="onSearchFocus()"
-        (blur)="hideSuggestions()"
-      >
+      <app-search-input [value]="searchQuery()" [placeholder]="'Czego szukasz?'"
+        inputClass="rounded-full !py-2.5 !pl-16 !pr-4" (valueChange)="onSearchQueryChange($event)" (search)="onSearch()"
+        (focus)="onSearchFocus()" (blur)="hideSuggestions()">
       </app-search-input>
 
       <!-- Search Suggestions Dropdown (Desktop) -->
       @if (showSuggestions() && suggestions()) {
-        <div class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-[60] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-          <!-- Categories Section -->
-          @if (suggestions()!.categories.length > 0) {
-            <div class="p-3 border-b border-slate-50 dark:border-slate-800">
-              <div class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest px-3 mb-2">Kategorie</div>
-              <div class="space-y-1">
-                @for (cat of suggestions()!.categories; track cat.id) {
-                  <button 
-                    (click)="selectCategory(cat.slug)"
-                    class="w-full text-left px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors flex items-center gap-3 group/item"
-                  >
-                    <div class="w-8 h-8 rounded-lg bg-primary/5 dark:bg-primary/20 flex items-center justify-center text-primary group-hover/item:bg-primary group-hover/item:text-white transition-colors">
-                      <lucide-icon [name]="MenuIcon" class="w-4 h-4"></lucide-icon>
-                    </div>
-                    <span class="font-medium">{{ cat.name }}</span>
-                  </button>
-                }
+      <div
+        class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-[60] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+        <!-- Categories Section -->
+        @if (suggestions()!.categories.length > 0) {
+        <div class="p-3 border-b border-slate-50 dark:border-slate-800">
+          <div class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest px-3 mb-2">
+            Kategorie</div>
+          <div class="space-y-1">
+            @for (cat of suggestions()!.categories; track cat.id) {
+            <button (click)="selectCategory(cat.slug)"
+              class="w-full text-left px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors flex items-center gap-3 group/item">
+              <div
+                class="w-8 h-8 rounded-lg bg-primary/5 dark:bg-primary/20 flex items-center justify-center text-primary group-hover/item:bg-primary group-hover/item:text-white transition-colors">
+                <lucide-icon [name]="MenuIcon" class="w-4 h-4"></lucide-icon>
               </div>
-            </div>
-          }
-
-          <!-- Products/Terms Section -->
-          @if (suggestions()!.products.length > 0) {
-            <div class="p-3 bg-slate-50/30 dark:bg-slate-800/20">
-              <div class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest px-3 mb-2">Wyszukiwania</div>
-              <div class="space-y-0.5">
-                @for (prod of suggestions()!.products; track prod.id) {
-                  <button 
-                    (click)="selectSuggestion(prod.name)"
-                    class="w-full text-left px-3 py-2 text-sm text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary dark:hover:text-primary hover:shadow-sm rounded-lg transition-all flex items-center gap-3"
-                  >
-                    <lucide-icon [name]="SearchIcon" class="w-4 h-4 text-slate-300 dark:text-slate-600"></lucide-icon>
-                    <span>{{ prod.name }}</span>
-                  </button>
-                }
-              </div>
-            </div>
-          }
-
-          @if (suggestions()!.categories.length === 0 && suggestions()!.products.length === 0) {
-            <div class="p-8 text-center text-slate-400 dark:text-slate-500 text-sm">
-              Brak dopasowań dla "<span class="text-slate-600 dark:text-slate-300 font-bold">{{ searchQuery() }}</span>"
-            </div>
-          }
+              <span class="font-medium">{{ cat.name }}</span>
+            </button>
+            }
+          </div>
         </div>
+        }
+
+        <!-- Products/Terms Section -->
+        @if (suggestions()!.products.length > 0) {
+        <div class="p-3 bg-slate-50/30 dark:bg-slate-800/20">
+          <div class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest px-3 mb-2">
+            Wyszukiwania</div>
+          <div class="space-y-0.5">
+            @for (prod of suggestions()!.products; track prod.id) {
+            <button (click)="selectSuggestion(prod.name)"
+              class="w-full text-left px-3 py-2 text-sm text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-primary dark:hover:text-primary hover:shadow-sm rounded-lg transition-all flex items-center gap-3">
+              <lucide-icon [name]="SearchIcon" class="w-4 h-4 text-slate-300 dark:text-slate-600"></lucide-icon>
+              <span>{{ prod.name }}</span>
+            </button>
+            }
+          </div>
+        </div>
+        }
+
+        @if (suggestions()!.categories.length === 0 && suggestions()!.products.length === 0) {
+        <div class="p-8 text-center text-slate-400 dark:text-slate-500 text-sm">
+          Brak dopasowań dla "<span class="text-slate-600 dark:text-slate-300 font-bold">{{ searchQuery() }}</span>"
+        </div>
+        }
+      </div>
       }
     </div>
 
@@ -170,132 +164,134 @@
       <div class="flex items-center gap-4 group relative z-50">
         <a routerLink="/account" class="flex items-center gap-4 cursor-pointer no-underline">
           <div class="flex flex-col items-end hidden sm:flex text-right">
-            <span class="text-[11px] font-bold text-slate-900 dark:text-white uppercase tracking-tighter"
-              >{{ authService.currentUser()?.firstName }}
-              {{ authService.currentUser()?.lastName }}</span
-            >
+            <span class="text-[11px] font-bold text-slate-900 dark:text-white uppercase tracking-tighter">{{
+              authService.currentUser()?.firstName }}
+              {{ authService.currentUser()?.lastName }}</span>
             <span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-tighter">Mój profil</span>
           </div>
-          <div class="flex flex-col items-center p-2 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
+          <div
+            class="flex flex-col items-center p-2 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
             <lucide-icon [name]="UserIcon" class="w-6 h-6"></lucide-icon>
           </div>
         </a>
         <div
-          class="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all p-2 z-[100]"
-        >
+          class="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all p-2 z-[100]">
           <div class="px-4 py-2 mb-1">
-            <div class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Twoje konto</div>
+            <div class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Twoje konto
+            </div>
           </div>
-          
-          <a
-            routerLink="/account/orders"
-            class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
-          >
-            <lucide-icon [name]="PackageIcon" class="w-4 h-4 text-slate-400 group-hover/item:text-primary transition-colors"></lucide-icon>
+
+          <a routerLink="/account/orders"
+            class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors">
+            <lucide-icon [name]="PackageIcon"
+              class="w-4 h-4 text-slate-400 group-hover/item:text-primary transition-colors"></lucide-icon>
             <span class="font-medium">Zamówienia</span>
           </a>
-          
-          <a
-            routerLink="/account/returns"
-            class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
-          >
-            <lucide-icon [name]="RefreshIcon" class="w-4 h-4 text-slate-400 group-hover/item:text-primary transition-colors"></lucide-icon>
+
+          <a routerLink="/account/returns"
+            class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors">
+            <lucide-icon [name]="RefreshIcon"
+              class="w-4 h-4 text-slate-400 group-hover/item:text-primary transition-colors"></lucide-icon>
             <span class="font-medium">Zwroty i reklamacje</span>
           </a>
-          
-          <a
-            routerLink="/account/shopping-lists"
-            class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
-          >
-            <lucide-icon [name]="HeartIcon" class="w-4 h-4 text-slate-400 group-hover/item:text-primary transition-colors"></lucide-icon>
+
+          <a routerLink="/account/shopping-lists"
+            class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors">
+            <lucide-icon [name]="HeartIcon"
+              class="w-4 h-4 text-slate-400 group-hover/item:text-primary transition-colors"></lucide-icon>
             <span class="font-medium">Listy zakupowe</span>
           </a>
-          
-          <a
-            routerLink="/account/reviews"
-            class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
-          >
-            <lucide-icon [name]="StarIcon" class="w-4 h-4 text-slate-400 group-hover/item:text-primary transition-colors"></lucide-icon>
+
+          <a routerLink="/account/reviews"
+            class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors">
+            <lucide-icon [name]="StarIcon"
+              class="w-4 h-4 text-slate-400 group-hover/item:text-primary transition-colors"></lucide-icon>
             <span class="font-medium">Moje opinie</span>
           </a>
-          
-          <a
-            routerLink="/account/addresses"
-            class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
-          >
-            <lucide-icon [name]="MapPinIcon" class="w-4 h-4 text-slate-400 group-hover/item:text-primary transition-colors"></lucide-icon>
+
+          <a routerLink="/account/addresses"
+            class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors">
+            <lucide-icon [name]="MapPinIcon"
+              class="w-4 h-4 text-slate-400 group-hover/item:text-primary transition-colors"></lucide-icon>
             <span class="font-medium">Dane do zamówień</span>
           </a>
-          
-          <a
-            routerLink="/account/settings"
-            class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
-          >
-            <lucide-icon [name]="SettingsIcon" class="w-4 h-4 text-slate-400 group-hover/item:text-primary transition-colors"></lucide-icon>
+
+          <a routerLink="/account/settings"
+            class="group/item flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors">
+            <lucide-icon [name]="SettingsIcon"
+              class="w-4 h-4 text-slate-400 group-hover/item:text-primary transition-colors"></lucide-icon>
             <span class="font-medium">Ustawienia konta</span>
           </a>
           <div class="border-t border-slate-100 dark:border-slate-800 my-2"></div>
-          <button
-            (click)="logout()"
-            class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors flex items-center gap-2"
-          >
+          <button (click)="logout()"
+            class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors flex items-center gap-2">
             <lucide-icon [name]="LogOutIcon" class="w-4 h-4"></lucide-icon>
             Wyloguj się
           </button>
         </div>
       </div>
       } @else {
-      <a
-        routerLink="/login"
-        class="flex items-center gap-4 cursor-pointer no-underline group"
-      >
+      <a routerLink="/login" class="flex items-center gap-4 cursor-pointer no-underline group">
         <div class="flex flex-col items-end hidden sm:flex text-right">
-          <span class="text-[11px] font-bold text-slate-900 dark:text-white uppercase tracking-tighter">Zaloguj się</span>
+          <span class="text-[11px] font-bold text-slate-900 dark:text-white uppercase tracking-tighter">Zaloguj
+            się</span>
           <span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-tighter">Twoje konto</span>
         </div>
-        <div class="flex flex-col items-center p-2 text-slate-600 dark:text-slate-400 group-hover:text-primary transition-colors">
+        <div
+          class="flex flex-col items-center p-2 text-slate-600 dark:text-slate-400 group-hover:text-primary transition-colors">
           <lucide-icon [name]="UserIcon" class="w-6 h-6"></lucide-icon>
         </div>
       </a>
       }
 
-      <a routerLink="/cart" class="relative hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-lg transition-colors group">
-        <lucide-icon [name]="ShoppingCartIcon" class="w-6 h-6 text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white"></lucide-icon>
-          @if (cartCount() > 0) {
-            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold shadow-sm ring-2 ring-white dark:ring-slate-900">
-              {{ cartCount() }}
-            </span>
-          }
+      <a routerLink="/cart"
+        class="relative hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-lg transition-colors group">
+        <lucide-icon [name]="ShoppingCartIcon"
+          class="w-6 h-6 text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white"></lucide-icon>
+        @if (cartCount() > 0) {
+        <span
+          class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold shadow-sm ring-2 ring-white dark:ring-slate-900">
+          {{ cartCount() }}
+        </span>
+        }
       </a>
-      
+
       @if (authService.isLoggedIn()) {
-           <a routerLink="/account/shopping-lists" class="hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-lg transition-colors group" title="Listy zakupowe">
-              <lucide-icon [name]="ListIcon" class="w-6 h-6 text-slate-600 dark:text-slate-400 group-hover:text-primary"></lucide-icon>
-           </a>
+      <a routerLink="/account/shopping-lists"
+        class="hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-lg transition-colors group"
+        title="Listy zakupowe">
+        <lucide-icon [name]="ListIcon"
+          class="w-6 h-6 text-slate-600 dark:text-slate-400 group-hover:text-primary"></lucide-icon>
+      </a>
       }
-      
+
       @if (authService.isAdmin()) {
-        <div class="relative group z-50">
-           <button class="hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-lg transition-colors group text-amber-500">
-              <lucide-icon [name]="ShieldIcon" class="w-6 h-6"></lucide-icon>
-           </button>
-           
-           <div class="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all p-2">
-              <div class="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Admin Panel</div>
-              <a routerLink="/admin/products" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors flex items-center gap-2">
-                  <lucide-icon [name]="LayoutGridIcon" class="w-4 h-4"></lucide-icon>
-                  Produkty
-              </a>
-               <a routerLink="/admin/categories" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors flex items-center gap-2">
-                  <lucide-icon [name]="MenuIcon" class="w-4 h-4"></lucide-icon>
-                  Kategorie
-              </a>
-               <a routerLink="/admin/attributes" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors flex items-center gap-2">
-                  <lucide-icon [name]="ListIcon" class="w-4 h-4"></lucide-icon>
-                  Atrybuty
-              </a>
-           </div>
+      <div class="relative group z-50">
+        <button
+          class="hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-lg transition-colors group text-amber-500">
+          <lucide-icon [name]="ShieldIcon" class="w-6 h-6"></lucide-icon>
+        </button>
+
+        <div
+          class="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all p-2">
+          <div class="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Admin Panel</div>
+          <a routerLink="/admin/products"
+            class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors flex items-center gap-2">
+            <lucide-icon [name]="LayoutGridIcon" class="w-4 h-4"></lucide-icon>
+            Produkty
+          </a>
+          <a routerLink="/admin/categories"
+            class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors flex items-center gap-2">
+            <lucide-icon [name]="MenuIcon" class="w-4 h-4"></lucide-icon>
+            Kategorie
+          </a>
+          <a routerLink="/admin/attributes"
+            class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors flex items-center gap-2">
+            <lucide-icon [name]="ListIcon" class="w-4 h-4"></lucide-icon>
+            Atrybuty
+          </a>
         </div>
+      </div>
       }
     </div>
   </div>
@@ -306,11 +302,8 @@
       <ul class="flex gap-6 py-2">
         @for (cat of categories(); track cat.id) {
         <li class="relative group">
-          <a
-            [routerLink]="['/products', cat.slug]"
-            (click)="suppressMenu()"
-            class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary flex items-center gap-1 py-3 transition-colors whitespace-nowrap"
-          >
+          <a [routerLink]="['/products', cat.slug]" (click)="suppressMenu()"
+            class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary flex items-center gap-1 py-3 transition-colors whitespace-nowrap">
             {{ cat.name }}
             @if (cat.subCategories && cat.subCategories.length > 0) {
             <lucide-icon [name]="ChevronIcon" class="w-3.5 h-3.5 opacity-50"></lucide-icon>
@@ -319,16 +312,16 @@
 
           <!-- Dropdown Mega Menu -->
           @if (cat.subCategories && cat.subCategories.length > 0) {
-            <div 
-              class="absolute top-full left-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pt-1"
-              [class.!invisible]="isMenuSuppressed()"
-            >
-              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl py-2 min-w-[220px]">
-                @for (sub of cat.subCategories; track sub.id) {
-                  <app-category-menu-item [category]="sub"></app-category-menu-item>
-                }
-              </div>
+          <div
+            class="absolute top-full left-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pt-1"
+            [class.!invisible]="isMenuSuppressed()">
+            <div
+              class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl py-2 min-w-[220px]">
+              @for (sub of cat.subCategories; track sub.id) {
+              <app-category-menu-item [category]="sub"></app-category-menu-item>
+              }
             </div>
+          </div>
           }
         </li>
         }
@@ -341,28 +334,24 @@
   <router-outlet></router-outlet>
 </main>
 
-<footer class="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 pt-12 pb-6 mt-12 transition-colors duration-300">
+<footer
+  class="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 pt-12 pb-6 mt-12 transition-colors duration-300">
   <div class="container-custom">
     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
       <!-- About -->
       <div class="col-span-2 lg:col-span-1">
-        <div class="text-xl font-black mb-6 text-slate-900 dark:text-white">SHOP<span class="text-primary">X</span></div>
+        <div class="text-xl font-black mb-6 text-slate-900 dark:text-white">SHOP<span class="text-primary">X</span>
+        </div>
         <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">
           Najlepszy sprzęt w najlepszych cenach. Dołącz do tysięcy zadowolonych klientów.
         </p>
         <div class="flex gap-4">
-          <lucide-icon
-            [name]="FacebookIcon"
-            class="w-5 h-5 text-slate-400 hover:text-primary cursor-pointer"
-          ></lucide-icon>
-          <lucide-icon
-            [name]="InstagramIcon"
-            class="w-5 h-5 text-slate-400 hover:text-primary cursor-pointer"
-          ></lucide-icon>
-          <lucide-icon
-            [name]="YoutubeIcon"
-            class="w-5 h-5 text-slate-400 hover:text-primary cursor-pointer"
-          ></lucide-icon>
+          <lucide-icon [name]="FacebookIcon"
+            class="w-5 h-5 text-slate-400 hover:text-primary cursor-pointer"></lucide-icon>
+          <lucide-icon [name]="InstagramIcon"
+            class="w-5 h-5 text-slate-400 hover:text-primary cursor-pointer"></lucide-icon>
+          <lucide-icon [name]="YoutubeIcon"
+            class="w-5 h-5 text-slate-400 hover:text-primary cursor-pointer"></lucide-icon>
         </div>
       </div>
 
@@ -399,8 +388,7 @@
     </div>
 
     <div
-      class="border-t border-slate-200 dark:border-slate-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-slate-400 font-medium"
-    >
+      class="border-t border-slate-200 dark:border-slate-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-slate-400 font-medium">
       <div>&copy; 2025 SHOPX Sp. z o.o.</div>
       <div class="flex gap-6">
         <span>Możesz płacić:</span>
@@ -415,36 +403,44 @@
 </footer>
 
 <!-- Mobile Bottom Navigation (x-kom style) -->
-<div class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-2 py-2 z-50 flex justify-around items-center h-16 transition-colors duration-300">
-  <a routerLink="/" class="flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all" [class.text-primary]="currentRoute() === '/'">
+<div
+  class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-2 py-2 z-50 flex justify-around items-center h-16 transition-colors duration-300">
+  <a routerLink="/" class="flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all"
+    [class.text-primary]="currentRoute() === '/'">
     <lucide-icon [name]="HomeIcon" class="w-6 h-6"></lucide-icon>
     <span class="text-[10px] font-bold uppercase tracking-tight">Sklep</span>
   </a>
-  
-  <a routerLink="/products" class="flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all" [class.text-primary]="currentRoute().startsWith('/products')">
+
+  <a routerLink="/products" class="flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all"
+    [class.text-primary]="currentRoute().startsWith('/products')">
     <lucide-icon [name]="LayoutGridIcon" class="w-6 h-6"></lucide-icon>
     <span class="text-[10px] font-bold uppercase tracking-tight">Kategorie</span>
   </a>
 
-  <a routerLink="/account/shopping-lists" class="flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all" [class.text-primary]="currentRoute().startsWith('/account/shopping-lists')">
+  <a routerLink="/account/shopping-lists" class="flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all"
+    [class.text-primary]="currentRoute().startsWith('/account/shopping-lists')">
     <lucide-icon [name]="HeartIcon" class="w-6 h-6"></lucide-icon>
     <span class="text-[10px] font-bold uppercase tracking-tight">Listy</span>
     @if (authService.isLoggedIn()) {
-      <span class="absolute top-2 translate-x-3 bg-primary text-white text-[8px] w-4 h-4 flex items-center justify-center rounded-full font-bold">12</span>
+    <span
+      class="absolute top-2 translate-x-3 bg-primary text-white text-[8px] w-4 h-4 flex items-center justify-center rounded-full font-bold">12</span>
     }
   </a>
 
-  <a routerLink="/cart" class="relative flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all" [class.text-primary]="currentRoute() === '/cart'">
+  <a routerLink="/cart" class="relative flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all"
+    [class.text-primary]="currentRoute() === '/cart'">
     <lucide-icon [name]="ShoppingCartIcon" class="w-6 h-6"></lucide-icon>
     <span class="text-[10px] font-bold uppercase tracking-tight">Koszyk</span>
     @if (cartCount() > 0) {
-      <span class="absolute top-2 translate-x-3 bg-red-500 text-white text-[8px] w-5 h-5 flex items-center justify-center rounded-full font-bold border-2 border-white dark:border-slate-900">
-        {{ cartCount() }}
-      </span>
+    <span
+      class="absolute top-2 translate-x-3 bg-red-500 text-white text-[8px] w-5 h-5 flex items-center justify-center rounded-full font-bold border-2 border-white dark:border-slate-900">
+      {{ cartCount() }}
+    </span>
     }
   </a>
 
-  <a routerLink="/account" class="flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all" [class.text-primary]="currentRoute().startsWith('/account') || currentRoute() === '/login'">
+  <a routerLink="/account" class="flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all"
+    [class.text-primary]="currentRoute().startsWith('/account') || currentRoute() === '/login'">
     <lucide-icon [name]="UserIcon" class="w-6 h-6"></lucide-icon>
     <span class="text-[10px] font-bold uppercase tracking-tight">Profil</span>
   </a>

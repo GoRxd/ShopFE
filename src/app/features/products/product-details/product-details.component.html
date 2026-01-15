@@ -1,478 +1,491 @@
 <div class="container-custom py-4 lg:py-8">
   <!-- Loading State -->
   @if (loading()) {
-    <div class="animate-pulse space-y-8">
-      <div class="h-6 bg-slate-100 dark:bg-slate-800 rounded w-1/4"></div>
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div class="lg:col-span-7 bg-slate-100 dark:bg-slate-800 h-[500px] rounded-2xl"></div>
-        <div class="lg:col-span-5 space-y-6">
-          <div class="h-10 bg-slate-100 dark:bg-slate-800 rounded w-3/4"></div>
-          <div class="h-32 bg-slate-100 dark:bg-slate-800 rounded-xl"></div>
-        </div>
+  <div class="animate-pulse space-y-8">
+    <div class="h-6 bg-slate-100 dark:bg-slate-800 rounded w-1/4"></div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div class="lg:col-span-7 bg-slate-100 dark:bg-slate-800 h-[500px] rounded-2xl"></div>
+      <div class="lg:col-span-5 space-y-6">
+        <div class="h-10 bg-slate-100 dark:bg-slate-800 rounded w-3/4"></div>
+        <div class="h-32 bg-slate-100 dark:bg-slate-800 rounded-xl"></div>
       </div>
     </div>
+  </div>
   } @else if (error()) {
-    <div class="text-center py-20">
-      <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2">Wystąpił błąd</h2>
-      <p class="text-slate-500 dark:text-slate-400">{{ error() }}</p>
-      <a routerLink="/" class="text-primary hover:text-primary-dark font-medium mt-4 inline-block">Wróć do strony głównej</a>
-    </div>
+  <div class="text-center py-20">
+    <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2">Wystąpił błąd</h2>
+    <p class="text-slate-500 dark:text-slate-400">{{ error() }}</p>
+    <a routerLink="/" class="text-primary hover:text-primary-dark font-medium mt-4 inline-block">Wróć do strony
+      głównej</a>
+  </div>
   } @else if (product(); as product) {
-    <!-- Breadcrumbs -->
-    <nav class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-6 overflow-x-auto scrollbar-hide whitespace-nowrap pb-2 w-full min-w-0">
-      <a routerLink="/" class="hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-1">
-        <lucide-icon [name]="HomeIcon" class="w-4 h-4"></lucide-icon>
-        <span>Sklep</span>
-      </a>
-      <lucide-icon [name]="ChevronRightIcon" class="w-4 h-4 text-slate-300 dark:text-slate-700"></lucide-icon>
-      
-      @for (crumb of breadcrumbs(); track crumb.slug; let last = $last) {
-        @if (!last) {
-          <a [routerLink]="['/products', crumb.slug]" class="hover:text-slate-900 dark:hover:text-white transition-colors">
-            {{ crumb.name }}
-          </a>
-          <lucide-icon [name]="ChevronRightIcon" class="w-4 h-4 text-slate-300 dark:text-slate-700"></lucide-icon>
-        } @else {
-          <a [routerLink]="['/products', crumb.slug]" class="text-slate-900 dark:text-white font-medium">
-             {{ crumb.name }}
-          </a>
+  <!-- Breadcrumbs -->
+  <nav
+    class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-3 overflow-x-auto scrollbar-hide whitespace-nowrap pb-1 w-full min-w-0">
+    <a routerLink="/" class="hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-1">
+      <lucide-icon [name]="HomeIcon" class="w-4 h-4"></lucide-icon>
+      <span>Sklep</span>
+    </a>
+    <lucide-icon [name]="ChevronRightIcon" class="w-4 h-4 text-slate-300 dark:text-slate-700"></lucide-icon>
+
+    @for (crumb of breadcrumbs(); track crumb.slug; let last = $last) {
+    @if (!last) {
+    <a [routerLink]="['/products', crumb.slug]" class="hover:text-slate-900 dark:hover:text-white transition-colors">
+      {{ crumb.name }}
+    </a>
+    <lucide-icon [name]="ChevronRightIcon" class="w-4 h-4 text-slate-300 dark:text-slate-700"></lucide-icon>
+    } @else {
+    <a [routerLink]="['/products', crumb.slug]" class="text-slate-900 dark:text-white font-medium">
+      {{ crumb.name }}
+    </a>
+    }
+    }
+  </nav>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 mb-10 items-start">
+
+    <!-- Left Column: Gallery -->
+    <div class="lg:col-span-7 space-y-4 animate-fade-in">
+      <div
+        class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl md:rounded-[2.5rem] p-4 md:p-6 flex items-center justify-center min-h-[250px] md:min-h-[350px] lg:min-h-[420px] relative group overflow-hidden transition-all duration-500"
+        style="box-shadow: var(--shadow-elegant);">
+        <!-- Main Image -->
+        <img [src]="currentImageUrl() || 'https://placehold.co/600x600/f8fafc/6366f1?text=' + product.name"
+          [alt]="product.name"
+          class="max-w-full max-h-[230px] md:max-h-[420px] object-contain transition-transform duration-700 group-hover:scale-105 cursor-zoom-in"
+          (click)="openLightbox()" />
+
+        @if (product.images && product.images.length > 1) {
+        <!-- Navigation Arrows -->
+        <button (click)="prevImage()"
+          class="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/90 dark:bg-slate-800/90 shadow-xl flex items-center justify-center text-slate-800 dark:text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-primary hover:text-white hover:scale-110 active:scale-95">
+          <lucide-icon [name]="ChevronRightIcon" class="w-6 h-6 rotate-180"></lucide-icon>
+        </button>
+        <button (click)="nextImage()"
+          class="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/90 dark:bg-slate-800/90 shadow-xl flex items-center justify-center text-slate-800 dark:text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-primary hover:text-white hover:scale-110 active:scale-95">
+          <lucide-icon [name]="ChevronRightIcon" class="w-6 h-6"></lucide-icon>
+        </button>
+
+        <!-- Image Counter -->
+        <div
+          class="absolute bottom-8 left-1/2 -translate-x-1/2 bg-slate-900/10 dark:bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-black text-slate-800 dark:text-white tracking-widest uppercase border border-white/20">
+          {{ selectedImageIndex() + 1 }} / {{ product.images.length }}
+        </div>
         }
+      </div>
+
+      <!-- Thumbnails -->
+      @if (product.images && product.images.length > 1) {
+      <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+        @for (image of product.images; track image.id; let i = $index) {
+        <button (click)="selectImage(i)"
+          class="flex-shrink-0 w-20 h-20 rounded-xl border-2 transition-all overflow-hidden"
+          [class.border-primary]="selectedImageIndex() === i" [class.border-transparent]="selectedImageIndex() !== i"
+          [class.opacity-50]="selectedImageIndex() !== i" [class.hover:opacity-100]="selectedImageIndex() !== i">
+          <img [src]="image.url" class="w-full h-full object-cover" [alt]="product.name" />
+        </button>
+        }
+      </div>
       }
-    </nav>
+    </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 mb-16 items-start">
-      
-      <!-- Left Column: Gallery -->
-      <div class="lg:col-span-7 space-y-4">
-        <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl md:rounded-3xl p-4 md:p-8 flex items-center justify-center min-h-[250px] md:min-h-[400px] lg:min-h-[500px] relative group overflow-hidden">
-           <!-- Main Image -->
-           <img 
-            [src]="currentImageUrl() || 'https://placehold.co/600x600/f8fafc/6366f1?text=' + product.name" 
-            [alt]="product.name"
-            class="max-w-full max-h-[230px] md:max-h-[400px] object-contain transition-transform duration-500 group-hover:scale-105 cursor-zoom-in"
-            (click)="openLightbox()"
-          />
-
-          @if (product.images && product.images.length > 1) {
-            <!-- Navigation Arrows -->
-            <button 
-              (click)="prevImage()"
-              class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow-lg flex items-center justify-center text-slate-800 dark:text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-slate-700"
-            >
-              <lucide-icon [name]="ChevronRightIcon" class="w-6 h-6 rotate-180"></lucide-icon>
-            </button>
-            <button 
-              (click)="nextImage()"
-              class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow-lg flex items-center justify-center text-slate-800 dark:text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white dark:hover:bg-slate-700"
-            >
-              <lucide-icon [name]="ChevronRightIcon" class="w-6 h-6"></lucide-icon>
-            </button>
-
-            <!-- Image Counter -->
-            <div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/10 dark:bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-slate-800 dark:text-white">
-              {{ selectedImageIndex() + 1 }} / {{ product.images.length }}
-            </div>
+    <!-- Right Column: Info & Buy Box -->
+    <div class="lg:col-span-5 flex flex-col gap-4 animate-slide-up">
+      <div class="pt-1">
+        <div class="flex items-center gap-2 mb-3">
+          <span
+            class="bg-primary/10 dark:bg-primary/20 text-primary text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">Oficjalny
+            Sklep</span>
+          @if (product.stockQuantity > 20) {
+          <span
+            class="bg-green-500/10 dark:bg-green-500/20 text-green-500 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">Duża
+            Dostępność</span>
           }
         </div>
+        <h1
+          class="text-xl lg:text-2xl font-black text-slate-900 dark:text-white leading-tight mb-2 mt-0 tracking-tight">
+          {{ product.name }}
+        </h1>
 
-        <!-- Thumbnails -->
-        @if (product.images && product.images.length > 1) {
-          <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            @for (image of product.images; track image.id; let i = $index) {
-              <button 
-                (click)="selectImage(i)"
-                class="flex-shrink-0 w-20 h-20 rounded-xl border-2 transition-all overflow-hidden"
-                [class.border-primary]="selectedImageIndex() === i"
-                [class.border-transparent]="selectedImageIndex() !== i"
-                [class.opacity-50]="selectedImageIndex() !== i"
-                [class.hover:opacity-100]="selectedImageIndex() !== i"
-              >
-                <img [src]="image.url" class="w-full h-full object-cover" [alt]="product.name" />
-              </button>
-            }
-          </div>
-        }
-      </div>
-
-      <!-- Right Column: Info & Buy Box -->
-      <div class="lg:col-span-5 flex flex-col gap-4">
-        <div class="pt-1">
-          <h1 class="text-2xl lg:text-3xl font-black text-slate-900 dark:text-white leading-tight mb-2 mt-0">
-            {{ product.name }}
-          </h1>
-          
-          <!-- Key Specs Preview -->
-          <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-2 mb-6">
-            @for (attr of product.attributes | slice:0:5; track attr.name) {
-              <li class="flex items-start gap-2">
-                <span class="text-slate-400 dark:text-slate-500 min-w-[120px]">{{ attr.name }}:</span>
-                @if (getAttributeLinkParams(attr.name, attr.value); as link) {
-                  <a [routerLink]="link.path" [queryParams]="link.queryParams" 
-                     class="font-medium text-primary hover:text-primary-dark hover:underline transition-colors cursor-pointer">
-                    {{ attr.value }}
-                  </a>
-                } @else {
-                  <span class="font-medium text-slate-800 dark:text-slate-200">{{ attr.value }}</span>
-                }
-              </li>
-            }
-          </ul>
-        </div>
-
-        <!-- Buy Box -->
-        <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 shadow-sm ring-1 ring-slate-100/50 dark:ring-slate-800/50">
-          <div class="flex items-end justify-between mb-6">
-            <div class="space-y-1">
-              <div class="text-3xl lg:text-4xl font-black text-slate-700 dark:text-white tracking-tight">
-                {{ product.price | plnCurrency }}
-              </div>
-            </div>
-          </div>
-
-          <div class="space-y-4 mb-6">
-             <div class="flex items-center gap-3 text-sm px-4 py-3 rounded-xl border" 
-                  [ngClass]="{
-                    'text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-900/30': product.stockQuantity > 5,
-                    'text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 border-orange-100 dark:border-orange-900/30': product.stockQuantity > 0 && product.stockQuantity <= 5,
-                    'text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-900/30': product.stockQuantity <= 0
-                  }">
-               <lucide-icon [name]="ClockIcon" class="w-5 h-5 flex-shrink-0" 
-                  [class.text-red-500]="product.stockQuantity <= 0"
-                  [class.text-orange-500]="product.stockQuantity > 0 && product.stockQuantity <= 5"></lucide-icon>
-               <div>
-                @if (product.stockQuantity > 0) {
-                  @if (product.stockQuantity <= 5) {
-                    <span class="font-bold block text-orange-600 dark:text-orange-400 animate-pulse">Ostatnie sztuki! ({{ product.stockQuantity }})</span>
-                    <span class="text-orange-500/80 dark:text-orange-400/80">Kup teraz, póki jest dostępny!</span>
-                  } @else {
-                    <span class="font-bold block">Dostępny od ręki</span>
-                    <span class="text-green-600/80 dark:text-green-400/80">Kup teraz, wyślemy dzisiaj!</span>
-                  }
-                } @else {
-                  <span class="font-bold block text-red-600 dark:text-red-400">Produkt niedostępny</span>
-                  <span class="text-red-500/80 dark:text-red-400/80">Obecnie brak w magazynie.</span>
-                }
-               </div>
-             </div>
-             
-             <div class="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-400 px-2">
-                <lucide-icon [name]="TruckIcon" class="w-5 h-5 text-primary"></lucide-icon>
-                <span>Darmowa dostawa od 300 zł</span>
-             </div>
-             <div class="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-400 px-2">
-                <lucide-icon [name]="ShieldCheckIcon" class="w-5 h-5 text-primary"></lucide-icon>
-                <span>Gwarancja 24 miesiące</span>
-             </div>
-          </div>
-
-          <div class="mb-4">
-             <label class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2 block">Ilość</label>
-             <div class="flex items-center gap-3">
-               <div class="flex items-center bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-                 <button 
-                   (click)="decreaseQuantity()" 
-                   [disabled]="quantity() <= 1"
-                   class="p-3 hover:text-primary transition-colors disabled:opacity-30 disabled:hover:text-current"
-                 >
-                   <lucide-icon [name]="MinusIcon" class="w-5 h-5"></lucide-icon>
-                 </button>
-                 <input 
-                   type="number" 
-                   [value]="quantity()" 
-                   (change)="updateQuantity($any($event.target).value)"
-                   class="w-16 text-center bg-transparent font-bold text-lg outline-none appearance-none border-none p-0 focus:ring-0"
-                 >
-                 <button 
-                   (click)="increaseQuantity()" 
-                   [disabled]="quantity() >= 100 || quantity() >= product.stockQuantity"
-                   class="p-3 hover:text-primary transition-colors disabled:opacity-30 disabled:hover:text-current"
-                 >
-                   <lucide-icon [name]="PlusIcon" class="w-5 h-5"></lucide-icon>
-                 </button>
-               </div>
-               <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">
-                  {{ quantity() }} szt. x {{ product.price | plnCurrency }} = {{ (product.price * quantity()) | plnCurrency }}
-               </span>
-             </div>
-          </div>
-
-          <div class="flex flex-col gap-3">
-             <button 
-               (click)="addToCart()"
-               [disabled]="product.stockQuantity <= 0"
-               class="w-full bg-success hover:bg-green-700 text-white font-bold h-14 rounded-xl text-lg transition-all shadow-lg hover:shadow-green-200 dark:hover:shadow-green-900/20 flex items-center justify-center gap-3 group active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-400 disabled:shadow-none"
-             >
-               <lucide-icon [name]="ShoppingCartIcon" class="w-6 h-6 group-hover:scale-110 transition-transform"></lucide-icon>
-               <span>{{ product.stockQuantity > 0 ? 'Dodaj do koszyka' : 'Brak w magazynie' }}</span>
-             </button>
-             <button 
-               (click)="openListModal()"
-               class="w-full bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 hover:border-slate-800 dark:hover:border-slate-600 text-slate-800 dark:text-slate-200 font-bold h-12 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 group"
-             >
-                <lucide-icon [name]="HeartIcon" class="w-5 h-5 text-slate-400 group-hover:text-red-500 transition-colors"></lucide-icon>
-                Dodaj do listy
-             </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Description & Specs Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 border-t border-slate-100 dark:border-slate-800 pt-16">
-      <div class="lg:col-span-2 space-y-12">
-        <section>
-          <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
-            Opis produktu
-          </h2>
-          <div class="prose prose-slate dark:prose-invert max-w-none text-slate-600 dark:text-slate-300 leading-relaxed bg-white dark:bg-slate-900 rounded-2xl p-6 lg:p-10 border border-slate-100 dark:border-slate-800">
-             {{ product.description }}
-             @if (!product.description) {
-               <p class="italic text-slate-400 dark:text-slate-500 text-center py-8">Brak opisu dla tego produktu.</p>
-             }
-          </div>
-        </section>
-        
-        <section>
-          <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">Specyfikacja</h2>
-          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
-            @for (attr of product.attributes; track attr.name; let odd = $odd) {
-              <div class="grid grid-cols-1 sm:grid-cols-3 p-4 sm:px-6 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" [class.bg-slate-50]="odd" [class.dark:bg-slate-800/50]="odd">
-                <dt class="font-medium text-slate-500 dark:text-slate-400 sm:col-span-1">{{ attr.name }}</dt>
-                 <dd class="sm:col-span-2 font-medium">
-                  @if (getAttributeLinkParams(attr.name, attr.value); as link) {
-                    <a [routerLink]="link.path" [queryParams]="link.queryParams" 
-                       class="text-primary hover:text-primary-dark hover:underline transition-colors block w-full">
-                      {{ attr.value }}
-                    </a>
-                  } @else {
-                    <span class="text-slate-900 dark:text-slate-200">{{ attr.value }}</span>
-                  }
-                </dd>
-              </div>
-            } @empty {
-               <div class="p-8 text-center text-slate-400 dark:text-slate-500 italic">Brak szczegółowej specyfikacji.</div>
-            }
-          </div>
-        </section>
-      </div>
-
-      <!-- Sticky Sidebar/Banner (Optional) -->
-      <div class="hidden lg:block lg:col-span-1">
-         <div class="sticky top-8 bg-primary/5 dark:bg-primary/10 rounded-3xl p-8 border border-primary/10 dark:border-primary/20">
-            <h3 class="text-xl font-bold text-primary mb-4">Dlaczego warto?</h3>
-            <ul class="space-y-4">
-              <li class="flex gap-3">
-                <div class="bg-white dark:bg-slate-800 p-2 rounded-lg text-primary shadow-sm">
-                   <lucide-icon [name]="TruckIcon" class="w-5 h-5"></lucide-icon>
-                </div>
-                <div>
-                  <p class="font-bold text-slate-900 dark:text-white text-sm">Szybka wysyłka</p>
-                  <p class="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Większość zamówień wysyłamy w 24h</p>
-                </div>
-              </li>
-              <li class="flex gap-3">
-                <div class="bg-white dark:bg-slate-800 p-2 rounded-lg text-primary shadow-sm">
-                   <lucide-icon [name]="ShieldCheckIcon" class="w-5 h-5"></lucide-icon>
-                </div>
-                <div>
-                  <p class="font-bold text-slate-900 dark:text-white text-sm">Bezpieczne zakupy</p>
-                  <p class="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Szyfrowane połączenie i płatności</p>
-                </div>
-              </li>
-            </ul>
-         </div>
-      </div>
-    </div>
-
-    <!-- Reviews Section -->
-    <div class="border-t border-slate-100 dark:border-slate-800 pt-16 mb-16">
-      <div class="flex flex-col lg:flex-row gap-12 items-start">
-        <!-- Left: Reviews List -->
-        <div class="w-full lg:w-2/3 min-w-0">
-          <div class="flex items-center gap-4 mb-8">
-            <h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-              Opinie klientów
-            </h2>
-            <div class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 w-8 h-8 rounded-full text-sm font-bold flex items-center justify-center">
-              {{ reviews().length }}
-            </div>
-          </div>
-
-          <div class="space-y-6">
-            @for (review of reviews(); track review.id) {
-              <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-                <div class="flex justify-between items-start mb-4">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold">
-                      {{ review.userFirstName[0] }}
-                    </div>
-                    <div>
-                      <p class="font-bold text-slate-900 dark:text-white leading-none mb-1">{{ review.userFirstName }}</p>
-                      <p class="text-xs text-slate-400">{{ review.createdAt | date:'longDate' }}</p>
-                    </div>
-                  </div>
-                  <div class="flex gap-0.5">
-                    @for (star of [1,2,3,4,5]; track star) {
-                      <lucide-icon 
-                        [name]="StarIcon" 
-                        class="w-4 h-4" 
-                        [class.text-yellow-400]="star <= review.rating"
-                        [class.text-slate-300]="star > review.rating"
-                        [attr.fill]="star <= review.rating ? 'currentColor' : 'none'"
-                      ></lucide-icon>
-                    }
-                  </div>
-                </div>
-                <p class="text-slate-600 dark:text-slate-300 break-words whitespace-pre-wrap">{{ review.comment }}</p>
-              </div>
-            } @empty {
-              <div class="text-center py-12 bg-slate-50/50 dark:bg-slate-800/30 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800">
-                <lucide-icon [name]="MessageSquareIcon" class="w-12 h-12 text-slate-300 mx-auto mb-4"></lucide-icon>
-                <p class="text-slate-500 dark:text-slate-400">Bądź pierwszym, który oceni ten produkt!</p>
-              </div>
-            }
-          </div>
-        </div>
-
-        <!-- Right: Add Review -->
-        <div class="lg:w-1/3">
-          <div class="bg-slate-50 dark:bg-slate-800/50 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 sticky top-8">
-            @if (isLoggedIn()) {
-              @if (hasAlreadyReviewed()) {
-                <div class="text-center py-4">
-                  <div class="w-16 h-16 bg-success/10 text-success rounded-full flex items-center justify-center mx-auto mb-4">
-                    <lucide-icon [name]="CheckIcon" class="w-8 h-8"></lucide-icon>
-                  </div>
-                  <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Dziękujemy!</h3>
-                  <p class="text-sm text-slate-500 dark:text-slate-400">Dodałeś już opinię dla tego produktu.</p>
-                </div>
-              } @else {
-                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Dodaj opinię</h3>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Podziel się swoją opinią o tym produkcie.</p>
-                
-                <div class="mb-6 text-center">
-                  <p class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-3">Twoja ocena:</p>
-                  <div class="flex justify-center gap-1">
-                    @for (star of [1,2,3,4,5]; track star) {
-                      <button 
-                        (click)="newReviewRating.set(star)"
-                        class="transition-all cursor-pointer outline-none hover:scale-110"
-                        [class.text-yellow-400]="star <= newReviewRating()"
-                        [class.text-slate-300]="star > newReviewRating()"
-                      >
-                        <lucide-icon 
-                          [name]="StarIcon" 
-                          class="w-9 h-9" 
-                          [attr.fill]="star <= newReviewRating() ? 'currentColor' : 'none'"
-                        ></lucide-icon>
-                      </button>
-                    }
-                  </div>
-                </div>
-
-                <div class="space-y-4">
-                  @if (submitError()) {
-                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-xl text-xs text-center">
-                      {{ submitError() | translate }}
-                    </div>
-                  }
-                  <div>
-                    <textarea 
-                      [(ngModel)]="newReviewComment"
-                      rows="4" 
-                      placeholder="Napisz co sądzisz o produkcie..."
-                      class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none transition-all dark:text-white"
-                    ></textarea>
-                  </div>
-                  <button 
-                    (click)="submitReview()"
-                    [disabled]="!newReviewComment().trim() || submittingReview()"
-                    class="w-full bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold h-12 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-primary/20"
-                  >
-                    @if (submittingReview()) {
-                      <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    } @else {
-                      <span>Wyślij opinię</span>
-                    }
-                  </button>
-                </div>
-              }
+        <!-- Key Specs Preview -->
+        <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-2.5 mb-8">
+          @for (attr of product.attributes | slice:0:5; track attr.name) {
+          <li class="flex items-center gap-3">
+            <div class="w-1.5 h-1.5 rounded-full bg-primary/30"></div>
+            <span class="text-slate-400 dark:text-slate-500 min-w-[120px]">{{ attr.name }}:</span>
+            @if (getAttributeLinkParams(attr.name, attr.value); as link) {
+            <a [routerLink]="link.path" [queryParams]="link.queryParams"
+              class="font-bold text-slate-800 dark:text-slate-200 hover:text-primary transition-colors cursor-pointer">
+              {{ attr.value }}
+            </a>
             } @else {
-              <div class="text-center">
-                <lucide-icon [name]="ShieldCheckIcon" class="w-12 h-12 text-slate-300 mx-auto mb-4"></lucide-icon>
-                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Zaloguj się</h3>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Tylko zalogowani klienci mogą dodawać opinie.</p>
-                <a routerLink="/auth/login" class="inline-block bg-primary text-white font-bold px-8 py-3 rounded-xl hover:bg-primary-dark transition-all">
-                  Logowanie
-                </a>
-              </div>
+            <span class="font-bold text-slate-800 dark:text-slate-200">{{ attr.value }}</span>
             }
+          </li>
+          }
+        </ul>
+      </div>
+
+      <!-- Buy Box -->
+      <div
+        class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-slate-100 dark:border-slate-800 rounded-[2.5rem] p-6 transition-all duration-300"
+        style="box-shadow: var(--shadow-elevated);">
+        <div class="flex items-end justify-between mb-6">
+          <div class="space-y-1">
+            <div class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5">Cena
+              brutto</div>
+            <div class="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
+              {{ product.price | plnCurrency }}
+            </div>
           </div>
+        </div>
+
+        <div class="space-y-3 mb-5">
+          <div class="flex items-center gap-3 text-xs px-4 py-2.5 rounded-2xl border transition-colors duration-300"
+            [ngClass]="{
+                    'text-green-700 dark:text-green-400 bg-green-50/50 dark:bg-green-900/10 border-green-200/50 dark:border-green-800/30': product.stockQuantity > 5,
+                    'text-orange-700 dark:text-orange-400 bg-orange-50/50 dark:bg-orange-900/10 border-orange-200/50 dark:border-orange-800/30': product.stockQuantity > 0 && product.stockQuantity <= 5,
+                    'text-red-700 dark:text-red-400 bg-red-50/50 dark:bg-red-900/10 border-red-200/50 dark:border-red-800/30': product.stockQuantity <= 0
+                  }">
+            <div class="p-2 rounded-xl" [class.bg-green-500/10]="product.stockQuantity > 5"
+              [class.bg-orange-500/10]="product.stockQuantity > 0 && product.stockQuantity <= 5"
+              [class.bg-red-500/10]="product.stockQuantity <= 0">
+              <lucide-icon [name]="ClockIcon" class="w-5 h-5 flex-shrink-0"
+                [class.text-red-500]="product.stockQuantity <= 0"
+                [class.text-orange-500]="product.stockQuantity > 0 && product.stockQuantity <= 5"
+                [class.text-green-500]="product.stockQuantity > 5"></lucide-icon>
+            </div>
+            <div>
+              @if (product.stockQuantity > 0) {
+              @if (product.stockQuantity <= 5) { <span
+                class="font-black block text-orange-600 dark:text-orange-400 animate-pulse uppercase tracking-wider text-[11px]">
+                Ostatnie sztuki! ({{ product.stockQuantity }})</span>
+                <span class="text-orange-500/80 dark:text-orange-400/70 text-xs">Kup teraz, zanim inni Cię
+                  ubiegną!</span>
+                } @else {
+                <span class="font-black block uppercase tracking-wider text-[11px]">Dostępny w magazynie</span>
+                <span class="text-green-600/80 dark:text-green-400/70 text-xs">Gotowy do wysyłki w 24 godziny.</span>
+                }
+                } @else {
+                <span
+                  class="font-black block text-red-600 dark:text-red-400 uppercase tracking-wider text-[11px]">Produkt
+                  niedostępny</span>
+                <span class="text-red-500/80 dark:text-red-400/70 text-xs">Poinformuj mnie o dostępności.</span>
+                }
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div
+              class="flex items-center gap-3 text-xs text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800/50">
+              <lucide-icon [name]="TruckIcon" class="w-5 h-5 text-primary"></lucide-icon>
+              <span class="font-bold">Darmowa dostawa <span class="text-slate-400 font-normal">od 300 zł</span></span>
+            </div>
+            <div
+              class="flex items-center gap-3 text-xs text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800/50">
+              <lucide-icon [name]="ShieldCheckIcon" class="w-5 h-5 text-primary"></lucide-icon>
+              <span class="font-bold">Gwarancja <span class="text-slate-400 font-normal">24 miesiące</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-5">
+          <label
+            class="text-[10px] font-black text-slate-400 dark:text-slate-500 mb-2 block uppercase tracking-widest">Wybierz
+            ilość</label>
+          <div class="flex items-center gap-3">
+            <div
+              class="flex items-center bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-0.5"
+              style="box-shadow: var(--shadow-subtle);">
+              <button (click)="decreaseQuantity()" [disabled]="quantity() <= 1"
+                class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white dark:hover:bg-slate-700 text-slate-500 hover:text-primary transition-all disabled:opacity-30">
+                <lucide-icon [name]="MinusIcon" class="w-4 h-4"></lucide-icon>
+              </button>
+              <input type="number" [value]="quantity()" (change)="updateQuantity($any($event.target).value)"
+                class="w-12 text-center bg-transparent font-black text-lg outline-none appearance-none border-none p-0 focus:ring-0 text-slate-900 dark:text-white">
+              <button (click)="increaseQuantity()" [disabled]="quantity() >= 100 || quantity() >= product.stockQuantity"
+                class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white dark:hover:bg-slate-700 text-slate-500 hover:text-primary transition-all disabled:opacity-30">
+                <lucide-icon [name]="PlusIcon" class="w-4 h-4"></lucide-icon>
+              </button>
+            </div>
+            <div class="flex flex-col">
+              <span
+                class="text-[10px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest leading-none mb-1">Razem</span>
+              <span class="text-sm text-slate-600 dark:text-slate-300 font-bold whitespace-nowrap">
+                {{ (product.price * quantity()) | plnCurrency }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-3">
+          <button (click)="addToCart()" [disabled]="product.stockQuantity <= 0"
+            class="w-full bg-gradient-to-r from-primary to-primary-dark text-white font-black h-14 rounded-2xl text-lg transition-all flex items-center justify-center gap-3 group active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-400 animate-glow-pulse"
+            style="box-shadow: var(--shadow-glow);">
+            <lucide-icon [name]="ShoppingCartIcon"
+              class="w-6 h-6 group-hover:scale-110 group-hover:rotate-[-10deg] transition-transform"></lucide-icon>
+            <span>{{ product.stockQuantity > 0 ? 'Dodaj do koszyka' : 'Brak w magazynie' }}</span>
+          </button>
+          <button (click)="openListModal()"
+            class="w-full bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 font-bold h-11 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 group border border-slate-200/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 hover:text-primary transition-all">
+            <lucide-icon [name]="HeartIcon"
+              class="w-5 h-5 text-slate-400 group-hover:text-red-500 group-hover:fill-red-500 transition-all"></lucide-icon>
+            <span class="text-sm">Dodaj do listy życzeń</span>
+          </button>
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Description & Specs Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 border-t border-slate-100 dark:border-slate-800 pt-16">
+    <div class="lg:col-span-2 space-y-12">
+      <section>
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
+          Opis produktu
+        </h2>
+        <div
+          class="prose prose-slate dark:prose-invert max-w-none text-slate-600 dark:text-slate-300 leading-relaxed bg-white dark:bg-slate-900 rounded-2xl p-6 lg:p-10 border border-slate-100 dark:border-slate-800">
+          {{ product.description }}
+          @if (!product.description) {
+          <p class="italic text-slate-400 dark:text-slate-500 text-center py-8">Brak opisu dla tego produktu.</p>
+          }
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-8 flex items-center gap-3 tracking-tight">
+          <div class="w-1.5 h-8 bg-primary rounded-full"></div>
+          Specyfikacja produktu
+        </h2>
+        <div
+          class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 overflow-hidden"
+          style="box-shadow: var(--shadow-elegant);">
+          @for (attr of product.attributes; track attr.name; let odd = $odd) {
+          <div
+            class="grid grid-cols-1 sm:grid-cols-3 p-5 sm:px-8 items-center border-b border-slate-50 dark:border-slate-800 last:border-0 transition-colors duration-300 hover:bg-slate-50/50 dark:hover:bg-slate-800/50"
+            [class.bg-slate-50/30]="odd" [class.dark:bg-slate-800/20]="odd">
+            <dt class="text-sm font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest sm:col-span-1">{{
+              attr.name }}</dt>
+            <dd class="sm:col-span-2 text-slate-700 dark:text-slate-200">
+              @if (getAttributeLinkParams(attr.name, attr.value); as link) {
+              <a [routerLink]="link.path" [queryParams]="link.queryParams"
+                class="font-bold text-primary hover:text-primary-dark transition-colors">
+                {{ attr.value }}
+              </a>
+              } @else {
+              <span class="font-bold">{{ attr.value }}</span>
+              }
+            </dd>
+          </div>
+          } @empty {
+          <div class="p-12 text-center text-slate-400 dark:text-slate-500 italic font-medium">Brak szczegółowej
+            specyfikacji dla tego modelu.</div>
+          }
+        </div>
+      </section>
+    </div>
+
+    <!-- Sticky Sidebar/Banner (Optional) -->
+    <div class="hidden lg:block lg:col-span-1">
+      <div
+        class="sticky top-8 bg-primary/5 dark:bg-primary/10 rounded-3xl p-8 border border-primary/10 dark:border-primary/20">
+        <h3 class="text-xl font-bold text-primary mb-4">Dlaczego warto?</h3>
+        <ul class="space-y-4">
+          <li class="flex gap-3">
+            <div class="bg-white dark:bg-slate-800 p-2 rounded-lg text-primary shadow-sm">
+              <lucide-icon [name]="TruckIcon" class="w-5 h-5"></lucide-icon>
+            </div>
+            <div>
+              <p class="font-bold text-slate-900 dark:text-white text-sm">Szybka wysyłka</p>
+              <p class="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Większość zamówień wysyłamy w 24h</p>
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <div class="bg-white dark:bg-slate-800 p-2 rounded-lg text-primary shadow-sm">
+              <lucide-icon [name]="ShieldCheckIcon" class="w-5 h-5"></lucide-icon>
+            </div>
+            <div>
+              <p class="font-bold text-slate-900 dark:text-white text-sm">Bezpieczne zakupy</p>
+              <p class="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Szyfrowane połączenie i płatności</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reviews Section -->
+  <div class="border-t border-slate-100 dark:border-slate-800 pt-16 mb-16">
+    <div class="flex flex-col lg:flex-row gap-12 items-start">
+      <!-- Left: Reviews List -->
+      <div class="w-full lg:w-2/3 min-w-0">
+        <div class="flex items-center gap-4 mb-8">
+          <h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+            Opinie klientów
+          </h2>
+          <div
+            class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 w-8 h-8 rounded-full text-sm font-bold flex items-center justify-center">
+            {{ reviews().length }}
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          @for (review of reviews(); track review.id) {
+          <div
+            class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 md:p-8 transition-all duration-300"
+            style="box-shadow: var(--shadow-soft);" onmouseover="this.style.boxShadow='var(--shadow-elegant)'"
+            onmouseout="this.style.boxShadow='var(--shadow-soft)'">
+            <div class="flex justify-between items-start mb-6">
+              <div class="flex items-center gap-4">
+                <div
+                  class="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 text-primary flex items-center justify-center font-black text-xl shadow-sm">
+                  {{ review.userFirstName[0] }}
+                </div>
+                <div>
+                  <p class="font-black text-slate-900 dark:text-white text-lg tracking-tight mb-0.5">{{
+                    review.userFirstName }}</p>
+                  <div class="flex items-center gap-2">
+                    <div class="flex gap-0.5">
+                      @for (star of [1,2,3,4,5]; track star) {
+                      <lucide-icon [name]="StarIcon" class="w-3.5 h-3.5" [class.text-amber-400]="star <= review.rating"
+                        [class.text-slate-200]="star > review.rating"
+                        [attr.fill]="star <= review.rating ? 'currentColor' : 'none'"></lucide-icon>
+                      }
+                    </div>
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ review.createdAt |
+                      date:'dd.MM.yyyy' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-slate-600 dark:text-slate-400 text-base leading-relaxed font-medium bg-slate-50/50 dark:bg-slate-800/30 p-5 rounded-2xl border border-slate-100/50 dark:border-slate-800/50">
+              {{ review.comment }}</p>
+          </div>
+          } @empty {
+          <div
+            class="text-center py-12 bg-slate-50/50 dark:bg-slate-800/30 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+            <lucide-icon [name]="MessageSquareIcon" class="w-12 h-12 text-slate-300 mx-auto mb-4"></lucide-icon>
+            <p class="text-slate-500 dark:text-slate-400">Bądź pierwszym, który oceni ten produkt!</p>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Right: Add Review -->
+      <div class="lg:w-1/3">
+        <div
+          class="bg-slate-50 dark:bg-slate-800/50 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 sticky top-8">
+          @if (isLoggedIn()) {
+          @if (hasAlreadyReviewed()) {
+          <div class="text-center py-4">
+            <div
+              class="w-16 h-16 bg-success/10 text-success rounded-full flex items-center justify-center mx-auto mb-4">
+              <lucide-icon [name]="CheckIcon" class="w-8 h-8"></lucide-icon>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Dziękujemy!</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400">Dodałeś już opinię dla tego produktu.</p>
+          </div>
+          } @else {
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Dodaj opinię</h3>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Podziel się swoją opinią o tym produkcie.</p>
+
+          <div class="mb-6 text-center">
+            <p class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-3">Twoja ocena:</p>
+            <div class="flex justify-center gap-1">
+              @for (star of [1,2,3,4,5]; track star) {
+              <button (click)="newReviewRating.set(star)"
+                class="transition-all cursor-pointer outline-none hover:scale-110"
+                [class.text-yellow-400]="star <= newReviewRating()" [class.text-slate-300]="star > newReviewRating()">
+                <lucide-icon [name]="StarIcon" class="w-9 h-9"
+                  [attr.fill]="star <= newReviewRating() ? 'currentColor' : 'none'"></lucide-icon>
+              </button>
+              }
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            @if (submitError()) {
+            <div
+              class="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-xl text-xs text-center">
+              {{ submitError() | translate }}
+            </div>
+            }
+            <div>
+              <textarea [(ngModel)]="newReviewComment" rows="4" placeholder="Napisz co sądzisz o produkcie..."
+                class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none transition-all dark:text-white"></textarea>
+            </div>
+            <button (click)="submitReview()" [disabled]="!newReviewComment().trim() || submittingReview()"
+              class="w-full bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold h-12 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-primary/20">
+              @if (submittingReview()) {
+              <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              } @else {
+              <span>Wyślij opinię</span>
+              }
+            </button>
+          </div>
+          }
+          } @else {
+          <div class="text-center">
+            <lucide-icon [name]="ShieldCheckIcon" class="w-12 h-12 text-slate-300 mx-auto mb-4"></lucide-icon>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Zaloguj się</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Tylko zalogowani klienci mogą dodawać opinie.</p>
+            <a routerLink="/auth/login"
+              class="inline-block bg-primary text-white font-bold px-8 py-3 rounded-xl hover:bg-primary-dark transition-all">
+              Logowanie
+            </a>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
   }
 </div>
 
 <!-- Add to List Modal -->
 @if (product(); as p) {
-  <app-add-to-shopping-list 
-    [productId]="p.id" 
-    [quantity]="quantity()"
-    [isOpen]="isListModalOpen()" 
-    (closeModal)="closeListModal()"
-  ></app-add-to-shopping-list>
+<app-add-to-shopping-list [productId]="p.id" [quantity]="quantity()" [isOpen]="isListModalOpen()"
+  (closeModal)="closeListModal()"></app-add-to-shopping-list>
 }
 
 <!-- Lightbox Overlay -->
 @if (isLightboxOpen()) {
-  <div 
-    class="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl animate-in fade-in duration-300"
-    (click)="closeLightbox()"
-  >
-    <!-- Close Button -->
-    <button 
-      (click)="closeLightbox(); $event.stopPropagation()"
-      class="fixed top-6 right-6 w-12 h-12 rounded-full bg-slate-900/10 dark:bg-white/10 hover:bg-slate-900/20 dark:hover:bg-white/20 flex items-center justify-center text-slate-900 dark:text-white transition-all active:scale-95 cursor-pointer z-[110]"
-    >
-      <lucide-icon [name]="XIcon" class="w-6 h-6"></lucide-icon>
+<div
+  class="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl animate-in fade-in duration-300"
+  (click)="closeLightbox()">
+  <!-- Close Button -->
+  <button (click)="closeLightbox(); $event.stopPropagation()"
+    class="fixed top-6 right-6 w-12 h-12 rounded-full bg-slate-900/10 dark:bg-white/10 hover:bg-slate-900/20 dark:hover:bg-white/20 flex items-center justify-center text-slate-900 dark:text-white transition-all active:scale-95 cursor-pointer z-[110]">
+    <lucide-icon [name]="XIcon" class="w-6 h-6"></lucide-icon>
+  </button>
+
+  <!-- Main Lightbox Image Container -->
+  <div class="relative w-full h-full flex items-center justify-center p-4 overflow-auto scrollbar-hide z-[105]"
+    (click)="closeLightbox()">
+    <img [src]="currentImageUrl()" [alt]="product()?.name"
+      class="max-w-full max-h-full object-contain rounded-xl shadow-2xl animate-in zoom-in-95 duration-300 transition-transform duration-500 origin-center"
+      [style.transform]="isZoomed() ? 'scale(2.5)' : 'scale(1)'" [class.cursor-zoom-out]="isZoomed()"
+      [class.cursor-zoom-in]="!isZoomed()" (click)="toggleZoom(); $event.stopPropagation()" />
+
+    @if (product()?.images && product()?.images!.length > 1) {
+    <!-- Navigation Arrows In Lightbox -->
+    <button (click)="prevImage(); $event.stopPropagation()"
+      class="fixed left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 md:w-16 h-12 md:h-16 rounded-full bg-white dark:bg-slate-800 shadow-xl flex items-center justify-center text-slate-800 dark:text-white hover:bg-primary hover:text-white transition-all active:scale-95 cursor-pointer z-[110]">
+      <lucide-icon [name]="ChevronLeftIcon" class="w-6 md:w-8 h-6 md:h-8"></lucide-icon>
+    </button>
+    <button (click)="nextImage(); $event.stopPropagation()"
+      class="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 md:w-16 h-12 md:h-16 rounded-full bg-white dark:bg-slate-800 shadow-xl flex items-center justify-center text-slate-800 dark:text-white hover:bg-primary hover:text-white transition-all active:scale-95 cursor-pointer z-[110]">
+      <lucide-icon [name]="ChevronRightIcon" class="w-6 md:w-8 h-6 md:h-8"></lucide-icon>
     </button>
 
-    <!-- Main Lightbox Image Container -->
-    <div 
-      class="relative w-full h-full flex items-center justify-center p-4 overflow-auto scrollbar-hide z-[105]" 
-      (click)="closeLightbox()"
-    >
-      <img 
-        [src]="currentImageUrl()" 
-        [alt]="product()?.name"
-        class="max-w-full max-h-full object-contain rounded-xl shadow-2xl animate-in zoom-in-95 duration-300 transition-transform duration-500 origin-center"
-        [style.transform]="isZoomed() ? 'scale(2.5)' : 'scale(1)'"
-        [class.cursor-zoom-out]="isZoomed()"
-        [class.cursor-zoom-in]="!isZoomed()"
-        (click)="toggleZoom(); $event.stopPropagation()"
-      />
-
-      @if (product()?.images && product()?.images!.length > 1) {
-        <!-- Navigation Arrows In Lightbox -->
-        <button 
-          (click)="prevImage(); $event.stopPropagation()"
-          class="fixed left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 md:w-16 h-12 md:h-16 rounded-full bg-white dark:bg-slate-800 shadow-xl flex items-center justify-center text-slate-800 dark:text-white hover:bg-primary hover:text-white transition-all active:scale-95 cursor-pointer z-[110]"
-        >
-          <lucide-icon [name]="ChevronLeftIcon" class="w-6 md:w-8 h-6 md:h-8"></lucide-icon>
-        </button>
-        <button 
-          (click)="nextImage(); $event.stopPropagation()"
-          class="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 md:w-16 h-12 md:h-16 rounded-full bg-white dark:bg-slate-800 shadow-xl flex items-center justify-center text-slate-800 dark:text-white hover:bg-primary hover:text-white transition-all active:scale-95 cursor-pointer z-[110]"
-        >
-          <lucide-icon [name]="ChevronRightIcon" class="w-6 md:w-8 h-6 md:h-8"></lucide-icon>
-        </button>
-
-        <!-- Image Counter In Lightbox -->
-        <div class="fixed bottom-6 left-1/2 -translate-x-1/2 text-slate-900 dark:text-white font-black tracking-widest text-sm uppercase z-[110] bg-white/20 dark:bg-slate-900/20 backdrop-blur px-4 py-1 rounded-full">
-          {{ selectedImageIndex() + 1 }} / {{ product()?.images?.length }}
-        </div>
-      }
+    <!-- Image Counter In Lightbox -->
+    <div
+      class="fixed bottom-6 left-1/2 -translate-x-1/2 text-slate-900 dark:text-white font-black tracking-widest text-sm uppercase z-[110] bg-white/20 dark:bg-slate-900/20 backdrop-blur px-4 py-1 rounded-full">
+      {{ selectedImageIndex() + 1 }} / {{ product()?.images?.length }}
     </div>
+    }
   </div>
+</div>
 }
