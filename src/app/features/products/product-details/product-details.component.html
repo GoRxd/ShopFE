@@ -115,7 +115,7 @@
             <span class="text-slate-400 dark:text-slate-500 min-w-[120px]">{{ attr.name }}:</span>
             @if (getAttributeLinkParams(attr.name, attr.value); as link) {
             <a [routerLink]="link.path" [queryParams]="link.queryParams"
-              class="font-bold text-slate-800 dark:text-slate-200 hover:text-primary transition-colors cursor-pointer">
+              class="font-bold text-slate-800 dark:text-slate-200 hover:text-primary transition-colors">
               {{ attr.value }}
             </a>
             } @else {
@@ -220,7 +220,7 @@
 
         <div class="flex flex-col gap-3">
           <button (click)="addToCart()" [disabled]="product.stockQuantity <= 0"
-            class="w-full bg-gradient-to-r from-primary to-primary-dark text-white font-black h-14 rounded-2xl text-lg transition-all flex items-center justify-center gap-3 group active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-400 animate-glow-pulse"
+            class="w-full bg-gradient-to-r from-primary to-primary-dark text-white font-black h-14 rounded-2xl text-lg transition-all flex items-center justify-center gap-3 group active:scale-[0.98] disabled:opacity-50 disabled:bg-slate-400 animate-glow-pulse"
             style="box-shadow: var(--shadow-glow);">
             <lucide-icon [name]="ShoppingCartIcon"
               class="w-6 h-6 group-hover:scale-110 group-hover:rotate-[-10deg] transition-transform"></lucide-icon>
@@ -403,7 +403,7 @@
             <div class="flex justify-center gap-1">
               @for (star of [1,2,3,4,5]; track star) {
               <button (click)="newReviewRating.set(star)"
-                class="transition-all cursor-pointer outline-none hover:scale-110"
+                class="transition-all outline-none hover:scale-110"
                 [class.text-yellow-400]="star <= newReviewRating()" [class.text-slate-300]="star > newReviewRating()">
                 <lucide-icon [name]="StarIcon" class="w-9 h-9"
                   [attr.fill]="star <= newReviewRating() ? 'currentColor' : 'none'"></lucide-icon>
@@ -424,7 +424,7 @@
                 class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none transition-all dark:text-white"></textarea>
             </div>
             <button (click)="submitReview()" [disabled]="!newReviewComment().trim() || submittingReview()"
-              class="w-full bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold h-12 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-primary/20">
+              class="w-full bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold h-12 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
               @if (submittingReview()) {
               <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
               } @else {
@@ -464,7 +464,7 @@
   (click)="closeLightbox()">
   <!-- Close Button -->
   <button (click)="closeLightbox(); $event.stopPropagation()"
-    class="fixed top-6 right-6 w-12 h-12 rounded-full bg-slate-900/10 dark:bg-white/10 hover:bg-slate-900/20 dark:hover:bg-white/20 flex items-center justify-center text-slate-900 dark:text-white transition-all active:scale-95 cursor-pointer z-[110]">
+    class="fixed top-6 right-6 w-12 h-12 rounded-full bg-slate-900/10 dark:bg-white/10 hover:bg-slate-900/20 dark:hover:bg-white/20 flex items-center justify-center text-slate-900 dark:text-white transition-all active:scale-95 z-[110]">
     <lucide-icon [name]="XIcon" class="w-6 h-6"></lucide-icon>
   </button>
 
@@ -479,11 +479,11 @@
     @if (product()?.images && product()?.images!.length > 1) {
     <!-- Navigation Arrows In Lightbox -->
     <button (click)="prevImage(); $event.stopPropagation()"
-      class="fixed left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 md:w-16 h-12 md:h-16 rounded-full bg-white dark:bg-slate-800 shadow-xl flex items-center justify-center text-slate-800 dark:text-white hover:bg-primary hover:text-white transition-all active:scale-95 cursor-pointer z-[110]">
+      class="fixed left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 md:w-16 h-12 md:h-16 rounded-full bg-white dark:bg-slate-800 shadow-xl flex items-center justify-center text-slate-800 dark:text-white hover:bg-primary hover:text-white transition-all active:scale-95 z-[110]">
       <lucide-icon [name]="ChevronLeftIcon" class="w-6 md:w-8 h-6 md:h-8"></lucide-icon>
     </button>
     <button (click)="nextImage(); $event.stopPropagation()"
-      class="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 md:w-16 h-12 md:h-16 rounded-full bg-white dark:bg-slate-800 shadow-xl flex items-center justify-center text-slate-800 dark:text-white hover:bg-primary hover:text-white transition-all active:scale-95 cursor-pointer z-[110]">
+      class="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 md:w-16 h-12 md:h-16 rounded-full bg-white dark:bg-slate-800 shadow-xl flex items-center justify-center text-slate-800 dark:text-white hover:bg-primary hover:text-white transition-all active:scale-95 z-[110]">
       <lucide-icon [name]="ChevronRightIcon" class="w-6 md:w-8 h-6 md:h-8"></lucide-icon>
     </button>
 

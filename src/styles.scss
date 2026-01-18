@@ -54,12 +54,40 @@
   body {
     @apply bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white antialiased;
     font-family: var(--font-sans);
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Premium link styles */
+  /* Professional, targeted cursor styles */
+  a[href],
+  a[routerLink],
+  button:not(:disabled),
+  input[type='button']:not(:disabled),
+  input[type='submit']:not(:disabled),
+  input[type='checkbox'],
+  input[type='radio'],
+  input[type='range'],
+  input[type='file'],
+  label[for],
+  select,
+  summary,
+  [role='button']:not(:disabled),
+  .cursor-pointer {
+    cursor: pointer;
+  }
+
+  h1, h2, h3, h4, h5, h6, p, span:not(.cursor-pointer) {
+    cursor: auto;
+  }
+
+  [disabled],
+  :disabled {
+    cursor: not-allowed !important;
+  }
+
   a {
     @apply transition-colors duration-200;
   }
@@ -75,7 +103,6 @@
 }
 
 @layer components {
-
   /* Premium Button Styles */
   .btn-primary {
     @apply relative overflow-hidden bg-gradient-to-br from-primary to-primary-dark text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed;
@@ -98,7 +125,9 @@
   }
 
   .input-field:focus {
-    box-shadow: var(--shadow-soft), 0 0 0 3px rgba(26, 86, 219, 0.1);
+    box-shadow:
+      var(--shadow-soft),
+      0 0 0 3px rgba(26, 86, 219, 0.1);
   }
 
   /* Premium Card Styles */
@@ -136,10 +165,8 @@
 }
 
 @layer utilities {
-
   /* Hide spin buttons in number inputs */
   .no-spin-buttons {
-
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
       -webkit-appearance: none;
@@ -149,8 +176,7 @@
     -moz-appearance: textfield;
   }
 
-  input[type=number] {
-
+  input[type='number'] {
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
       -webkit-appearance: none;
@@ -262,12 +288,14 @@
   /* Premium borders */
   .border-gradient {
     border: 1px solid transparent;
-    background: linear-gradient(white, white) padding-box,
+    background:
+      linear-gradient(white, white) padding-box,
       linear-gradient(135deg, rgba(26, 86, 219, 0.3), rgba(245, 158, 11, 0.3)) border-box;
   }
 
   .dark .border-gradient {
-    background: linear-gradient(theme('colors.slate.900'), theme('colors.slate.900')) padding-box,
+    background:
+      linear-gradient(theme('colors.slate.900'), theme('colors.slate.900')) padding-box,
       linear-gradient(135deg, rgba(26, 86, 219, 0.5), rgba(245, 158, 11, 0.5)) border-box;
   }
 }
@@ -318,7 +346,6 @@
 }
 
 @keyframes glowPulse {
-
   0%,
   100% {
     box-shadow: 0 8px 30px rgba(26, 86, 219, 0.3);
@@ -331,7 +358,6 @@
 
 /* Loading skeleton enhancement */
 @keyframes skeletonPulse {
-
   0%,
   100% {
     opacity: 1;
